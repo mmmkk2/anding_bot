@@ -87,7 +87,7 @@ def main_check_payment():
     try:
         driver = create_driver()
     except Exception as e:
-        send_telegram_and_log(f"[ChromeDriver 오류] 드라이버 생성 실패: {e}")
+        # send_telegram_and_log(f"[ChromeDriver 오류] 드라이버 생성 실패: {e}")
         return
     now_full_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -101,7 +101,7 @@ def main_check_payment():
 
     try:
         if not login(driver):
-            send_telegram_and_log("[결제] 로그인 실패")
+            # send_telegram_and_log("[결제] 로그인 실패")
             return
 
         driver.get(PAYMENT_URL)
@@ -121,7 +121,16 @@ def main_check_payment():
 
         payments_today = []
         new_payments = []
+
         today_str = datetime.now().strftime("%Y.%m.%d")
+
+        # 로그 파일 날짜가 오늘이 아니면 초기화
+        if os.path.exists(PAYMENT_LOG_FILE):
+            last_modified = datetime.fromtimestamp(os.path.getmtime(PAYMENT_LOG_FILE)).strftime("%Y.%m.%d")
+            if last_modified != today_str:
+                with open(PAYMENT_LOG_FILE, "w", newline='', encoding="utf-8") as f:
+                    writer = csv.DictWriter(f, fieldnames=["datetime", "payment_id", "name", "amount", "product", "date"])
+                    writer.writeheader()
 
         for row in rows:
             cols = row.find_elements("tag name", "td")
@@ -145,8 +154,8 @@ def main_check_payment():
                 }
                 new_payments.append(payment_record)
 
-                payment_message = f"[결제 발생] 결제번호: {payment_id} / 이름: {name} / 금액: {amount}원 / 상품: {product} / 시간: {date}"
-                send_telegram_and_log(payment_message, broadcast=True)
+                # payment_message = f"[결제 발생] 결제번호: {payment_id} / 이름: {name} / 금액: {amount}원 / 상품: {product} / 시간: {date}"
+                # send_telegram_and_log(payment_message, broadcast=True)
 
         if new_payments:
             os.makedirs("dashboard_log", exist_ok=True)
@@ -233,12 +242,13 @@ def main_check_payment():
 
         if new_payments:
             plain_summary = f"[오늘 결제] 총 {total_count}건, {total_amount:,}원"
-            send_telegram_and_log(plain_summary, broadcast=True)
+            # send_telegram_and_log(plain_summary, broadcast=True)
 
-        send_telegram_and_log(f"{location_tag} ✅ [결제 - 모니터링] 정상 종료되었습니다.")
+        # send_telegram_and_log(f"{location_tag} ✅ [결제 - 모니터링] 정상 종료되었습니다.")
 
     except Exception as e:
-        send_telegram_and_log(f"[payment_check 오류] {e}")
+        # send_telegram_and_log(f"[payment_check 오류] {e}")
+        pass
     finally:
         driver.quit()
 
