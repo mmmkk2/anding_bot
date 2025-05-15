@@ -26,8 +26,8 @@ try:
 except:
     pass
 
-COOKIE_FILE = os.getenv("COOKIE_FILE") or "log/last_payment_id.pkl"
-SEAT_CACHE_FILE = os.getenv("SEAT_CACHE_FILE") or "log/last_seat_state.pkl"
+COOKIE_FILE = os.getenv("COOKIE_FILE") or "/home/mmkkshim/anding_bot/log/last_payment_id.pkl"
+SEAT_CACHE_FILE = os.getenv("SEAT_CACHE_FILE") or "/home/mmkkshim/anding_bot/log/last_seat_state.pkl"
 
 FIX_SEATS = int(os.getenv("FIX_SEATS", 5))
 LAPTOP_SEATS = int(os.getenv("LAPTOP_SEATS", 6))
@@ -104,7 +104,7 @@ def check_seat_status(driver):
         status_emoji = "🟢"
 
     # === 좌석 기록 저장
-    log_path = "log/seat_history.csv"
+    log_path = "/home/mmkkshim/anding_bot/log/seat_history.csv"
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
     with open(log_path, "a", encoding="utf-8") as f:
         now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
@@ -203,7 +203,7 @@ import requests
 import socket
 
 def save_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
-    history_path = "log/seat_history.csv"
+    history_path = "/home/mmkkshim/anding_bot/log/seat_history.csv"
     history_rows = []
     if os.path.exists(history_path):
         with open(history_path, "r", encoding="utf-8") as f:
@@ -319,7 +319,7 @@ def save_dashboard_html(used_free, total_free, used_laptop, total_laptop, remain
     </body>
     </html>
     """
-    with open("seat_dashboard.html", "w", encoding="utf-8") as f:
+    with open("/home/mmkkshim/anding_bot/seat_dashboard.html", "w", encoding="utf-8") as f:
         f.write(html)
         
 
@@ -392,7 +392,7 @@ def check_payment_status(driver):
     return msg
 
 def save_payment_dashboard_html(payments):
-    history_path = "log/payment_history.csv"
+    history_path = "/home/mmkkshim/anding_bot/log/payment_history.csv"
     os.makedirs(os.path.dirname(history_path), exist_ok=True)
     with open(history_path, "a", encoding="utf-8") as f:
         for p in payments:
@@ -464,7 +464,7 @@ def save_payment_dashboard_html(payments):
     </body>
     </html>
     """
-    with open("payment_dashboard.html", "w", encoding="utf-8") as f:
+    with open("/home/mmkkshim/anding_bot/payment_dashboard.html", "w", encoding="utf-8") as f:
         f.write(html)
 
 
