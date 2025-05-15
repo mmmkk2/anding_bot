@@ -134,7 +134,7 @@ def main_check_payment():
             date = cols[7].text.strip()
             product = cols[4].text.strip()
 
-            if today_str in date:
+            if today_str in date and payment_id not in existing_ids:
                 payment_record = {
                     'datetime': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     'payment_id': payment_id,
@@ -143,12 +143,10 @@ def main_check_payment():
                     'product': product,
                     'date': date
                 }
-                payments_today.append(payment_record)
+                new_payments.append(payment_record)
 
-                if payment_id not in existing_ids:
-                    new_payments.append(payment_record)
-                    payment_message = f"[결제 발생] 결제번호: {payment_id} / 이름: {name} / 금액: {amount}원 / 상품: {product} / 시간: {date}"
-                    send_telegram_and_log(payment_message, broadcast=True)
+                payment_message = f"[결제 발생] 결제번호: {payment_id} / 이름: {name} / 금액: {amount}원 / 상품: {product} / 시간: {date}"
+                send_telegram_and_log(payment_message, broadcast=True)
 
         if new_payments:
             os.makedirs("dashboard_log", exist_ok=True)
