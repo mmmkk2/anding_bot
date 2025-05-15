@@ -1,6 +1,4 @@
-from set import login, find_location, create_driver, send_broadcast_and_update, send_telegram_and_log
-
-
+from module.set import login, find_location, create_driver, send_broadcast_and_update, send_telegram_and_log
 
 import os
 import time
