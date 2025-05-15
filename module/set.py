@@ -214,14 +214,14 @@ def create_driver():
     # chrome_options.binary_location = "/home/mmkkshim/bin/chromium_custom"
 
     # 2. Headless 모드 설정
-    chrome_options.add_argument("--headless")  # 최신 Headless 모드 (Chrome 109+)
+    chrome_options.add_argument("--headless=new")  # 최신 Headless 모드 (Chrome 109+)
 
     # 3. 필수 안정성 옵션
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
-    
+
     # 4. 사용자 데이터 디렉토리를 임시로 생성
     # user_data_dir = tempfile.mkdtemp()
     # chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
