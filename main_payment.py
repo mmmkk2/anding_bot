@@ -112,8 +112,15 @@ def main_check_payment():
             update_dashboard("payment", "(결제 데이터 없음)")
             return
 
+        existing_ids = set()
+        if os.path.exists(PAYMENT_LOG_FILE):
+            with open(PAYMENT_LOG_FILE, "r", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    existing_ids.add(row.get("payment_id", "").strip())
+
         payments_today = []
-        new_payment_detected = False
+        new_payments = []
         today_str = datetime.now().strftime("%Y.%m.%d")
 
         for row in rows:
@@ -128,37 +135,29 @@ def main_check_payment():
             product = cols[4].text.strip()
 
             if today_str in date:
-                payments_today.append({
+                payment_record = {
                     'datetime': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     'payment_id': payment_id,
                     'name': name,
                     'amount': amount,
                     'product': product,
                     'date': date
-                })
-                new_payment_detected = True
-                payment_message = f"[결제 발생] 결제번호: {payment_id} / 이름: {name} / 금액: {amount}원 / 상품: {product} / 시간: {date}"
-                send_telegram_and_log(payment_message, broadcast=True)
+                }
+                payments_today.append(payment_record)
 
-        if payments_today:
+                if payment_id not in existing_ids:
+                    new_payments.append(payment_record)
+                    payment_message = f"[결제 발생] 결제번호: {payment_id} / 이름: {name} / 금액: {amount}원 / 상품: {product} / 시간: {date}"
+                    send_telegram_and_log(payment_message, broadcast=True)
+
+        if new_payments:
             os.makedirs("dashboard_log", exist_ok=True)
-
-            existing_ids = set()
-            if os.path.exists(PAYMENT_LOG_FILE):
-                with open(PAYMENT_LOG_FILE, "r", encoding="utf-8") as f:
-                    reader = csv.DictReader(f)
-                    for row in reader:
-                        existing_ids.add(row.get("payment_id", "").strip())
-
-            new_payments = [p for p in payments_today if p['payment_id'] not in existing_ids]
-
-            if new_payments:
-                file_exists = os.path.exists(PAYMENT_LOG_FILE)
-                with open(PAYMENT_LOG_FILE, "a", newline='', encoding="utf-8") as f:
-                    writer = csv.DictWriter(f, fieldnames=new_payments[0].keys())
-                    if not file_exists:
-                        writer.writeheader()
-                    writer.writerows(new_payments)
+            file_exists = os.path.exists(PAYMENT_LOG_FILE)
+            with open(PAYMENT_LOG_FILE, "a", newline='', encoding="utf-8") as f:
+                writer = csv.DictWriter(f, fieldnames=new_payments[0].keys())
+                if not file_exists:
+                    writer.writeheader()
+                writer.writerows(new_payments)
 
         total_count, total_amount, payments = get_today_payment_summary()
         table_html = generate_html_table(payments)
@@ -234,7 +233,7 @@ def main_check_payment():
         with open("payment_dashboard.html", "w", encoding="utf-8") as f:
             f.write(summary_msg)
 
-        if new_payment_detected:
+        if new_payments:
             plain_summary = f"[오늘 결제] 총 {total_count}건, {total_amount:,}원"
             send_telegram_and_log(plain_summary, broadcast=True)
 
