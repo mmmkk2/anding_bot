@@ -5,6 +5,11 @@ import csv
 from datetime import datetime
 from module.set import create_driver, login, send_telegram_and_log, update_dashboard, find_location
 
+# Load .env configuration file path from environment variable if provided
+from dotenv import load_dotenv
+dotenv_path = os.getenv("DOTENV_PATH", "/home/mmkkshim/anding_bot/.env")
+load_dotenv(dotenv_path)
+
 PAYMENT_LOG_FILE = "dashboard_log/payment_log.csv"
 COOKIE_FILE = "log/last_payment_id.pkl"
 BASE_URL = "https://partner.cobopay.co.kr"
@@ -79,7 +84,11 @@ def main_check_payment():
 
     send_telegram_and_log(f"{location_tag} 📢 [결제 - 모니터링] 시작합니다.")
 
-    driver = create_driver()
+    try:
+        driver = create_driver()
+    except Exception as e:
+        send_telegram_and_log(f"[ChromeDriver 오류] 드라이버 생성 실패: {e}")
+        return
     now_full_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     loop_msg = (
