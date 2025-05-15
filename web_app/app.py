@@ -34,9 +34,16 @@ def combined_dashboard():
             }}
             .dashboard-container {{
                 display: flex;
-                flex-wrap: wrap;
-                gap: 1rem;
+                gap: 2rem;
                 justify-content: center;
+                align-items: flex-start;
+                flex-direction: column;
+            }}
+
+            @media (min-width: 1000px) {{
+                .dashboard-container {{
+                    flex-direction: row;
+                }}
             }}
             .dashboard-box {{
                 flex: 1 1 600px;
@@ -60,7 +67,8 @@ def combined_dashboard():
         <div class='dashboard-container'>
             <div class='dashboard-box'>
                 <iframe src='/seat' style='height: auto; min-height: 700px; max-height: 1000px;'></iframe>
-            <div class='dashboard-box''>
+            </div>
+            <div class='dashboard-box'>
                 <iframe src='/payment' style='height: 1000px;'></iframe>
             </div>
         </div>

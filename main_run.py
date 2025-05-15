@@ -1,3 +1,4 @@
+import sys
 from module.set import login, find_location, create_driver, send_broadcast_and_update, send_telegram_and_log
 
 import os
@@ -320,8 +321,190 @@ def save_dashboard_html(used_free, total_free, used_laptop, total_laptop, remain
     with open("seat_dashboard.html", "w", encoding="utf-8") as f:
         f.write(html)
         
-if __name__ == "__main__":
 
+# === Payment logic merged from main_payment.py ===
+
+PAYMENT_URL = f"{BASE_URL}/pay/paymentList"
+PAYMENT_CACHE_FILE = COOKIE_FILE
+
+def check_payment_status(driver):
+    driver.get(PAYMENT_URL)
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
+
+    payments = []
+
+    while True:
+        rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+        for row in rows:
+            cols = row.find_elements(By.TAG_NAME, "td")
+            if len(cols) < 6:
+                continue
+            payment_id = cols[0].text.strip()
+            payment_date = cols[1].text.strip()
+            user_name = cols[2].text.strip()
+            seat_type = cols[3].text.strip()
+            amount = cols[4].text.strip()
+            status = cols[5].text.strip()
+            payments.append({
+                "id": payment_id,
+                "date": payment_date,
+                "user": user_name,
+                "seat_type": seat_type,
+                "amount": amount,
+                "status": status
+            })
+        try:
+            next_btn = driver.find_element(By.CSS_SELECTOR, 'ul.pagination li.active + li a')
+            if "javascript:;" in next_btn.get_attribute("href"):
+                break
+            next_btn.click()
+            time.sleep(1)
+        except:
+            break
+
+    # Load last payment id to detect new payments
+    last_payment_id = None
+    if os.path.exists(PAYMENT_CACHE_FILE):
+        with open(PAYMENT_CACHE_FILE, "rb") as f:
+            last_payment_id = pickle.load(f)
+
+    new_payments = []
+    for payment in payments:
+        if last_payment_id is None or payment["id"] > last_payment_id:
+            new_payments.append(payment)
+
+    # Save latest payment id
+    if payments:
+        with open(PAYMENT_CACHE_FILE, "wb") as f:
+            pickle.dump(payments[0]["id"], f)
+
+    # Compose message for new payments
+    msg_lines = []
+    for p in new_payments:
+        msg_lines.append(f"결제 ID: {p['id']}, 사용자: {p['user']}, 좌석: {p['seat_type']}, 금액: {p['amount']}, 상태: {p['status']}")
+
+    msg = "[결제 알림]\n" + "\n".join(msg_lines) if msg_lines else "새로운 결제 내역이 없습니다."
+
+    # Save payment dashboard html
+    save_payment_dashboard_html(payments)
+
+    return msg
+
+def save_payment_dashboard_html(payments):
+    history_path = "log/payment_history.csv"
+    os.makedirs(os.path.dirname(history_path), exist_ok=True)
+    with open(history_path, "a", encoding="utf-8") as f:
+        for p in payments:
+            f.write(f"{p['id']},{p['date']},{p['user']},{p['seat_type']},{p['amount']},{p['status']}\n")
+
+    now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
+    rows_html = ""
+    for p in payments[:20]:
+        rows_html += f"<tr><td>{p['id']}</td><td>{p['date']}</td><td>{p['user']}</td><td>{p['seat_type']}</td><td>{p['amount']}</td><td>{p['status']}</td></tr>"
+
+    html = f"""
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>앤딩스터디카페 결제 내역</title>
+        <meta http-equiv="refresh" content="60" />
+        <style>
+            body {{
+                font-family: 'Apple SD Gothic Neo', 'Arial', sans-serif;
+                background: #f4f4f4;
+                margin: 0;
+                padding: 1rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }}
+            table {{
+                border-collapse: collapse;
+                width: 90%;
+                max-width: 800px;
+                background: white;
+                border-radius: 1rem;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            }}
+            th, td {{
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: center;
+            }}
+            th {{
+                background-color: #4CAF50;
+                color: white;
+            }}
+            caption {{
+                font-size: 1.5rem;
+                margin: 1rem 0;
+                font-weight: bold;
+                color: #333;
+            }}
+        </style>
+    </head>
+    <body>
+        <table>
+            <caption>🧾 결제 내역 (최근 20건)</caption>
+            <thead>
+                <tr>
+                    <th>ID</th><th>날짜</th><th>사용자</th><th>좌석 유형</th><th>금액</th><th>상태</th>
+                </tr>
+            </thead>
+            <tbody>
+                {rows_html}
+            </tbody>
+        </table>
+        <div style="text-align:center; margin-top:1rem; color:#888;">업데이트 시각: {now_str}</div>
+    </body>
+    </html>
+    """
+    with open("payment_dashboard.html", "w", encoding="utf-8") as f:
+        f.write(html)
+
+
+def main_check_payment():
+
+    # ✅ 인증번호 파일 초기화
+    if os.path.exists("auth_code.txt"):
+        os.remove("auth_code.txt")
+
+    loop_min = 5
+    total_loops = 1440 // loop_min
+    now = datetime.now()
+    minutes_since_midnight = now.hour * 60 + now.minute
+    current_loop = (minutes_since_midnight // loop_min) + 1
+
+    location_tag = find_location()
+    send_telegram_and_log(f"📢 [결제 - 모니터링] 시작합니다.")
+
+    driver = create_driver()
+
+    try:
+        if login(driver):
+            payment_status_msg = check_payment_status(driver)
+            now_full_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            loop_msg = (
+                f"\n\n🧾 결제 모니터링 정상 동작 중\n"
+                f"Loop {current_loop}/{total_loops}\n"
+                f"⏰ 날짜 + 실행 시각: {now_full_str}"
+            )
+            full_msg = loop_msg + "\n\n" + payment_status_msg
+            send_broadcast_and_update(full_msg, broadcast=False, category="payment")
+
+            send_telegram_and_log(f"{location_tag} ✅ [결제 - 모니터링] 정상 종료되었습니다.")
+        else:
+            send_broadcast_and_update("❌ [결제] 로그인 실패", broadcast=False, category="payment")
+    except Exception as e:
+        send_broadcast_and_update(f"❌ [결제 오류] {e}", broadcast=False, category="payment")
+    finally:
+        driver.quit()
+
+
+if __name__ == "__main__":
     ip = requests.get("https://api.ipify.org").text
     print(f"현재 외부 IP 주소: {ip}")
     print(f"📡 Running on hostname: {socket.gethostname()}")
@@ -330,4 +513,8 @@ if __name__ == "__main__":
     # listener_thread = threading.Thread(target=start_telegram_listener, daemon=True)
     # listener_thread.start()
 
-    main_check_seat()
+    if "seat" in sys.argv:
+        main_check_seat()
+
+    if "payment" in sys.argv:
+        main_check_payment()
