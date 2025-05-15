@@ -215,6 +215,13 @@ def save_dashboard_html(used_free, total_free, used_laptop, total_laptop, remain
         if len(parts) >= 2:
             timestamps.append(parts[0])
             used_frees.append(int(parts[1]))
+    # Determine line color based on status_emoji
+    if status_emoji == "🔴":
+        line_color = 'rgba(255, 99, 132, 1)'  # red
+    elif status_emoji == "🟡":
+        line_color = 'rgba(255, 206, 86, 1)'  # yellow
+    else:
+        line_color = 'rgba(75, 192, 192, 1)'  # green
     chart_script = f"""
     <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
     <script>
@@ -226,7 +233,7 @@ def save_dashboard_html(used_free, total_free, used_laptop, total_laptop, remain
                 datasets: [{{
                     label: '자유석 사용 수',
                     data: {used_frees},
-                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderColor: '{line_color}',
                     tension: 0.1
                 }}]
             }},
