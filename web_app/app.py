@@ -4,6 +4,47 @@ import os
 app = Flask(__name__)
 
 @app.route("/")
+def combined_dashboard():
+    seat_path = "/home/mmkkshim/anding_bot/seat_dashboard.html"
+    payment_path = "/home/mmkkshim/anding_bot/payment_dashboard.html"
+
+    seat_html = ""
+    payment_html = ""
+
+    if os.path.exists(seat_path):
+        with open(seat_path, "r", encoding="utf-8") as f:
+            seat_html = f.read()
+    if os.path.exists(payment_path):
+        with open(payment_path, "r", encoding="utf-8") as f:
+            payment_html = f.read()
+
+    combined_html = f"""
+    <!DOCTYPE html>
+    <html lang='ko'>
+    <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <title>앤딩스터디카페 통합 대시보드</title>
+        <style>
+            body {{
+                margin: 0;
+                padding: 1rem;
+                background: #f4f4f4;
+                font-family: Arial, sans-serif;
+            }}
+            .section {{
+                margin-bottom: 2rem;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class='section'>{seat_html}</div>
+        <div class='section'>{payment_html}</div>
+    </body>
+    </html>
+    """
+    return combined_html
+
 @app.route("/seat")
 def seat_dashboard():
     dashboard_path = "/home/mmkkshim/anding_bot/seat_dashboard.html"
