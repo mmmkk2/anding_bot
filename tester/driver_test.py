@@ -1,4 +1,4 @@
-from set import create_driver  # 이미 작성한 create_driver 함수 불러오기
+from module.set import create_driver  # 이미 작성한 create_driver 함수 불러오기
 from selenium.webdriver.common.by import By
 
 try:
