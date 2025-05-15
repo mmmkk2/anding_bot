@@ -59,7 +59,7 @@ def combined_dashboard():
     <body>
         <div class='dashboard-container'>
             <div class='dashboard-box' style='align-items: flex-start;'>
-                <iframe src='/seat' style='height: auto; min-height: 500px;'></iframe>
+                <iframe src='/seat' style='height: 1000px;'></iframe>
             </div>
             <div class='dashboard-box'>
                 <iframe src='/payment' style='height: 1000px;'></iframe>
