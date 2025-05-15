@@ -258,7 +258,7 @@ def save_dashboard_html(used_free, total_free, used_laptop, total_laptop, remain
     <html lang="ko">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <title>앤딩스터디카페 좌석 현황</title>
         <meta http-equiv="refresh" content="60">
         <style>
@@ -269,8 +269,9 @@ def save_dashboard_html(used_free, total_free, used_laptop, total_laptop, remain
                 padding: 1rem;
                 display: flex;
                 justify-content: center;
-                align-items: center;
-                height: 100vh;
+                align-items: flex-start;
+                min-height: 100vh;
+                box-sizing: border-box;
             }}
             .box {{
                 background: white;
@@ -407,7 +408,7 @@ def save_payment_dashboard_html(payments):
     <html lang="ko">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <title>앤딩스터디카페 결제 내역</title>
         <meta http-equiv="refresh" content="60" />
         <style>
@@ -418,8 +419,9 @@ def save_payment_dashboard_html(payments):
                 padding: 1rem;
                 display: flex;
                 justify-content: center;
-                align-items: center;
-                height: 100vh;
+                align-items: flex-start;
+                min-height: 100vh;
+                box-sizing: border-box;
             }}
             table {{
                 border-collapse: collapse;
