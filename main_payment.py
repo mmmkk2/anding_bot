@@ -64,6 +64,11 @@ def generate_html_table(payments):
     return html
 
 def main_check_payment():
+
+    # ✅ 인증번호 파일 초기화
+    if os.path.exists("auth_code.txt"):
+        os.remove("auth_code.txt")
+            
     loop_min = 5
     total_loops = 1440 // loop_min
     now = datetime.now()
