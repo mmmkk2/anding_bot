@@ -142,10 +142,23 @@ def main_check_payment():
 
         if payments_today:
             os.makedirs("dashboard_log", exist_ok=True)
-            with open(PAYMENT_LOG_FILE, "w", newline='', encoding="utf-8") as f:
-                writer = csv.DictWriter(f, fieldnames=payments_today[0].keys())
-                writer.writeheader()
-                writer.writerows(payments_today)
+
+            existing_ids = set()
+            if os.path.exists(PAYMENT_LOG_FILE):
+                with open(PAYMENT_LOG_FILE, "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        existing_ids.add(row.get("payment_id", "").strip())
+
+            new_payments = [p for p in payments_today if p['payment_id'] not in existing_ids]
+
+            if new_payments:
+                file_exists = os.path.exists(PAYMENT_LOG_FILE)
+                with open(PAYMENT_LOG_FILE, "a", newline='', encoding="utf-8") as f:
+                    writer = csv.DictWriter(f, fieldnames=new_payments[0].keys())
+                    if not file_exists:
+                        writer.writeheader()
+                    writer.writerows(new_payments)
 
         total_count, total_amount, payments = get_today_payment_summary()
         table_html = generate_html_table(payments)
