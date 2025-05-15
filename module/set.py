@@ -221,8 +221,7 @@ def create_driver():
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.add_argument("--remote-debugging-port=9222")  # DevToolsActivePort 문제 우회
-
+    
     # 4. 사용자 데이터 디렉토리를 임시로 생성
     # user_data_dir = tempfile.mkdtemp()
     # chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
