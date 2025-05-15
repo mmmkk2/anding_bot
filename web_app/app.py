@@ -47,7 +47,7 @@ def combined_dashboard():
                 overflow: hidden;
                 display: flex;
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
             }}
             iframe {{
                 width: 100%;
