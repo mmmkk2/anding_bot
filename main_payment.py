@@ -63,7 +63,7 @@ def generate_html_table(payments):
     html += "</table>"
     return html
 
-def main_check_payment(headless=False):
+def main_check_payment():
     loop_min = 5
     total_loops = 1440 // loop_min
     now = datetime.now()
@@ -74,7 +74,7 @@ def main_check_payment(headless=False):
 
     send_telegram_and_log(f"{location_tag} 📢 [결제 - 모니터링] 시작합니다.")
 
-    driver = create_driver(headless=headless)
+    driver = create_driver()
     now_full_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     loop_msg = (
@@ -166,4 +166,4 @@ def main_check_payment(headless=False):
         driver.quit()
 
 if __name__ == "__main__":
-    main_check_payment(headless=True)
+    main_check_payment()
