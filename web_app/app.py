@@ -30,16 +30,30 @@ def combined_dashboard():
                 margin: 0;
                 padding: 1rem;
                 background: #f4f4f4;
-                font-family: Arial, sans-serif;
+                font-family: 'Apple SD Gothic Neo', Arial, sans-serif;
             }}
-            .section {{
-                margin-bottom: 2rem;
+            .dashboard-container {{
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+                justify-content: center;
+            }}
+            .dashboard-box {{
+                background: white;
+                border-radius: 1rem;
+                padding: 1.5rem;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                flex: 1 1 600px;
+                max-width: 600px;
+                box-sizing: border-box;
             }}
         </style>
     </head>
     <body>
-        <div class='section'>{seat_html}</div>
-        <div class='section'>{payment_html}</div>
+        <div class='dashboard-container'>
+            <div class='dashboard-box'>{seat_html}</div>
+            <div class='dashboard-box'>{payment_html}</div>
+        </div>
     </body>
     </html>
     """
