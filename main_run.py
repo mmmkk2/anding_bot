@@ -399,9 +399,13 @@ def save_payment_dashboard_html(payments):
             f.write(f"{p['id']},{p['date']},{p['user']},{p['seat_type']},{p['amount']},{p['status']}\n")
 
     now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
-    rows_html = ""
-    for p in payments[:20]:
-        rows_html += f"<tr><td>{p['id']}</td><td>{p['date']}</td><td>{p['user']}</td><td>{p['seat_type']}</td><td>{p['amount']}</td><td>{p['status']}</td></tr>"
+    # If payments is empty, show '결제 데이터 없음'
+    if not payments:
+        rows_html = "<tr><td colspan='6'>결제 데이터 없음</td></tr>"
+    else:
+        rows_html = ""
+        for p in payments[:20]:
+            rows_html += f"<tr><td>{p['id']}</td><td>{p['date']}</td><td>{p['user']}</td><td>{p['seat_type']}</td><td>{p['amount']}</td><td>{p['status']}</td></tr>"
 
     html = f"""
     <!DOCTYPE html>
