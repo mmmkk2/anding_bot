@@ -41,15 +41,16 @@ def combined_dashboard():
             .dashboard-box {{
                 flex: 1 1 600px;
                 max-width: 600px;
-                height: 1000px;  /* ✔️ 높이 통일 */
                 border-radius: 1rem;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                overflow: hidden;
                 background: white;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
             }}
             iframe {{
                 width: 100%;
-                height: 100%;
                 border: none;
                 display: block;
             }}
@@ -57,11 +58,11 @@ def combined_dashboard():
     </head>
     <body>
         <div class='dashboard-container'>
-            <div class='dashboard-box'>
-                <iframe src='/seat'></iframe>
+            <div class='dashboard-box' style='align-items: flex-start;'>
+                <iframe src='/seat' style='height: auto; min-height: 500px;'></iframe>
             </div>
             <div class='dashboard-box'>
-                <iframe src='/payment'></iframe>
+                <iframe src='/payment' style='height: 1000px;'></iframe>
             </div>
         </div>
     </body>
