@@ -1,2 +1,4 @@
 # 환경 변수 파일 (민감정보)
 .env
+/local_backup/
+/tester/
