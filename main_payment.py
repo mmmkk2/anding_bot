@@ -237,7 +237,7 @@ def main_check_payment():
                 <h3>💳 오늘 결제 현황</h3>
                 <p>📅 날짜: {today_str}</p>
                 <p>🧾 총 결제: <b>{total_count}건 / {total_amount:,}원</b></p>
-                <p>⏰ 실행 시각: {now_time_str}</p>
+                <div class="updated">업데이트 시각: {now_str}</div>
                 <div>{table_html}</div>
             </div>
         </body>
