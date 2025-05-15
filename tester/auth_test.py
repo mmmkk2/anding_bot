@@ -4,11 +4,11 @@ import requests
 from datetime import datetime
 import pytz
 from dotenv import load_dotenv
-from set import login, create_driver  # 필요한 함수만 임포트
+from module.set import login, create_driver  # 필요한 함수만 임포트
 
 # === 환경변수 로드 ===
 try:
-    load_dotenv("/home/mmkkshim/anding-study-bot/.env")
+    load_dotenv("/home/mmkkshim/anding_bot/.env")
 except Exception as e:
     print(f"[.env 로드 실패] {e}")
 

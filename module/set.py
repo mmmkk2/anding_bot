@@ -14,7 +14,7 @@ from selenium.webdriver.chrome.options import Options
 
 # === 환경변수 로드 ===
 try:
-    load_dotenv("/home/mmkkshim/anding-study-bot/.env")
+    load_dotenv("/home/mmkkshim/anding_bot/.env")
 except Exception as e:
     print(f"[.env 로드 실패] {e}")
 
@@ -57,7 +57,7 @@ def send_telegram_and_log(msg, broadcast=False):
 
 auth_code = None  # Event-driven 인증번호 저장 변수
 
-auth_path="/home/mmkkshim/anding-study-bot/auth_code.txt"
+auth_path="/home/mmkkshim/anding_bot/auth_code.txt"
 
 # === 로그인 함수 ===
 def login(driver):

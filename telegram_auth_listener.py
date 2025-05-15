@@ -8,13 +8,13 @@ import asyncio
 
 # === 환경변수 로드 ===
 try:
-    load_dotenv("/home/mmkkshim/anding-study-bot/.env")
+    load_dotenv("/home/mmkkshim/anding_bot/.env")
 except Exception as e:
     print(f"[.env 로드 실패] {e}")
 
 BOT_TOKEN = os.getenv("TELEGRAM_TOKEN")
 EMERGENCY_CHAT_ID = os.getenv("EMERGENCY_CHAT_ID")  # ✅ broadcast용 채팅 ID
-AUTH_CODE_PATH = "/home/mmkkshim/anding-study-bot/auth_code.txt"
+AUTH_CODE_PATH = "/home/mmkkshim/anding_bot/auth_code.txt"
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.from_user.is_bot:

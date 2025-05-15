@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROJECT_DIR="/home/mmkkshim/anding-study-bot"
+PROJECT_DIR="/home/mmkkshim/anding_bot"
 MONITOR="$PROJECT_DIR/main_seat_check3.py"
 
 echo "🔁 combined loop 시작됨: $(date)"

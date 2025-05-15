@@ -19,7 +19,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 # === 설정 ===
 try:
-    load_dotenv("/home/mmkkshim/anding-study-bot/.env")
+    load_dotenv("/home/mmkkshim/anding_bot/.env")
 except:
     pass
 

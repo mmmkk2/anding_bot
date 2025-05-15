@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 경로 설정
-PROJECT_DIR="/home/mmkkshim/anding-study-bot"
+PROJECT_DIR="/home/mmkkshim/anding_bot"
 SCRIPT="$PROJECT_DIR/telegram_auth_listener.py"
 
 while true

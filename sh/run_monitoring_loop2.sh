@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROJECT_DIR="/home/mmkkshim/anding-study-bot"
+PROJECT_DIR="/home/mmkkshim/anding_bot"
 LISTENER="$PROJECT_DIR/telegram_auth_listener.py"
 MONITOR="$PROJECT_DIR/main_seat_check3.py"
 
