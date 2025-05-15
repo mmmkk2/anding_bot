@@ -102,6 +102,15 @@ def check_seat_status(driver):
     else:
         status_emoji = "🟢"
 
+    save_dashboard_html(
+        used_free=used_free_seats,
+        total_free=TOTAL_FREE_SEATS,
+        used_laptop=used_labtop_seats,
+        total_laptop=len(laptop_seat_numbers),
+        remaining=remaining_seats,
+        status_emoji=status_emoji
+    )
+
     # === 메시지 작성
     msg = (
         f"[좌석 알림] {status_emoji}\n"
@@ -184,6 +193,40 @@ def start_telegram_listener():
 
 import requests
 import socket
+
+def save_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
+    now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
+
+    html = f"""
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <title>앤딩스터디카페 좌석 현황</title>
+        <meta http-equiv="refresh" content="60">
+        <style>
+            body {{ font-family: 'Arial'; background: #f4f4f4; padding: 20px; }}
+            .box {{ background: white; border-radius: 10px; padding: 20px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }}
+            h1 {{ text-align: center; color: #333; }}
+            .stat {{ font-size: 1.2em; margin: 10px 0; }}
+            .emoji {{ font-size: 2em; text-align: center; }}
+        </style>
+    </head>
+    <body>
+        <div class="box">
+            <h1>🪑 앤딩스터디카페 좌석 현황</h1>
+            <div class="emoji">{status_emoji}</div>
+            <div class="stat">자유석: {used_free}/{total_free}</div>
+            <div class="stat">노트북석: {used_laptop}/{total_laptop}</div>
+            <div class="stat">남은 자유석: {remaining}석</div>
+            <div class="stat" style="color:gray; font-size:0.9em;">업데이트 시각: {now_str}</div>
+        </div>
+    </body>
+    </html>
+    """
+
+    with open("seat_dashboard.html", "w", encoding="utf-8") as f:
+        f.write(html)
 
 if __name__ == "__main__":
 
