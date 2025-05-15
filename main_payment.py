@@ -165,5 +165,13 @@ def main_check_payment():
     finally:
         driver.quit()
 
+import requests
+import socket
+
 if __name__ == "__main__":
+
+    ip = requests.get("https://api.ipify.org").text
+    print(f"현재 외부 IP 주소: {ip}")
+    print(f"📡 Running on hostname: {socket.gethostname()}")
+
     main_check_payment()
