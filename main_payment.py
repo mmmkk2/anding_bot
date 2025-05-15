@@ -156,17 +156,70 @@ def main_check_payment():
 
         # ✅ seat 스타일로 통일된 dashboard HTML
         summary_msg = f"""
-        <div style="font-family: Arial, sans-serif; font-size: 14px;">
-          <h3>💳 오늘 결제 현황</h3>
-          <p>📅 날짜: {today_str}</p>
-          <p>🧾 총 결제: <b>{total_count}건 / {total_amount:,}원</b></p>
-          <p>⏰ 실행 시각: {now_time_str}</p>
-          <hr/>
-          {table_html}
-        </div>
+        <!DOCTYPE html>
+        <html lang="ko">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>앤딩스터디카페 결제 현황</title>
+            <style>
+                body {{
+                    font-family: 'Apple SD Gothic Neo', 'Arial', sans-serif;
+                    background: #f4f4f4;
+                    margin: 0;
+                    padding: 1rem;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }}
+                .box {{
+                    background: white;
+                    border-radius: 1rem;
+                    padding: 1.5rem;
+                    max-width: 600px;
+                    width: 100%;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                    text-align: center;
+                    font-size: 14px;
+                }}
+                h3 {{
+                    margin-bottom: 1rem;
+                }}
+                table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 13px;
+                    margin-top: 1rem;
+                }}
+                th, td {{
+                    border: 1px solid #ddd;
+                    padding: 6px;
+                }}
+                th {{
+                    background-color: #f0f0f0;
+                }}
+                .updated {{
+                    font-size: 0.85rem;
+                    color: #888;
+                    margin-top: 1rem;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="box">
+                <h3>💳 오늘 결제 현황</h3>
+                <p>📅 날짜: {today_str}</p>
+                <p>🧾 총 결제: <b>{total_count}건 / {total_amount:,}원</b></p>
+                <p>⏰ 실행 시각: {now_time_str}</p>
+                <div>{table_html}</div>
+            </div>
+        </body>
+        </html>
         """
 
         update_dashboard("payment", summary_msg)
+        with open("payment_dashboard.html", "w", encoding="utf-8") as f:
+            f.write(summary_msg)
 
         if new_payment_detected:
             plain_summary = f"[오늘 결제] 총 {total_count}건, {total_amount:,}원"
