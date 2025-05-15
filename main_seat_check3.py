@@ -20,7 +20,8 @@ import telegram_auth_listener
 
 # === 설정 ===
 try:
-    load_dotenv("/home/mmkkshim/anding-study-bot/.env")
+    load_dotenv("/home/mmkkshim/anding_bot/.env")
+    
 except:
     pass
 
