@@ -39,20 +39,30 @@ def combined_dashboard():
                 justify-content: center;
             }}
             .dashboard-box {{
-                background: white;
-                border-radius: 1rem;
-                padding: 1.5rem;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 flex: 1 1 600px;
                 max-width: 600px;
-                box-sizing: border-box;
+                height: 900px;
+                border: none;
+                border-radius: 1rem;
+                overflow: hidden;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            }}
+            iframe {{
+                width: 100%;
+                height: 100%;
+                border: none;
+                border-radius: 1rem;
             }}
         </style>
     </head>
     <body>
         <div class='dashboard-container'>
-            <div class='dashboard-box'>{seat_html}</div>
-            <div class='dashboard-box'>{payment_html}</div>
+            <div class='dashboard-box'>
+                <iframe src='/seat'></iframe>
+            </div>
+            <div class='dashboard-box'>
+                <iframe src='/payment'></iframe>
+            </div>
         </div>
     </body>
     </html>
