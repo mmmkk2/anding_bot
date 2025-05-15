@@ -102,6 +102,13 @@ def check_seat_status(driver):
     else:
         status_emoji = "🟢"
 
+    # === 좌석 기록 저장
+    log_path = "log/seat_history.csv"
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+    with open(log_path, "a", encoding="utf-8") as f:
+        now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
+        f.write(f"{now_str},{used_free_seats}\n")
+
     save_dashboard_html(
         used_free=used_free_seats,
         total_free=TOTAL_FREE_SEATS,
