@@ -170,6 +170,7 @@ def save_payment_dashboard_html(payments):
                 box-sizing: border-box;
                 justify-content: center;
                 text-align: center;  /* 텍스트 정렬 보정 */
+                max-width: 100vw;
             }}
             .box {{
                 background: white;
