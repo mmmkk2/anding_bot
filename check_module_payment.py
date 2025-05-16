@@ -177,7 +177,7 @@ def save_payment_dashboard_html(payments):
                 border-radius: 1rem;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 padding: 1.5rem;
-                max-width: 400px;
+                max-width: 600px;
                 width: 100%;
                 text-align: center;
             }}
