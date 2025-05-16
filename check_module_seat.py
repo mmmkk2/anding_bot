@@ -263,7 +263,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 font-family: 'Apple SD Gothic Neo', 'Arial', sans-serif;
                 background: #f1f3f5;
                 margin: 0;
-                padding: 2rem;
+                padding: 1rem;
                 display: flex;
                 justify-content: center;
                 align-items: flex-start;
@@ -297,13 +297,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 font-size: 0.8rem;
                 color: #888;
                 margin-top: 1rem;
-            }}
-            /* 📱 모바일 전용 스타일 추가 */
-            @media (max-width: 480px) {{
-              .box {{
-                padding: 1rem;
-                max-width: 95vw;
-              }}
             }}
         </style>
     </head>

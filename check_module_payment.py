@@ -164,7 +164,7 @@ def save_payment_dashboard_html(payments):
             body {{
                 font-family: 'Apple SD Gothic Neo', Arial, sans-serif;
                 background: #f1f3f5;
-                padding: 2rem;
+                padding: 1rem;
                 margin: 0;
                 display: flex;
                 justify-content: center;
@@ -177,7 +177,7 @@ def save_payment_dashboard_html(payments):
                 background: white;
                 border-radius: 1rem;
                 padding: 1rem;
-                max-width: 800px;         /* 데스크탑 기준 최대 폭 */
+                max-width: 600px;         /* 데스크탑 기준 최대 폭 */
                 width: 100%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 text-align: center;
