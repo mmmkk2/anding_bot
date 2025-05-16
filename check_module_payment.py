@@ -236,7 +236,7 @@ def save_payment_dashboard_html(payments):
             <table>
                 <thead>
                     <tr>
-                        <th>결제번호</th>
+                        <th>번호</th>
                         <th>이름</th>
                         <th>금액</th>
                         <th>상품</th>
