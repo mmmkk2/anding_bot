@@ -113,6 +113,8 @@ def check_payment_status(driver):
                 f.write(driver.page_source)
             raise Exception(f"❌ [결제 파싱 오류] {e}")
 
+    print(f"PAYMENT_LOG_FILE = {PAYMENT_CACHE_FILE}")
+
     # 마지막으로 읽은 결제 ID와 새 결제 내역 비교
     last_payment_id = None
     if os.path.exists(PAYMENT_CACHE_FILE):
@@ -253,19 +255,19 @@ def main_check_payment():
     if os.path.exists("auth_code.txt"):
         os.remove("auth_code.txt")
 
-
     location_tag = find_location()
-    send_telegram_and_log(f"📢 [결제 - 모니터링] 시작합니다.")
+    # send_telegram_and_log(f"📢 [결제 - 모니터링] 시작합니다.")  # Disabled Telegram notification
 
     driver = create_driver()
 
     try:
         if login(driver):
             check_payment_status(driver)
-            send_telegram_and_log(f"{location_tag} ✅ [결제 - 모니터링] 정상 종료되었습니다.")
+            # send_telegram_and_log(f"{location_tag} ✅ [결제 - 모니터링] 정상 종료되었습니다.")  # Disabled Telegram notification
         else:
             send_broadcast_and_update("❌ [결제] 로그인 실패", broadcast=False, category="payment")
     except Exception as e:
-        send_broadcast_and_update(f"❌ [결제 오류] {e}", broadcast=False, category="payment")
+        # send_broadcast_and_update(f"❌ [결제 오류] {e}", broadcast=False, category="payment")  # Disabled broadcast in except
+        pass
     finally:
         driver.quit()
