@@ -499,15 +499,3 @@ def main_check_payment():
         send_broadcast_and_update(f"❌ [결제 오류] {e}", broadcast=False, category="payment")
     finally:
         driver.quit()
-
-
-if __name__ == "__main__":
-    ip = requests.get("https://api.ipify.org").text
-    print(f"현재 외부 IP 주소: {ip}")
-    print(f"📡 Running on hostname: {socket.gethostname()}")
-
-    # # 인증 리스너를 백그라운드에서 실행
-    # listener_thread = threading.Thread(target=start_telegram_listener, daemon=True)
-    # listener_thread.start()
-
-    main_check_seat()
