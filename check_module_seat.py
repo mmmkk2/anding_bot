@@ -113,7 +113,7 @@ def check_seat_status(driver):
         now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
         f.write(f"{now_str},{used_free_seats}\n")
 
-    save_dashboard_html(
+    save_seat_dashboard_html(
         used_free=used_free_seats,
         total_free=TOTAL_FREE_SEATS,
         used_laptop=used_labtop_seats,
@@ -199,7 +199,7 @@ def start_telegram_listener():
 import requests
 import socket
 
-def save_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
+def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
     history_path = "/home/mmkkshim/anding_bot/log/seat_history.csv"
     history_rows = []
     if os.path.exists(history_path):
@@ -320,35 +320,45 @@ def save_dashboard_html(used_free, total_free, used_laptop, total_laptop, remain
         f.write(html)
         
 
-# === Payment logic merged from main_payment.py ===
 
-PAYMENT_URL = f"{BASE_URL}/pay/paymentList"
-PAYMENT_CACHE_FILE = COOKIE_FILE
-
-def check_payment_status(driver):
     print("[DEBUG] 결제 페이지 진입 시도 중:", PAYMENT_URL)
     time.sleep(2)  # 로그인 후 쿠키 세팅 대기
     driver.get(PAYMENT_URL)
     print("[DEBUG] 페이지 진입 완료")
-    WebDriverWait(driver, 15).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, "table#m_table_1.dataTable"))
-    )
-    time.sleep(1.5)  # JS로 row 생성 시간 확보
+
+    try:
+        # '이름' 컬럼이 있는 테이블이 로드될 때까지 대기 (페이지의 결제 테이블에는 id="m_table_1"가 있음)
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.XPATH, "//table[@id='m_table_1']//th[contains(text(), '이름')]"))
+        )
+        print("[DEBUG] '이름' 컬럼 있는 테이블 로딩 완료")
+        time.sleep(1.5)  # JS에서 row 생성 시간 확보
+    except TimeoutException:
+        with open("debug_payment_timeout.html", "w", encoding="utf-8") as f:
+            f.write(driver.page_source)
+        raise Exception("❌ [결제 오류] '이름' 컬럼이 포함된 테이블을 찾을 수 없습니다.")
 
     payments = []
-
     while True:
-        rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+        # 여기서는 id를 기준으로 테이블 내 tbody의 row들을 모두 가져옵니다.
+        rows = driver.find_elements(By.CSS_SELECTOR, "table#m_table_1 tbody tr")
+        print(f"[DEBUG] 로드된 row 수: {len(rows)}")
         for row in rows:
             cols = row.find_elements(By.TAG_NAME, "td")
-            if len(cols) < 6:
+            # 스크린샷으로 파악한 결제 내역 테이블은 12개의 열이 있어야 함
+            if len(cols) < 12:
                 continue
-            payment_id = cols[0].text.strip()
-            payment_date = cols[1].text.strip()
-            user_name = cols[2].text.strip()
-            seat_type = cols[3].text.strip()
-            amount = cols[4].text.strip()
-            status = cols[5].text.strip()
+
+            # 스크린샷 기반 열 인덱스
+            payment_id = cols[0].text.strip()    # No (결제 ID)
+            user_name = cols[1].text.strip()       # 이름
+            # cols[2]는 전화번호, cols[3]는 결제방법, cols[4]는 결제수단
+            status = cols[5].text.strip()          # 결제상태 (예: 승인완료)
+            amount = cols[6].text.strip()          # 결제금액
+            payment_date = cols[7].text.strip()    # 결제일시
+            seat_type = cols[8].text.strip()       # 결제상품 (예: 스터디룸(2인) 등)
+            # cols[9]는 시작시간, cols[10]는 종료시간, cols[11]는 가입일
+
             payments.append({
                 "id": payment_id,
                 "date": payment_date,
@@ -357,16 +367,26 @@ def check_payment_status(driver):
                 "amount": amount,
                 "status": status
             })
-        try:
-            next_btn = driver.find_element(By.CSS_SELECTOR, 'ul.pagination li.active + li a')
-            if "javascript:;" in next_btn.get_attribute("href"):
-                break
-            next_btn.click()
-            time.sleep(1)
-        except:
-            break
 
-    # Load last payment id to detect new payments
+        # 페이지네이션: '다음' 버튼이 활성화되어 있으면 클릭, 아니면 종료
+        try:
+            next_li = driver.find_element(By.CSS_SELECTOR, 'ul.pagination li.next')
+            if "disabled" in next_li.get_attribute("class"):
+                print("[DEBUG] 다음 페이지 없음 → 루프 종료")
+                break
+            next_btn = next_li.find_element(By.TAG_NAME, "a")
+            next_btn.click()
+            print("[DEBUG] 다음 페이지 클릭")
+            time.sleep(1.5)  # 다음 페이지 로딩 시간 확보
+        except NoSuchElementException:
+            print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
+            break
+        except Exception as e:
+            with open("debug_payment_error.html", "w", encoding="utf-8") as f:
+                f.write(driver.page_source)
+            raise Exception(f"❌ [결제 파싱 오류] {e}")
+
+    # 마지막으로 읽은 결제 ID와 새 결제 내역 비교
     last_payment_id = None
     if os.path.exists(PAYMENT_CACHE_FILE):
         with open(PAYMENT_CACHE_FILE, "rb") as f:
@@ -377,105 +397,138 @@ def check_payment_status(driver):
         if last_payment_id is None or payment["id"] > last_payment_id:
             new_payments.append(payment)
 
-    # Save latest payment id
+    # 가장 최신의 결제 ID 저장
     if payments:
         with open(PAYMENT_CACHE_FILE, "wb") as f:
             pickle.dump(payments[0]["id"], f)
 
-    # Compose message for new payments
-    msg_lines = []
-    for p in new_payments:
-        msg_lines.append(f"결제 ID: {p['id']}, 사용자: {p['user']}, 좌석: {p['seat_type']}, 금액: {p['amount']}, 상태: {p['status']}")
-
+    # 텔레그램 메시지 등 전송 메시지 구성
+    msg_lines = [
+        f"결제 ID: {p['id']}, 사용자: {p['user']}, 좌석: {p['seat_type']}, 금액: {p['amount']}, 상태: {p['status']}"
+        for p in new_payments
+    ]
     msg = "[결제 알림]\n" + "\n".join(msg_lines) if msg_lines else "새로운 결제 내역이 없습니다."
 
-    # Save payment dashboard html
+    # 대시보드 HTML 저장 함수 호출 (기존 구현)
     save_payment_dashboard_html(payments)
 
     return msg
 
-def save_payment_dashboard_html(payments):
-    history_path = "/home/mmkkshim/anding_bot/log/payment_history.csv"
-    os.makedirs(os.path.dirname(history_path), exist_ok=True)
-    with open(history_path, "a", encoding="utf-8") as f:
-        for p in payments:
-            f.write(f"{p['id']},{p['date']},{p['user']},{p['seat_type']},{p['amount']},{p['status']}\n")
 
+    today = datetime.now(kst).strftime("%Y.%m.%d")
+    summary_time = datetime.now(kst).strftime("%H:%M")
+    summary_count = len(payments)
+    summary_amount = sum(int(p['amount'].replace(',', '').replace('원', '')) for p in payments if p['amount'])
+
+    html_rows = ""
+    for row in payments:
+        html_rows += f"""
+            <tr>
+                <td>{row['id']}</td>
+                <td>{row['user']}</td>
+                <td>{row['amount']}</td>
+                <td>{row['seat_type']}</td>
+                <td>{row['date']}</td>
+            </tr>
+        """
     now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
-    # If payments is empty, show '결제 데이터 없음'
-    if not payments:
-        rows_html = "<tr><td colspan='6'>결제 데이터 없음</td></tr>"
-    else:
-        rows_html = ""
-        for p in payments[:20]:
-            rows_html += f"<tr><td>{p['id']}</td><td>{p['date']}</td><td>{p['user']}</td><td>{p['seat_type']}</td><td>{p['amount']}</td><td>{p['status']}</td></tr>"
-
     html = f"""
     <!DOCTYPE html>
     <html lang="ko">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        <title>앤딩스터디카페 결제 내역</title>
-        <meta http-equiv="refresh" content="60" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>오늘 결제 현황</title>
         <style>
             body {{
-                font-family: 'Apple SD Gothic Neo', 'Arial', sans-serif;
-                background: #f4f4f4;
+                font-family: 'Apple SD Gothic Neo', Arial, sans-serif;
+                background: #f1f3f5;
+                padding: 2rem;
                 margin: 0;
-                padding: 1rem;
                 display: flex;
                 justify-content: center;
-                align-items: flex-start;
-                min-height: 100vh;
-                box-sizing: border-box;
+            }}
+            .container {{
+                background: white;
+                border-radius: 1rem;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+                padding: 2rem;
+                width: 100%;
+                max-width: 900px;
+            }}
+            .updated {{
+                font-size: 0.8rem;
+                color: #888;
+                margin-top: 1rem;
+            }}            
+            h2 {{
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+                color: #343a40;
+                text-align: center;
+            }}
+            .summary {{
+                font-size: 0.95rem;
+                margin-bottom: 1rem;
+                color: #555;
+                text-align: center;
             }}
             table {{
                 border-collapse: collapse;
-                width: 90%;
-                max-width: 800px;
+                width: 100%;
                 background: white;
-                border-radius: 1rem;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                border-radius: 0.5rem;
+                overflow: hidden;
             }}
             th, td {{
-                border: 1px solid #ddd;
-                padding: 8px;
+                border: 1px solid #dee2e6;
+                padding: 0.75rem;
                 text-align: center;
+                font-size: 0.90rem;
+                color: #343a40;
             }}
             th {{
-                background-color: #4CAF50;
+                background-color: #6c757d;
                 color: white;
-            }}
-            caption {{
-                font-size: 1.5rem;
-                margin: 1rem 0;
                 font-weight: bold;
-                color: #333;
+            }}
+            tr:nth-child(even) {{
+                background-color: #f8f9fa;
             }}
         </style>
     </head>
     <body>
-        <table>
-            <caption>🧾 결제 내역 (최근 20건)</caption>
-            <thead>
-                <tr>
-                    <th>ID</th><th>날짜</th><th>사용자</th><th>좌석 유형</th><th>금액</th><th>상태</th>
-                </tr>
-            </thead>
-            <tbody>
-                {rows_html}
-            </tbody>
-        </table>
-        <div style="text-align:center; margin-top:1rem; color:#888;">업데이트 시각: {now_str}</div>
+        <div class="container">
+            <h2>오늘 결제 현황</h2>
+            <div class="summary">
+                날짜: {today}<br>
+                총 결제: {summary_count}건 / {summary_amount}원<br>
+            </div>
+            <div class="updated">업데이트 시각: {now_str}</div>            
+            <table>
+                <thead>
+                    <tr>
+                        <th>결제번호</th>
+                        <th>이름</th>
+                        <th>금액</th>
+                        <th>상품</th>
+                        <th>결제일</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {html_rows}
+                </tbody>
+            </table>
+        </div>
     </body>
     </html>
     """
+
     with open("/home/mmkkshim/anding_bot/payment_dashboard.html", "w", encoding="utf-8") as f:
         f.write(html)
 
 
-def main_check_payment():
+
 
     # ✅ 인증번호 파일 초기화
     if os.path.exists("auth_code.txt"):
