@@ -274,7 +274,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             .box {{
                 background: white;
                 border-radius: 1rem;
-                padding: 1.5rem;
+                padding: 1rem;
                 max-width: 600px;         /* 데스크탑 기준 최대 폭 */
                 width: 100%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
