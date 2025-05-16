@@ -179,6 +179,7 @@ def save_payment_dashboard_html(payments):
                 width: 100%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 text-align: center;
+                margin: 0 auto;
             }}
             h2 {{
                 font-size: 1.4rem;

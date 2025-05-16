@@ -279,6 +279,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 width: 100%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 text-align: center;
+                margin: 0 auto;
             }}                     
             h1 {{
                 font-size: 1.4rem;
