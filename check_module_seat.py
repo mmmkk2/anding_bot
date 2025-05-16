@@ -265,10 +265,10 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 margin: 0;
                 padding: 1rem;
                 display: flex;
-                min-height: 100vh;
+                align-items: flex-start;
+                min-height: 95vh;
                 box-sizing: border-box;
                 justify-content: center;
-                align-items: center; /* 세로 중앙 정렬 */
                 text-align: center;  /* 텍스트 정렬 보정 */
             }}
             .box {{
@@ -286,11 +286,11 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 color: #333;
             }}
             .emoji {{
-                font-size: 2.5rem;
+                font-size: 1.4rem;
                 margin-bottom: 1rem;
             }}
             .stat {{
-                font-size: 1.1rem;
+                font-size: 1.0rem;
                 margin: 0.3rem 0;
             }}
             .updated {{
