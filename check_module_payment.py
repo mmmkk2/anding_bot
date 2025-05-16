@@ -220,7 +220,7 @@ def save_payment_dashboard_html(payments):
             @media (max-width: 480px) {{
                 .box {{
                     padding: 1rem;
-                    max-width: 95vw;
+                    max-width: 100vw;
                 }}
             }}
         </style>
