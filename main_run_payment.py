@@ -1,6 +1,6 @@
 import requests
 import socket
-from check_module import main_check_seat
+from check_module import main_check_payment
 
 if __name__ == "__main__":
     ip = requests.get("https://api.ipify.org").text
