@@ -201,7 +201,7 @@ def save_payment_dashboard_html(payments):
             table {{
                 width: 100%;
                 border-collapse: collapse;
-                font-size: 0.85rem;
+                font-size: 0.8rem;
                 margin-top: 1rem;
             }}
             th, td {{
