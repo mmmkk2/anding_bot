@@ -154,11 +154,6 @@ def main_check_seat():
     if os.path.exists("auth_code.txt"):
         os.remove("auth_code.txt")
 
-    loop_min = 5
-    total_loops = 1440 // loop_min
-    now = datetime.now()
-    minutes_since_midnight = now.hour * 60 + now.minute
-    current_loop = (minutes_since_midnight // loop_min) + 1
 
     location_tag = find_location()
     send_telegram_and_log(f"📢 [좌석 - 모니터링] 시작합니다.")
@@ -171,7 +166,6 @@ def main_check_seat():
             now_full_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             loop_msg = (
                 f"\n\n🪑 좌석 모니터링 정상 동작 중\n"
-                f"Loop {current_loop}/{total_loops}\n"
                 f"⏰ 날짜 + 실행 시각: {now_full_str}"
             )
             full_msg = loop_msg + "\n\n" + seat_status_msg
@@ -481,12 +475,7 @@ def main_check_payment():
     if os.path.exists("auth_code.txt"):
         os.remove("auth_code.txt")
 
-    loop_min = 5
-    total_loops = 1440 // loop_min
-    now = datetime.now()
-    minutes_since_midnight = now.hour * 60 + now.minute
-    current_loop = (minutes_since_midnight // loop_min) + 1
-
+    
     location_tag = find_location()
     send_telegram_and_log(f"📢 [결제 - 모니터링] 시작합니다.")
 
@@ -498,7 +487,6 @@ def main_check_payment():
             now_full_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             loop_msg = (
                 f"\n\n🧾 결제 모니터링 정상 동작 중\n"
-                f"Loop {current_loop}/{total_loops}\n"
                 f"⏰ 날짜 + 실행 시각: {now_full_str}"
             )
             full_msg = loop_msg + "\n\n" + payment_status_msg
