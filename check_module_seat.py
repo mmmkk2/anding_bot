@@ -298,6 +298,13 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 color: #888;
                 margin-top: 1rem;
             }}
+            /* 📱 모바일 전용 스타일 추가 */
+            @media (max-width: 480px) {{
+              .box {{
+                padding: 1rem;
+                max-width: 95vw;
+              }}
+            }}
         </style>
     </head>
     <body>
@@ -320,4 +327,3 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     with open("/home/mmkkshim/anding_bot/seat_dashboard.html", "w", encoding="utf-8") as f:
         f.write(html)
         
-

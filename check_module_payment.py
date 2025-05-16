@@ -178,7 +178,7 @@ def save_payment_dashboard_html(payments):
                 border-radius: 1rem;
                 padding: 1.5rem;
                 max-width: 600px;         /* 데스크탑 기준 최대 폭 */
-                width: 80%;
+                width: 100%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 text-align: center;
             }}
@@ -215,6 +215,14 @@ def save_payment_dashboard_html(payments):
             tr:nth-child(even) {{
                 background-color: #f8f9fa;
             }}
+
+            /* 📱 모바일 전용 스타일 추가 */
+            @media (max-width: 480px) {{
+                .box {{
+                    padding: 1rem;
+                    max-width: 95vw;
+                }}
+            }}
         </style>
     </head>
     <body>
@@ -222,7 +230,7 @@ def save_payment_dashboard_html(payments):
             <h2>오늘 결제 현황</h2>
             <div class="summary">
                 날짜: {today}<br>
-                총 결제: {summary_count}건 / {summary_amount}원<br>
+                총 결제: {summary_count}건 / {summary_amount:,}원<br>
             </div>
             <div class="updated">업데이트 시각: {now_str}</div>
             <table>
