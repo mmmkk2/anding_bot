@@ -217,7 +217,7 @@ def save_payment_dashboard_html(payments):
             }}
 
             /* 📱 모바일 전용 스타일 추가 */
-            @media (max-width: 480px) {{
+            @media (max-width: 700px) {{
                 .box {{
                     padding: 1rem;
                     max-width: 100vw;
