@@ -162,7 +162,7 @@ def save_payment_dashboard_html(payments):
             body {{
                 font-family: 'Apple SD Gothic Neo', Arial, sans-serif;
                 background: #f1f3f5;
-                padding: 2rem;
+                padding: 1rem;
                 margin: 0;
                 display: flex;
                 align-items: flex-start;
