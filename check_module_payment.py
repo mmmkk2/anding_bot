@@ -171,6 +171,7 @@ def save_payment_dashboard_html(payments):
                 align-items: flex-start;
                 min-height: 100vh;
                 box-sizing: border-box;
+                flex-wrap: wrap;  /* 모바일에서 줄바꿈 허용 */
             }}
             .box {{
                 background: white;

@@ -269,6 +269,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 align-items: flex-start;
                 min-height: 100vh;
                 box-sizing: border-box;
+                flex-wrap: wrap;  /* 모바일에서 줄바꿈 허용 */
             }}
             .box {{
                 background: white;
