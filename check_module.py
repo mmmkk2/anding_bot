@@ -326,7 +326,10 @@ PAYMENT_URL = f"{BASE_URL}/pay/paymentList"
 PAYMENT_CACHE_FILE = COOKIE_FILE
 
 def check_payment_status(driver):
+    print("[DEBUG] 결제 페이지 진입 시도 중:", PAYMENT_URL)
+    time.sleep(2)  # 로그인 후 쿠키 세팅 대기
     driver.get(PAYMENT_URL)
+    print("[DEBUG] 페이지 진입 완료")
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
 
     payments = []
