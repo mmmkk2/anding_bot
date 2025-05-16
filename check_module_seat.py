@@ -265,11 +265,11 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 margin: 0;
                 padding: 1rem;
                 display: flex;
-                justify-content: center;
-                align-items: flex-start;
                 min-height: 100vh;
                 box-sizing: border-box;
-                flex-wrap: wrap;  /* 모바일에서 줄바꿈 허용 */
+                justify-content: center;
+                align-items: center; /* 세로 중앙 정렬 */
+                text-align: center;  /* 텍스트 정렬 보정 */
             }}
             .box {{
                 background: white;

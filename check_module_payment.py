@@ -167,11 +167,11 @@ def save_payment_dashboard_html(payments):
                 padding: 1rem;
                 margin: 0;
                 display: flex;
-                justify-content: center;
-                align-items: flex-start;
                 min-height: 100vh;
                 box-sizing: border-box;
-                flex-wrap: wrap;  /* 모바일에서 줄바꿈 허용 */
+                justify-content: center;
+                align-items: center; /* 세로 중앙 정렬 */
+                text-align: center;  /* 텍스트 정렬 보정 */
             }}
             .box {{
                 background: white;
