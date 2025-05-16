@@ -55,6 +55,12 @@ def combined_dashboard():
                 display: flex;
                 flex-direction: column;
                 align-items: stretch;
+                margin: 0 auto;
+            }}
+            @media (max-width: 768px) {{
+                .dashboard-box {{
+                    max-width: 95vw;
+                }}
             }}
             iframe {{
                 width: 100%;
