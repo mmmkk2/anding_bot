@@ -147,7 +147,7 @@ def save_payment_dashboard_html(payments):
     summary_time = datetime.now(kst).strftime("%H:%M")
     summary_count = len(payments)
     summary_amount = sum(int(p['amount'].replace(',', '').replace('원', '')) for p in payments if p['amount'])
-
+    now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
     html_rows = ""
     for row in payments:
         html_rows += f"""
@@ -232,7 +232,7 @@ def save_payment_dashboard_html(payments):
                 날짜: {today}<br>
                 총 결제: {summary_count}건 / {summary_amount}원<br>
             </div>
-            <div class="updated">업데이트 시각: {summary_time}</div>            
+            <div class="updated">업데이트 시각: {now_str}</div>            
             <table>
                 <thead>
                     <tr>
