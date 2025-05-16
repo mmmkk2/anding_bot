@@ -176,7 +176,7 @@ def save_payment_dashboard_html(payments):
                 border-radius: 1rem;
                 padding: 1rem;
                 max-width: 600px;         /* 데스크탑 기준 최대 폭 */
-                width: 100%;
+                width: 110%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 text-align: center;
                 margin: 0 auto;
