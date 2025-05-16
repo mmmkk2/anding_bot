@@ -53,7 +53,12 @@ def check_seat_status(driver):
     driver.get(SEAT_URL)
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
 
-    current_time = datetime.now(kst)
+    # Use browser's JS time for current time
+    # Import execute_script if not already imported
+    from selenium.webdriver.common.by import By  # already imported above
+    # Use JS to get browser time in ISO format
+    timestamp = driver.execute_script("return new Date().toISOString();")
+    current_time = datetime.fromisoformat(timestamp[:-1]).astimezone(kst)
     current_hour = current_time.hour
 
     while True:
