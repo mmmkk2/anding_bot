@@ -164,10 +164,12 @@ def save_payment_dashboard_html(payments):
             body {{
                 font-family: 'Apple SD Gothic Neo', Arial, sans-serif;
                 background: #f1f3f5;
-                padding: 2rem;
                 margin: 0;
-                display: flex;
+                padding: 2rem;
                 justify-content: center;
+                align-items: flex-start;
+                min-height: 100vh;
+                box-sizing: border-box;                
             }}
             .container {{
                 background: white;
