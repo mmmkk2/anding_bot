@@ -204,9 +204,9 @@ def save_payment_dashboard_html(payments):
             }}
             th, td {{
                 border: 1px solid #dee2e6;
-                padding: 0.75rem;
+                padding: 0.2rem;
                 text-align: center;
-                font-size: 0.9rem;
+                font-size: 0.8rem;
                 color: #343a40;
             }}
             th {{
