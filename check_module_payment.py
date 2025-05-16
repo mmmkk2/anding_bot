@@ -113,8 +113,6 @@ def check_payment_status(driver):
                 f.write(driver.page_source)
             raise Exception(f"❌ [결제 파싱 오류] {e}")
 
-    print(f"PAYMENT_LOG_FILE = {PAYMENT_CACHE_FILE}")
-
     # 마지막으로 읽은 결제 ID와 새 결제 내역 비교
     last_payment_id = None
     if os.path.exists(PAYMENT_CACHE_FILE):
