@@ -330,7 +330,10 @@ def check_payment_status(driver):
     time.sleep(2)  # 로그인 후 쿠키 세팅 대기
     driver.get(PAYMENT_URL)
     print("[DEBUG] 페이지 진입 완료")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
+    WebDriverWait(driver, 15).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "table#m_table_1.dataTable"))
+    )
+    time.sleep(1.5)  # JS로 row 생성 시간 확보
 
     payments = []
 
