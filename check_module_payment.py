@@ -184,6 +184,11 @@ def save_payment_dashboard_html(payments):
                 width: 100%;
                 max-width: 900px;
             }}
+            .updated {{
+                font-size: 0.8rem;
+                color: #888;
+                margin-top: 1rem;
+            }} 
             h2 {{
                 font-size: 1.5rem;
                 margin-bottom: 1rem;
@@ -191,7 +196,7 @@ def save_payment_dashboard_html(payments):
                 text-align: center;
             }}
             .summary {{
-                font-size: 0.95rem;
+                font-size: 0.9rem;
                 margin-bottom: 1rem;
                 color: #555;
                 text-align: center;
@@ -207,7 +212,7 @@ def save_payment_dashboard_html(payments):
                 border: 1px solid #dee2e6;
                 padding: 0.75rem;
                 text-align: center;
-                font-size: 0.95rem;
+                font-size: 0.9rem;
                 color: #343a40;
             }}
             th {{
@@ -226,8 +231,8 @@ def save_payment_dashboard_html(payments):
             <div class="summary">
                 날짜: {today}<br>
                 총 결제: {summary_count}건 / {summary_amount}원<br>
-                실행 시각: {summary_time}
             </div>
+            <div class="updated">업데이트 시각: {summary_time}</div>            
             <table>
                 <thead>
                     <tr>
