@@ -129,17 +129,8 @@ def check_payment_status(driver):
         with open(PAYMENT_CACHE_FILE, "wb") as f:
             pickle.dump(payments[0]["id"], f)
 
-    # 텔레그램 메시지 등 전송 메시지 구성
-    msg_lines = [
-        f"결제 ID: {p['id']}, 사용자: {p['user']}, 좌석: {p['seat_type']}, 금액: {p['amount']}, 상태: {p['status']}"
-        for p in new_payments
-    ]
-    msg = "[결제 알림]\n" + "\n".join(msg_lines) if msg_lines else "새로운 결제 내역이 없습니다."
-
     # 대시보드 HTML 저장 함수 호출 (기존 구현)
     save_payment_dashboard_html(payments)
-
-    return msg
 
 
 def save_payment_dashboard_html(payments):
@@ -270,15 +261,7 @@ def main_check_payment():
 
     try:
         if login(driver):
-            payment_status_msg = check_payment_status(driver)
-            now_full_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            loop_msg = (
-                f"\n\n🧾 결제 모니터링 정상 동작 중\n"
-                f"⏰ 날짜 + 실행 시각: {now_full_str}"
-            )
-            full_msg = loop_msg + "\n\n" + payment_status_msg
-            send_broadcast_and_update(full_msg, broadcast=False, category="payment")
-
+            check_payment_status(driver)
             send_telegram_and_log(f"{location_tag} ✅ [결제 - 모니터링] 정상 종료되었습니다.")
         else:
             send_broadcast_and_update("❌ [결제] 로그인 실패", broadcast=False, category="payment")
