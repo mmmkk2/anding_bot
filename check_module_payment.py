@@ -164,58 +164,52 @@ def save_payment_dashboard_html(payments):
             body {{
                 font-family: 'Apple SD Gothic Neo', Arial, sans-serif;
                 background: #f1f3f5;
-                margin: 0;
                 padding: 2rem;
+                margin: 0;
+                display: flex;
                 justify-content: center;
                 align-items: flex-start;
                 min-height: 100vh;
-                box-sizing: border-box;                
+                box-sizing: border-box;
             }}
-            .container {{
+            .box {{
                 background: white;
                 border-radius: 1rem;
-                box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-                padding: 2rem 1rem;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                padding: 1.5rem;
+                max-width: 400px;
                 width: 100%;
-                max-width: 900px;
-                margin: 0 auto;
+                text-align: center;
+            }}
+            h2 {{
+                font-size: 1.4rem;
+                margin-bottom: 1rem;
+                color: #333;
+            }}
+            .summary {{
+                font-size: 1rem;
+                margin-bottom: 1rem;
+                color: #555;
             }}
             .updated {{
                 font-size: 0.8rem;
                 color: #888;
                 margin-top: 1rem;
                 text-align: center;
-            }} 
-            h2 {{
-                font-size: 1.5rem;
-                margin-bottom: 1rem;
-                color: #343a40;
-                text-align: center;
-            }}
-            .summary {{
-                font-size: 0.9rem;
-                margin-bottom: 1rem;
-                color: #555;
-                text-align: center;
             }}
             table {{
-                border-collapse: collapse;
                 width: 100%;
-                background: white;
-                border-radius: 0.5rem;
-                overflow: hidden;
+                border-collapse: collapse;
+                font-size: 0.85rem;
+                margin-top: 1rem;
             }}
             th, td {{
                 border: 1px solid #dee2e6;
-                padding: 0.2rem;
-                text-align: center;
-                font-size: 0.8rem;
-                color: #343a40;
+                padding: 0.5rem;
             }}
             th {{
                 background-color: #6c757d;
                 color: white;
-                font-weight: bold;
             }}
             tr:nth-child(even) {{
                 background-color: #f8f9fa;
@@ -223,13 +217,13 @@ def save_payment_dashboard_html(payments):
         </style>
     </head>
     <body>
-        <div class="container">
+        <div class="box">
             <h2>오늘 결제 현황</h2>
             <div class="summary">
                 날짜: {today}<br>
-                총 결제: {summary_count}건 / {summary_amount:,}원<br>
+                총 결제: {summary_count}건 / {summary_amount}원<br>
             </div>
-            <div class="updated">업데이트 시각: {now_str}</div>            
+            <div class="updated">업데이트 시각: {now_str}</div>
             <table>
                 <thead>
                     <tr>
