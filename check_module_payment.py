@@ -221,6 +221,7 @@ def save_payment_dashboard_html(payments):
             .number {{
                 font-size: 0.7rem;
                 min-width: 20px;
+                padding: 0.4rem;
             }}            
             .user {{
                 min-width: 40px;
