@@ -139,7 +139,13 @@ def save_payment_dashboard_html(payments):
     today = datetime.now(kst).strftime("%Y.%m.%d")
     summary_time = datetime.now(kst).strftime("%H:%M")
     summary_count = len(payments)
-    summary_amount = sum(int(p['amount'].replace(',', '').replace('원', '')) for p in payments if p['amount'])
+    # summary_amount = sum(int(p['amount'].replace(',', '').replace('원', '')) for p in payments if p['amount'])
+    summary_amount = sum(
+        int(p['amount'].replace(',', '').replace('원', ''))
+        for p in payments
+        if p['amount'] and '승인' in p['status']
+    )
+    
     now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
     html_rows = ""
     for row in payments:
