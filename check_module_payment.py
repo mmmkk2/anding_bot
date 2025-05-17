@@ -138,6 +138,8 @@ def check_payment_status(driver):
 def save_payment_dashboard_html(payments):
     today = datetime.now(kst).strftime("%Y.%m.%d")
     summary_time = datetime.now(kst).strftime("%H:%M")
+    today_str = datetime.now(kst).strftime("%Y-%m-%d")
+    payments = [p for p in payments if p["date"].startswith(today_str)]
     summary_count = len(payments)
     summary_amount = sum(int(p['amount'].replace(',', '').replace('원', '')) for p in payments if p['amount'])
     now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
