@@ -149,7 +149,7 @@ def save_payment_dashboard_html(payments):
                 <td>{row['user']}</td>
                 <td>{row['amount']}</td>
                 <td>{row['seat_type']}</td>
-                <td>{row['date']}</td>
+                <td>{row['date'][11:18]}</td>
             </tr>
         """
 
@@ -236,7 +236,7 @@ def save_payment_dashboard_html(payments):
                         <th>이름</th>
                         <th>금액</th>
                         <th>상품</th>
-                        <th>결제일</th>
+                        <th>결제일시</th>
                     </tr>
                 </thead>
                 <tbody>
