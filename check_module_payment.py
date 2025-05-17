@@ -148,8 +148,8 @@ def save_payment_dashboard_html(payments):
                 <td>{row['id']}</td>
                 <td>{row['user']}</td>
                 <td>{row['amount']}</td>
-                <tdr>{row['seat_type']}</tdr>
-                <tdr>{row['date'][:10]} {row['date'][11:19]}</tdr>
+                <td class="breakable">{row['seat_type']}</td>
+                <td class="breakable">{row['date'][:10]} {row['date'][11:19]}</td>
             </tr>
         """
 
@@ -207,13 +207,9 @@ def save_payment_dashboard_html(payments):
                 font-size: 0.8rem;
                 margin-top: 1rem;
             }}
-            th, td, tdr {{
+            th, td {{
                 border: 1px solid #dee2e6;
                 padding: 0.1rem;
-            }}
-            tdr {{
-                word-break: break-word;
-                white-space: normal;
             }}
             th {{
                 background-color: #6c757d;
@@ -222,8 +218,11 @@ def save_payment_dashboard_html(payments):
             tr:nth-child(even) {{
                 background-color: #f8f9fa;
             }}
-
-
+            .breakable {{
+                word-break: break-word;
+                white-space: normal;
+                max-width: 120px;
+            }}
         </style>
     </head>
     <body>
