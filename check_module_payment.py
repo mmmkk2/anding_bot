@@ -210,7 +210,7 @@ def save_payment_dashboard_html(payments):
             th, td {{
                 border: 1px solid #dee2e6;
                 padding: 0.1rem;
-                min-width: 50px;
+                min-width: 30px;
             }}
             th {{
                 background-color: #6c757d;
