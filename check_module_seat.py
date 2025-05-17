@@ -306,12 +306,12 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     </head>
     <body>
         <div class="box">
+            <div class="stat"><b>{now_str[:10]}</b></div>
+            <div class="updated">업데이트 시각: {now_str}</div>
             <div class="emoji">{status_emoji}</div>
-            <div class="stat">{now_str[:10]}</div>
             <div class="stat">자유석: {used_free}/{total_free}</div>
             <div class="stat">노트북석: {used_laptop}/{total_laptop}</div>
-            <div class="stat">남은 자유석: {remaining}석</div>
-            <div class="updated">업데이트 시각: {now_str}</div>
+            <div class="stat">남은 자유석: {remaining}석</div>            
             <div style="margin-top:2rem;">            
                 <canvas id="seatChart" height="200"></canvas>
                 {chart_script}
