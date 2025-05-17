@@ -226,6 +226,7 @@ def save_payment_dashboard_html(payments):
                 min-width: 50px;
             }}
             .breakable {{
+                font-size: 0.7rem;
                 padding: 0.01rem;
                 word-break: break-word;
                 white-space: normal;                
