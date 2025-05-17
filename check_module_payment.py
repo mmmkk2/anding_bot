@@ -222,7 +222,7 @@ def save_payment_dashboard_html(payments):
                 padding: 0.4rem;
                 word-break: break-word;
                 white-space: normal;
-                max-width: 80px;
+                max-width: 60px;
             }}
         </style>
     </head>
