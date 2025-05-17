@@ -222,15 +222,13 @@ def save_payment_dashboard_html(payments):
             .user {{
                 min-width: 40px;
             }}
-            .amount {{
-            
+            .amount {{            
                 min-width: 50px;
             }}
             .breakable {{
                 padding: 0.4rem;
                 word-break: break-word;
                 white-space: normal;                
-                max-width: 80px; /* ✅ 줄바꿈을 유도하는 제한 (선택사항) */
             }}
         </style>
     </head>
