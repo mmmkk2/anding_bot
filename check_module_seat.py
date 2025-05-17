@@ -221,32 +221,49 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     else:
         line_color = 'rgba(75, 192, 192, 1)'  # green
     chart_script = f"""
-    <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
-    <script>
-        const ctx = document.getElementById('seatChart').getContext('2d');
-        new Chart(ctx, {{
-            type: 'line',
-            data: {{
-                labels: {timestamps},
-                datasets: [{{
-                    label: '자유석 사용 수',
-                    data: {used_frees},
-                    borderColor: '{line_color}',
-                    tension: 0.1
-                }}]
-            }},
-            options: {{
-                responsive: true,
-                scales: {{
-                    y: {{
-                        beginAtZero: true,
-                        max: {total_free}
+<script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1'></script>
+<script>
+    const ctx = document.getElementById('seatChart').getContext('2d');
+    new Chart(ctx, {{
+        type: 'line',
+        data: {{
+            datasets: [{{
+                label: '자유석 사용 수',
+                data: [
+                    {','.join([f"{{ x: '{timestamps[i]}', y: {used_frees[i]} }}" for i in range(len(timestamps))])}
+                ],
+                borderColor: '{line_color}',
+                tension: 0.1
+            }}]
+        }},
+        options: {{
+            responsive: true,
+            parsing: false,
+            scales: {{
+                x: {{
+                    type: 'time',
+                    time: {{
+                        tooltipFormat: 'HH:mm',
+                        displayFormats: {{
+                            minute: 'HH:mm'
+                        }}
+                    }},
+                    title: {{
+                        display: true,
+                        text: '시간'
                     }}
+                }},
+                y: {{
+                    beginAtZero: true,
+                    max: {total_free}
                 }}
             }}
-        }});
-    </script>
-    """
+        }}
+    }});
+</script>
+"""
 
     now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
 
@@ -306,7 +323,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         <div class="box">
             <h1>🪑 앤딩스터디카페 좌석 현황</h1>
             <div class="emoji">{status_emoji}</div>
-            <div class="stat">자유석: {used_free}/{total_free}</div>
+            <div class="stat">자유석: {used_free}/{total_free}</div>chart_script
             <div class="stat">노트북석: {used_laptop}/{total_laptop}</div>
             <div class="stat">남은 자유석: {remaining}석</div>
             <div class="updated">업데이트 시각: {now_str}</div>
