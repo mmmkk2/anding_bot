@@ -183,8 +183,9 @@ def save_payment_dashboard_html(payments):
                 max-width: 600px;         /* 데스크탑 기준 최대 폭 */
                 width: 100%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                overflow-y: auto;
                 text-align: center;
-                margin: 0 auto;
+                margin: 0 auto;                
             }}
             h1 {{
                 font-size: 1.1rem;
