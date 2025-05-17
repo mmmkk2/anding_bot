@@ -148,8 +148,8 @@ def save_payment_dashboard_html(payments):
                 <td>{row['id']}</td>
                 <td>{row['user']}</td>
                 <td>{row['amount']}</td>
-                <td>{row['seat_type']}</td>
-                <td>{row['date'][:10]} {row['date'][11:19]}</td>
+                <tdr>{row['seat_type']}</tdr>
+                <tdr>{row['date'][:10]} {row['date'][11:19]}</tdr>
             </tr>
         """
 
@@ -207,11 +207,11 @@ def save_payment_dashboard_html(payments):
                 font-size: 0.8rem;
                 margin-top: 1rem;
             }}
-            th, td {{
+            th, td, tdr {{
                 border: 1px solid #dee2e6;
                 padding: 0.1rem;
             }}
-            td {{
+            tdr {{
                 word-break: break-word;
                 white-space: normal;
             }}
