@@ -229,8 +229,8 @@ def save_payment_dashboard_html(payments):
                 min-width: 50px;
             }}
             .seat {{
-                font-size: 0.8rem;
-                padding: 0.2rem;
+                font-size: 0.7rem;
+                padding: 0.4rem;
                 word-break: break-word;
                 white-space: normal;        
                 min-width: 50px;        
@@ -238,7 +238,7 @@ def save_payment_dashboard_html(payments):
             }}            
             .time {{
                 font-size: 0.7rem;
-                padding: 0.2rem;
+                padding: 0.4rem;
                 word-break: break-word;
                 white-space: normal; 
                 min-width: 50px;               
