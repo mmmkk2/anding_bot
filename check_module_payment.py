@@ -210,7 +210,7 @@ def save_payment_dashboard_html(payments):
             th, td {{
                 border: 1px solid #dee2e6;
                 padding: 0.1rem;
-                min-width: 20px;
+                min-width: 40px;
                 vertical-align: top; /* ✅ 줄바꿈 시 정렬 보정 */  
             }}
             th {{
