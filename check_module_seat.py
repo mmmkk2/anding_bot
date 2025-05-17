@@ -312,7 +312,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             <div class="stat">남은 자유석: {remaining}석</div>
             <div class="updated">업데이트 시각: {now_str}</div>
             <div style="margin-top:2rem;">
-                <h2 style="font-size:1rem; color:#444;">📈 최근 자유석 이용 추이</h2>
+                <h2 style="font-size:1rem; color:#444;">📈 {now_str[:10]} 자유석 이용 추이</h2>
                 <canvas id="seatChart" height="200"></canvas>
                 {chart_script}
             </div>
