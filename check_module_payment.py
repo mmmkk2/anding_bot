@@ -223,8 +223,8 @@ def save_payment_dashboard_html(payments):
                 min-width: 40px;
             }}
             .amount {{
-                text-align: right;  /* 금액 우측 정렬 */
-                min-width: 100px;
+            
+                min-width: 50px;
             }}
             .breakable {{
                 padding: 0.4rem;
