@@ -241,7 +241,7 @@ def save_payment_dashboard_html(payments):
                 padding: 0.1rem;  
                 word-break: break-word;
                 white-space: normal; 
-                min-width: 55px;
+                min-width: 58px;
                 max-width: 90px; /*
             }}            
             .time {{
