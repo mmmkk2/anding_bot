@@ -184,8 +184,8 @@ def save_payment_dashboard_html(payments):
                 text-align: center;
                 margin: 0 auto;
             }}
-            h2 {{
-                font-size: 1.4rem;
+            h1 {{
+                font-size: 1.1rem;
                 margin-bottom: 1rem;
                 color: #333;
             }}
@@ -223,7 +223,7 @@ def save_payment_dashboard_html(payments):
     </head>
     <body>
         <div class="box">
-            <h2>오늘 결제 현황</h2>
+            <h1>오늘 결제 현황</h1>
             <div class="summary">
                 날짜: {today}<br>
                 총 결제: {summary_count}건 / {summary_amount:,}원<br>

@@ -281,15 +281,17 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 width: 100%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 text-align: center;
+                min-height: 300px;
+                max-height: 600px;
                 margin: 0 auto;
             }}                     
             h1 {{
-                font-size: 1.4rem;
+                font-size: 1.1rem;
                 margin-bottom: 1rem;
                 color: #333;
             }}
             .emoji {{
-                font-size: 1.4rem;
+                font-size: 1.1rem;
                 margin-bottom: 1rem;
             }}
             .stat {{
