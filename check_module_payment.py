@@ -138,8 +138,6 @@ def check_payment_status(driver):
 def save_payment_dashboard_html(payments):
     today = datetime.now(kst).strftime("%Y.%m.%d")
     summary_time = datetime.now(kst).strftime("%H:%M")
-    today_str = datetime.now(kst).strftime("%Y-%m-%d")
-    payments = [p for p in payments if p["date"].startswith(today_str)]
     summary_count = len(payments)
     summary_amount = sum(int(p['amount'].replace(',', '').replace('원', '')) for p in payments if p['amount'])
     now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
@@ -183,9 +181,8 @@ def save_payment_dashboard_html(payments):
                 max-width: 600px;         /* 데스크탑 기준 최대 폭 */
                 width: 100%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                overflow-y: auto;
                 text-align: center;
-                margin: 0 auto;                
+                margin: 0 auto;
             }}
             h1 {{
                 font-size: 1.1rem;
