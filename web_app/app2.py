@@ -10,12 +10,12 @@ def summary_dashboard():
 
     def extract_inner_box(file_path):
         if not os.path.exists(file_path):
-            return "<div class='box'>데이터 없음</div>"
+            return "<div>데이터 없음</div>"
         with open(file_path, "r", encoding="utf-8") as f:
             html = f.read()
         start = html.find('<div class="box">')
         end = html.find("</div>", start)
-        return html[start:end+6] if start != -1 else "<div class='box'>박스 형식 오류</div>"
+        return html[start+18:end] if start != -1 else "<div>박스 형식 오류</div>"
 
     seat_summary = extract_inner_box(seat_path)
     payment_summary = extract_inner_box(payment_path)
@@ -26,7 +26,7 @@ def summary_dashboard():
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>요약 대시보드</title>
+        <title>앤딩스터디카페 통합 요약</title>
         <style>
             body {{
                 font-family: 'Apple SD Gothic Neo', Arial, sans-serif;
@@ -36,21 +36,30 @@ def summary_dashboard():
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                justify-content: start;
-                gap: 2rem;
-            }}
-            .summary-wrapper {{
-                max-width: 720px;
-                width: 100%;
             }}
             .box {{
+                max-width: 720px;
+                width: 100%;
+                background: white;
+                border-radius: 1rem;
+                padding: 1.5rem;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                margin: 0 auto;
+                text-align: center;
+            }}
+            hr {{
+                margin: 2rem 0;
+                border: none;
+                border-top: 1px solid #ccc;
             }}
         </style>
     </head>
     <body>
-        <div class="summary-wrapper">{seat_summary}</div>
-        <div class="summary-wrapper">{payment_summary}</div>
+        <div class="box">
+            {seat_summary}
+            <hr />
+            {payment_summary}
+        </div>
     </body>
     </html>
     """
