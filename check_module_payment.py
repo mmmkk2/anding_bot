@@ -210,6 +210,8 @@ def save_payment_dashboard_html(payments):
             th, td {{
                 border: 1px solid #dee2e6;
                 padding: 0.1rem;
+                min-width: 20px;
+                vertical-align: top; /* ✅ 줄바꿈 시 정렬 보정 */  
             }}
             th {{
                 background-color: #6c757d;
@@ -221,8 +223,8 @@ def save_payment_dashboard_html(payments):
             .breakable {{
                 padding: 0.4rem;
                 word-break: break-word;
-                white-space: normal;
-                max-width: 50px;
+                white-space: normal;                
+                max-width: 120px; /* ✅ 줄바꿈을 유도하는 제한 (선택사항) */
             }}
         </style>
     </head>
