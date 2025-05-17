@@ -256,7 +256,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-        <title>앤딩스터디카페 좌석 현황</title>
+        <title>좌석 현황</title>
         <meta http-equiv="refresh" content="60">
         <style>
             body {{
@@ -304,7 +304,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     </head>
     <body>
         <div class="box">
-            <h1>🪑 앤딩스터디카페 좌석 현황</h1>
+            <h1>🪑 좌석 현황</h1>
             <div class="emoji">{status_emoji}</div>
             <div class="stat">자유석: {used_free}/{total_free}</div>chart_script
             <div class="stat">노트북석: {used_laptop}/{total_laptop}</div>
