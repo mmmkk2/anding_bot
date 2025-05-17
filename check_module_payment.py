@@ -83,7 +83,7 @@ def check_payment_status(driver):
             status = cols[5].text.strip()          # 결제상태 (예: 승인완료)
             amount = cols[6].text.strip()          # 결제금액
             payment_date = cols[7].text.strip()    # 결제일시
-            seat_type = cols[8].text.strip().split("/")[0] + "<br>" + cols[9].text.strip()      # 결제상품 (예: 스터디룸(2인) 등)
+            seat_type = cols[8].text.strip().split("/")[0] + "/<br>" + cols[9].text.strip()      # 결제상품 (예: 스터디룸(2인) 등)
             
 
             # cols[9]는 시작시간, cols[10]는 종료시간, cols[11]는 가입일
