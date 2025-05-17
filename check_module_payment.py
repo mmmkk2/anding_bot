@@ -145,11 +145,11 @@ def save_payment_dashboard_html(payments):
     for row in payments:
         html_rows += f"""
             <tr>
-                <td>{row['id']}</td>
+                <td class="number">{row['id']}</td>
                 <td class="user">{row['user']}</td>
                 <td class="amount">{row['amount']}</td>
-                <td class="breakable">{row['seat_type']}</td>
-                <td class="breakable">{row['date'][:10]} {row['date'][11:19]}</td>
+                <td class="seat">{row['seat_type']}</td>
+                <td class="time">{row['date'][:10]} {row['date'][11:19]}</td>
             </tr>
         """
 
@@ -209,8 +209,7 @@ def save_payment_dashboard_html(payments):
             }}
             th, td {{
                 border: 1px solid #dee2e6;
-                padding: 0.4rem;
-                min-width: 20px;
+                padding: 0.2rem;
             }}
             th {{
                 background-color: #6c757d;
@@ -219,18 +218,31 @@ def save_payment_dashboard_html(payments):
             tr:nth-child(even) {{
                 background-color: #f8f9fa;
             }}
+            .number {{
+                font-size: 0.7rem;
+                min-width: 20px;
+            }}            
             .user {{
                 min-width: 40px;
             }}
             .amount {{            
                 min-width: 50px;
             }}
-            .breakable {{
+            .seat {{
+                font-size: 0.8rem;
+                padding: 0.01rem;
+                word-break: break-word;
+                white-space: normal;        
+                min-width: 50px;        
+                max-width: 90px; /*
+            }}            
+            .time {{
                 font-size: 0.7rem;
                 padding: 0.01rem;
                 word-break: break-word;
-                white-space: normal;                
-                max-width: 90px; /* ✅ 줄바꿈을 유도하는 제한 (선택사항) */
+                white-space: normal; 
+                min-width: 50px;               
+                max-width: 90px; /*
             }}
         </style>
     </head>
