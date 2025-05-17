@@ -277,7 +277,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 background: white;
                 border-radius: 1rem;
                 padding: 1rem;
-                max-width: 500px;         /* 데스크탑 기준 최대 폭 */
+                max-width: 600px;         /* 데스크탑 기준 최대 폭 */
                 width: 100%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 text-align: center;
@@ -307,12 +307,12 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         <div class="box">
             <h1>🪑 좌석 현황</h1>
             <div class="emoji">{status_emoji}</div>
-            <div class="stat">자유석: {used_free}/{total_free}</div>chart_script
+            <div class="stat">자유석: {used_free}/{total_free}</div>
             <div class="stat">노트북석: {used_laptop}/{total_laptop}</div>
             <div class="stat">남은 자유석: {remaining}석</div>
             <div class="updated">업데이트 시각: {now_str}</div>
             <div style="margin-top:2rem;">
-                <h2 style="font-size:1rem; color:#444;">📈 {now_str[:10]} 자유석 이용 추이</h2>
+                <h2 style="font-size:1rem; color:#444;">📈 자유석 이용 추이<br>{now_str[:10]}</h2>
                 <canvas id="seatChart" height="200"></canvas>
                 {chart_script}
             </div>
