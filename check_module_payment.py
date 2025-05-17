@@ -160,6 +160,7 @@ def save_payment_dashboard_html(payments):
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>오늘 결제 현황</title>
+        <meta http-equiv="refresh" content="60">
         <style>
             body {{
                 font-family: 'Apple SD Gothic Neo', Arial, sans-serif;
