@@ -229,10 +229,7 @@ def save_payment_dashboard_html(payments):
                 min-width: 50px;
             }}
             .seat {{
-                font-size: 0.7rem;
-                padding: 0.6rem;
-                word-break: break-word;
-                white-space: normal;        
+                padding: 0.6rem;  
                 min-width: 50px;        
                 max-width: 90px; /*
             }}            
