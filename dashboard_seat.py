@@ -203,15 +203,13 @@ def start_telegram_listener():
 import requests
 import socket
 
-chart_timedelta = float(os.getenv("CHART_TIME_DELTA", "12"))
-
 def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
     history_path = "/home/mmkkshim/anding_bot/log/seat_history.csv"
 
     from datetime import timedelta
 
     history_rows = []
-    cutoff_time = datetime.now(kst) - timedelta(hours=chart_timedelta)
+    cutoff_time = datetime.now(kst) - timedelta(hours=12)
 
     with open(history_path, "r", encoding="utf-8") as f:
         for line in reversed(f.readlines()):
