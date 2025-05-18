@@ -37,5 +37,5 @@ if __name__ == "__main__":
     main_check_payment()
     main_check_studyroom()
         
-    if should_run_studyroom():
-        main_check_studyroom()
+    # if should_run_studyroom():
+    #     main_check_studyroom()
