@@ -247,22 +247,9 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     x: {{
                         type: 'time',
                         time: {{
+                            unit: 'minute',
                             displayFormats: {{
                                 minute: 'HH:mm'
-                            }},
-                            tooltipFormat: 'HH:mm'
-                        }},
-                        ticks: {{
-                            callback: function(value, index, ticks) {{
-                                const date = new Date(value);
-                                const hours = date.getHours();
-                                const minutes = date.getMinutes();
-                                if (minutes === 0 || minutes === 30) {{
-                                    const hour12 = hours % 12 || 12;
-                                    const suffix = hours < 12 ? 'AM' : 'PM';
-                                    return `${{hour12}}:${{('0' + minutes).slice(-2)}} ${{suffix}}`;
-                                }}
-                                return '';
                             }}
                         }},
                         title: {{
@@ -298,7 +285,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 margin: 0;
                 display: flex;
                 align-items: flex-start;
-                max-height: 60vh;
+                max-height: 70vh;
                 box-sizing: border-box;
                 justify-content: center;
                 text-align: center;  /* 텍스트 정렬 보정 */
@@ -334,9 +321,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 margin-top: 1rem;
             }}          
             @media (max-width: 480px) {{
-                body{{
-                    max-height: 70vh;
-                }}
                 .box {{
                     max-height: 100vh;  /* 화면 높이의 90%까지 확장 */
                 }}
@@ -351,7 +335,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             <div class="stat">남은 자유석: {remaining}석</div>            
             <div class="updated">업데이트 시각: {now_str}</div>
             <div style="margin-top:0.5rem;">            
-                 <canvas id="seatChart" style="height: 30vh; width: 100%;"></canvas>
+                 <canvas id="seatChart" height="200"></canvas>
                 {chart_script}
             </div>
         </div>
