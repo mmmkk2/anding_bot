@@ -212,7 +212,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         parts = line.strip().split(",")
         if len(parts) >= 2:
             timestamp_obj = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
-            timestamps.append(timestamp_obj.strftime("%H:%M"))
+            timestamps.append(timestamp_obj.strftime("%Y-%m-%dT%H:%M:%S"))
             used_frees.append(int(parts[1]))
     # Determine line color based on status_emoji
     if status_emoji == "🔴":
@@ -245,10 +245,9 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     x: {{
                         type: 'time',
                         time: {{
-                            parser: 'HH:mm',
-                            unit: 'hour',
+                            unit: 'minute',
                             displayFormats: {{
-                                hour: 'HH:mm'
+                                minute: 'HH:mm'
                             }}
                         }},
                         title: {{
