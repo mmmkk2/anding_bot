@@ -28,6 +28,13 @@ def check_studyroom(driver):
     time.sleep(2)  # 로그인 후 쿠키 세팅 대기
     driver.get(ROOM_URL)
     print("[DEBUG] 예약룸 진입 완료")
+    try:
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div.col-sm-4.mb-sm-2 input"))
+        )
+        print("[DEBUG] 종료일 입력 필드 로딩 완료")
+    except TimeoutException:
+        raise Exception("❌ [예약룸 오류] 종료일 입력 필드를 찾을 수 없습니다.")
 
     # (테이블 대기 삭제됨: 검색 버튼 클릭 이후로 이동)
     today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
