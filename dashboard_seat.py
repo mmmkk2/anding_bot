@@ -247,10 +247,19 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     x: {{
                         type: 'time',
                         time: {{
-                            unit: 'minute',
-                            stepSize: 30,
                             displayFormats: {{
                                 minute: 'HH:mm'
+                            }},
+                            tooltipFormat: 'HH:mm',
+                            unit: 'minute',
+                            round: 'minute'
+                        }},
+                        ticks: {{
+                            source: 'auto',
+                            callback: function(value, index, ticks) {{
+                                const date = new Date(value);
+                                const minutes = date.getMinutes();
+                                return (minutes === 0 || minutes === 30) ? date.toTimeString().slice(0,5) : '';
                             }}
                         }},
                         title: {{
