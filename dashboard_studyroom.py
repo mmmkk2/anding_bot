@@ -53,6 +53,8 @@ def check_studyroom(driver):
     search_button.click()
     print("[DEBUG] 검색 버튼 클릭 완료")
 
+    time.sleep(1.5)  # Ensure search results load fully before parsing
+
     # 검색 버튼 클릭 후, 테이블 행이 로드될 때까지 대기
     try:
         WebDriverWait(driver, 10).until(
@@ -65,17 +67,16 @@ def check_studyroom(driver):
             f.write(driver.page_source)
         raise Exception("❌ [예약룸 오류] 유효한 예약 데이터를 포함한 행이 나타나지 않았습니다.")
 
-    soup = BeautifulSoup(driver.page_source, "html.parser")
-
-    table = soup.select_one("table")
-    rows = table.select("tbody tr") if table else []
+    rows = driver.find_elements(By.CSS_SELECTOR, "table#m_table_1 tbody tr")
 
     reservations = []
 
 
     for row in rows:
-        cols = row.find_all("td")
-        print(cols)
+        if "dataTables_empty" in row.get_attribute("class"):
+            continue
+
+        cols = row.find_elements(By.TAG_NAME, "td")
         if len(cols) >= 6:
             reserve_date = cols[0].text.strip()
             reserve_time = cols[1].text.strip()
