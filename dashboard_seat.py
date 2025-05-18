@@ -285,7 +285,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 margin: 0;
                 display: flex;
                 align-items: flex-start;
-                min-height: 90vh;
+                min-height: 100vh;
                 box-sizing: border-box;
                 justify-content: center;
                 text-align: center;  /* 텍스트 정렬 보정 */
@@ -302,13 +302,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 overflow-y: auto;
                 margin: 0 auto;
             }}       
-            @media (max-width: 480px) {{
-                .box {{
-                max-width: 95vw;
-                /* padding: 1.2rem; */
-                min-height: 90vh;  /* 화면 높이의 90%까지 확장 */
-                }}
-            }}         
             h1 {{
                 font-size: 1.1rem;
                 margin-bottom: 1rem;
@@ -326,7 +319,14 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 font-size: 0.8rem;
                 color: #888;
                 margin-top: 1rem;
-            }}            
+            }}          
+            @media (max-width: 480px) {{
+                .box {{
+                max-width: 95vw;
+                /* padding: 1.2rem;
+                min-height: 80vh;  /* 화면 높이의 90%까지 확장 */
+                }}
+            }}                
         </style>
     </head>
     <body>
@@ -337,7 +337,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             <div class="stat">남은 자유석: {remaining}석</div>            
             <div class="updated">업데이트 시각: {now_str}</div>
             <div style="margin-top:0.5rem;">            
-                <canvas id="seatChart" style="height: 40vh;"></canvas>
+                <canvas id="seatChart" style="height: 30vh; ></canvas>
                 {chart_script}
             </div>
         </div>
