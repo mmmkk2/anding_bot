@@ -232,6 +232,12 @@ def check_studyroom(driver):
     </html>
     """
 
+    # Always print a summary, even if DEBUG is False
+    if not reservations and not DEBUG:
+        print("[INFO] 완료: 예약 건수가 없어 출력하지 않았습니다.")
+    elif not DEBUG:
+        print(f"[INFO] 완료: {len(reservations)}건의 예약 정보를 HTML로 저장했습니다.")
+
     with open("/home/mmkkshim/anding_bot/studyroom_dashboard.html", "w", encoding="utf-8") as f:
         f.write(html)
 
