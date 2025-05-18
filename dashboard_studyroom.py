@@ -33,6 +33,7 @@ def check_studyroom(driver):
             EC.presence_of_element_located((By.CSS_SELECTOR, "div.col-sm-4.mb-sm-2 input"))
         )
         print("[DEBUG] 종료일 입력 필드 로딩 완료")
+        print("[DEBUG] 종료일 입력 필드에 날짜 입력 시도:", datetime.now(kst).strftime("%Y.%m.%d"))
     except TimeoutException:
         raise Exception("❌ [예약룸 오류] 종료일 입력 필드를 찾을 수 없습니다.")
 
@@ -44,10 +45,12 @@ def check_studyroom(driver):
     end_input.clear()
     end_input.send_keys(today_date_str)
     end_input.send_keys(Keys.RETURN)
+    print("[DEBUG] 종료일 입력 완료 및 엔터 전송")
     
     # Click the 검색 버튼 (parent of <i class="fas fa-search"></i>)
     search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
     search_button.click()
+    print("[DEBUG] 검색 버튼 클릭 완료")
 
     # 검색 버튼 클릭 후, 테이블 행이 로드될 때까지 대기
     try:
