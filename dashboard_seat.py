@@ -337,7 +337,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             <div class="stat">남은 자유석: {remaining}석</div>            
             <div class="updated">업데이트 시각: {now_str}</div>
             <div style="margin-top:0.5rem;">            
-                <canvas id="seatChart" style="height: 30vh;"></canvas>
+                <canvas id="seatChart" style="height: 40vh;"></canvas>
                 {chart_script}
             </div>
         </div>
