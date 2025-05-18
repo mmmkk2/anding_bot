@@ -301,7 +301,14 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 text-align: center;
                 overflow-y: auto;
                 margin: 0 auto;
-            }}                     
+            }}       
+            @media (max-width: 480px) {{
+                .box {{
+                max-width: 95vw;
+                /* padding: 1.2rem; */
+                min-height: 90vh;  /* 화면 높이의 90%까지 확장 */
+                }}
+            }}         
             h1 {{
                 font-size: 1.1rem;
                 margin-bottom: 1rem;
