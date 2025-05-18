@@ -277,10 +277,14 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                             }}
                         }},
                         ticks: {{
-                            callback: function(value) {{
+                            callback: function(value, index, ticks) {{
                                 const date = new Date(value);
-                                const minutes = date.getMinutes();
-                                return (minutes === 0 || minutes === 30) ? date.toTimeString().slice(0,5) : '';
+                                const hours = date.getHours().toString().padStart(2, '0');
+                                const minutes = date.getMinutes().toString().padStart(2, '0');
+                                if (minutes === '00' || minutes === '30') {{
+                                    return hours + ':' + minutes;
+                                }}
+                                return '';
                             }}
                         }},
                         title: {{
