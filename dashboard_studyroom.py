@@ -27,6 +27,8 @@ def check_studyroom(driver):
     print("[DEBUG] 예약룸 페이지 진입 시도 중:", ROOM_URL)
     time.sleep(2)  # 로그인 후 쿠키 세팅 대기
     driver.get(ROOM_URL)
+    print("[DEBUG] 현재 페이지 URL:", driver.current_url)
+    print("[DEBUG] 현재 페이지 TITLE:", driver.title)
     print("[DEBUG] 예약룸 진입 완료")
     try:
         WebDriverWait(driver, 10).until(
@@ -42,6 +44,7 @@ def check_studyroom(driver):
 
     # Set the 종료일 input field
     end_input = driver.find_element(By.CSS_SELECTOR, "div.col-sm-4.mb-sm-2 input")
+    print("[DEBUG] 종료일 input 태그 구조:", end_input.get_attribute("outerHTML"))
     end_input.clear()
     end_input.send_keys(today_date_str)
     print("[DEBUG] 종료일 입력 필드 현재 값:", end_input.get_attribute("value"))
@@ -50,6 +53,7 @@ def check_studyroom(driver):
     
     # Click the 검색 버튼 (parent of <i class="fas fa-search"></i>)
     search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
+    print("[DEBUG] 검색 버튼 태그 구조:", search_button.get_attribute("outerHTML"))
     search_button.click()
     print("[DEBUG] 검색 버튼 클릭 완료")
     time.sleep(1.5)  # Ensure search results load fully before parsing
@@ -67,6 +71,7 @@ def check_studyroom(driver):
         raise Exception("❌ [예약룸 오류] 유효한 예약 데이터를 포함한 행이 나타나지 않았습니다.")
 
     rows = driver.find_elements(By.CSS_SELECTOR, "table#m_table_1 tbody tr")
+    print(f"[DEBUG] 검색 결과 행 수: {len(rows)}")
 
     reservations = []
 
@@ -76,6 +81,10 @@ def check_studyroom(driver):
             continue
 
         cols = row.find_elements(By.TAG_NAME, "td")
+        print("[DEBUG] row HTML:", row.get_attribute("outerHTML"))
+        print("[DEBUG] col count:", len(cols))
+        for i, col in enumerate(cols):
+            print(f"[DEBUG] col[{i}] text: {col.text.strip()}")
         if len(cols) >= 6:
             reserve_date = cols[0].text.strip()
             reserve_time = cols[1].text.strip()
@@ -83,6 +92,15 @@ def check_studyroom(driver):
             room_type = cols[3].text.strip()
             start_time = cols[4].text.strip()
             end_time = cols[5].text.strip()
+
+            print("[DEBUG] 추출된 값:", {
+                "reserve_date": reserve_date,
+                "reserve_time": reserve_time,
+                "name": name,
+                "room_type": room_type,
+                "start_time": start_time,
+                "end_time": end_time
+            })
 
             date_part = end_time.split(" ")[0]
             reservation_time = f"{start_time} ~ {end_time}"
