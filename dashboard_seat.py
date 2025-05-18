@@ -248,10 +248,8 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         type: 'time',
                         time: {{
                             unit: 'minute',
-<<<<<<< HEAD
                             displayFormats: {{
                                 minute: 'HH:mm'
-=======
                             unitStepSize: 30,
                             displayFormats: {{
                                 minute: 'HH:mm'
@@ -270,7 +268,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                                     return `${{formattedHour}}:${{('0' + minute).slice(-2)}} ${{ampm}}`;
                                 }}
                                 return '';
->>>>>>> 4c97ab05df36f777c2012eba5902910d9e6608e7
                             }}
                         }}
                     }},
