@@ -21,8 +21,21 @@ today_str = datetime.now(kst).strftime("%Y.%m.%d")
 def check_studyroom(driver):
 
     driver.get(ROOM_URL)
+    # --- Set 종료일 to today, click 검색, and wait for table update ---
+    from selenium.webdriver.common.keys import Keys
+    from datetime import datetime
+    today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
+    # Set the 종료일 input field
+    end_input = driver.find_element(By.CSS_SELECTOR, "div.col-sm-4.mb-sm-2 input")
+    end_input.clear()
+    end_input.send_keys(today_date_str)
+    end_input.send_keys(Keys.RETURN)
+    # Click the 검색 버튼 (parent of <i class="fas fa-search"></i>)
+    search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
+    search_button.click()
+    # Wait for table to update
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
-
+    # ---------------------------------------------------------------
 
     soup = BeautifulSoup(driver.page_source, "html.parser")
 
