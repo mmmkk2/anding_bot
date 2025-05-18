@@ -16,6 +16,8 @@ from selenium.webdriver.support import expected_conditions as EC
 BASE_URL = "https://partner.cobopay.co.kr"
 ROOM_URL = f"{BASE_URL}/use/studyUse"
 
+CSS_FILE = os.getenv("CSS_FILE")
+
 kst = pytz.timezone("Asia/Seoul")
 today_str = datetime.now(kst).strftime("%Y.%m.%d")
 
@@ -159,85 +161,7 @@ def check_studyroom(driver):
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>스터디룸 예약 현황</title>
         <meta http-equiv="refresh" content="60">
-        <style>
-            body {{
-                font-family: 'Apple SD Gothic Neo', Arial, sans-serif;
-                background: #f1f3f5;
-                padding: 0.5rem;
-                margin: 0;
-                display: flex;
-                align-items: flex-start;
-                min-height: 100vh;
-                box-sizing: border-box;
-                justify-content: center;
-                text-align: center;
-                max-width: 100vw;
-            }}
-            .box {{
-                background: white;
-                border-radius: 1rem;
-                padding: 1rem;
-                max-width: 650px;
-                width: 100%;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                text-align: center;
-                margin: 0 auto;
-            }}
-            @media (max-width: 480px) {{
-                .box {{
-                max-width: 95vw;
-                /* padding: 1.2rem; */
-                min-height: 90vh;  /* 화면 높이의 90%까지 확장 */
-                }}
-            }}             
-            h1 {{
-                font-size: 1.1rem;
-                margin-bottom: 1rem;
-                color: #333;
-            }}
-            .summary {{
-                font-size: 1rem;
-                margin-bottom: 1rem;
-                color: #555;
-            }}
-            .updated {{
-                font-size: 0.8rem;
-                color: #888;
-                margin-top: 1rem;
-                text-align: center;
-            }}
-            .tables {{
-                display: flex;
-                justify-content: space-around;
-                gap: 1rem;
-                flex-wrap: wrap;
-            }}
-            .table-box {{
-                flex: 1;
-                min-width: 280px;
-            }}
-            .table-box h2 {{
-                font-size: 1rem;
-                margin: 0.5rem 0;
-            }}
-            table {{
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 0.8rem;
-                margin-top: 1rem;
-            }}
-            th, td {{
-                border: 1px solid #dee2e6;
-                padding: 0.2rem;
-            }}
-            th {{
-                background-color: #6c757d;
-                color: white;
-            }}
-            tr:nth-child(even) {{
-                background-color: #f8f9fa;
-            }}
-        </style>
+        <link rel="stylesheet" href="{CSS_FILE}">
     </head>
     <body>
         <div class="box">
