@@ -205,7 +205,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     if os.path.exists(history_path):
         with open(history_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
-            history_rows = lines[-10:]
+            history_rows = lines[-20:]
     timestamps = []
     used_frees = []
     for line in history_rows:
