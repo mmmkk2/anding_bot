@@ -45,14 +45,14 @@ def check_studyroom(driver):
     # 검색 버튼 클릭 후, 테이블 행이 로드될 때까지 대기
     try:
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "table#m_table_1 tbody tr"))
+            EC.presence_of_element_located((By.XPATH, "//table[@id='m_table_1']//tbody/tr[not(contains(@class, 'dataTables_empty'))]"))
         )
         print("[DEBUG] 예약룸 테이블 로딩 완료")
         time.sleep(1.5)  # JS에서 row 생성 시간 확보
     except TimeoutException:
         with open("debug_studyroom_timeout.html", "w", encoding="utf-8") as f:
             f.write(driver.page_source)
-        raise Exception("❌ [예약룸 오류] 예약 테이블을 찾지 못했습니다.")
+        raise Exception("❌ [예약룸 오류] 유효한 예약 데이터를 포함한 행이 나타나지 않았습니다.")
 
     soup = BeautifulSoup(driver.page_source, "html.parser")
 
