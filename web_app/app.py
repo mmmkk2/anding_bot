@@ -4,7 +4,100 @@ import re
 from datetime import datetime
 import pytz  # 추가
 
+
 app = Flask(__name__)
+
+# --- Form-based login logic ---
+from flask import request, redirect, url_for, session, render_template_string
+
+app.secret_key = "your_secret_key"  # change this to a secure value
+
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        if username == "anding" and password == "study1234":
+            session["logged_in"] = True
+            return redirect(url_for("summary_dashboard"))
+        return "로그인 실패", 401
+    return render_template_string('''
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>로그인</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+        h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 0.7rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 0.7rem;
+            background: #495057;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #343a40;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <form method="post">
+            <h3>로그인</h3>
+            <input type="text" name="username" placeholder="아이디" required>
+            <input type="password" name="password" placeholder="비밀번호" required>
+            <button type="submit">로그인</button>
+        </form>
+    </div>
+</body>
+</html>
+''')
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+@app.before_request
+def require_login():
+    if request.endpoint not in ("login", "static") and not session.get("logged_in"):
+        return redirect(url_for("login"))
 
 
 @app.route("/")
