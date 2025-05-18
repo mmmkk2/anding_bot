@@ -43,8 +43,8 @@ def check_studyroom(driver):
     today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
 
     # Set the 종료일 input field
-    end_input = driver.find_element(By.CSS_SELECTOR, "div.col-sm-4.mb-sm-2 input")
-    print("[DEBUG] 종료일 input 태그 구조:", end_input.get_attribute("outerHTML"))
+    end_input = driver.find_element(By.CSS_SELECTOR, "input[name='s_end_dt']")
+    print("[DEBUG] 종료일 input 태그 구조 (name='s_end_dt'):", end_input.get_attribute("outerHTML"))
     end_input.clear()
     end_input.send_keys(today_date_str)
     print("[DEBUG] 종료일 입력 필드 현재 값:", end_input.get_attribute("value"))
