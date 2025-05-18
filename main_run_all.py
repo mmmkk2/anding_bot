@@ -33,8 +33,9 @@ if __name__ == "__main__":
     # listener_thread = threading.Thread(target=start_telegram_listener, daemon=True)
     # listener_thread.start()
 
-    main_check_seat()
+    
     main_check_payment()
+    main_check_seat()
     main_check_studyroom()
         
     # if should_run_studyroom():
