@@ -42,17 +42,14 @@ def check_studyroom(driver):
     # (테이블 대기 삭제됨: 검색 버튼 클릭 이후로 이동)
     today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
 
-    # Set the 종료일 input field
+    # Set the 종료일 input field using JavaScript
     end_input = driver.find_element(By.CSS_SELECTOR, "input[name='s_end_date']")
     print("[DEBUG] 종료일 input 태그 구조 (name='s_end_date'):", end_input.get_attribute("outerHTML"))
-    end_input.clear()
-    end_input.send_keys(Keys.CONTROL + "a")
-    end_input.send_keys(Keys.DELETE)
-    end_input.send_keys(today_date_str)
-    end_input.send_keys(Keys.ENTER)
-    end_input.send_keys(Keys.TAB)
+    script = f"document.querySelector('input[name=\"s_end_date\"]').value = '{today_date_str}';"
+    driver.execute_script(script)
     time.sleep(0.5)
-    print("[DEBUG] 종료일 입력 필드 현재 값:", end_input.get_attribute("value"))
+    value_after = driver.execute_script("return document.querySelector('input[name=\"s_end_date\"]').value;")
+    print("[DEBUG] JS로 설정된 종료일 값:", value_after)
     
     # Click the 검색 버튼 (parent of <i class="fas fa-search"></i>)
     search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
