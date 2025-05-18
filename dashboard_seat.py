@@ -257,12 +257,12 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                             source: 'auto',
                             callback: function(value, index, ticks) {{
                                 const date = new Date(value);
-                                const minutes = date.getMinutes();
-                                const hours = date.getHours();
-                                const hour12 = hours % 12 || 12;
-                                const suffix = hours < 12 ? 'AM' : 'PM';
-                                if (minutes === 0 || minutes === 30) {{
-                                    return `${{hour12}}:${{('0' + minutes).slice(-2)}} ${{suffix}}`;
+                                const hour = date.getHours();
+                                const minute = date.getMinutes();
+                                const formattedHour = hour % 12 || 12;
+                                const ampm = hour < 12 ? "AM" : "PM";
+                                if (minute === 0 || minute === 30) {{
+                                    return `${{formattedHour}}:${{('0' + minute).slice(-2)}} ${{ampm}}`;
                                 }}
                                 return '';
                             }}
