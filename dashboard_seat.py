@@ -29,8 +29,6 @@ except:
 COOKIE_FILE = os.getenv("COOKIE_FILE") or "/home/mmkkshim/anding_bot/log/last_payment_id.pkl"
 SEAT_CACHE_FILE = os.getenv("SEAT_CACHE_FILE") or "/home/mmkkshim/anding_bot/log/last_seat_state.pkl"
 
-CSS_FILE = os.getenv("CSS_FILE")
-
 FIX_SEATS = int(os.getenv("FIX_SEATS", 5))
 LAPTOP_SEATS = int(os.getenv("LAPTOP_SEATS", 6))
 
@@ -203,13 +201,15 @@ def start_telegram_listener():
 import requests
 import socket
 
+chart_timedelta = float(os.getenv("CHART_TIME_DELTA", "12"))
+
 def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
     history_path = "/home/mmkkshim/anding_bot/log/seat_history.csv"
 
     from datetime import timedelta
 
     history_rows = []
-    cutoff_time = datetime.now(kst) - timedelta(hours=12)
+    cutoff_time = datetime.now(kst) - timedelta(hours=chart_timedelta)
 
     with open(history_path, "r", encoding="utf-8") as f:
         for line in reversed(f.readlines()):
@@ -291,7 +291,58 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <title>좌석 현황</title>
         <meta http-equiv="refresh" content="60">
-        <link rel="stylesheet" href="{CSS_FILE}">
+        <style>
+            body {{
+                font-family: 'Apple SD Gothic Neo', 'Arial', sans-serif;
+                background: #f1f3f5;
+                padding: 0.5rem;
+                margin: 0;
+                display: flex;
+                align-items: flex-start;
+                max-height: 60vh;
+                box-sizing: border-box;
+                justify-content: center;
+                text-align: center;  /* 텍스트 정렬 보정 */
+                max-width: 100vw;
+            }}
+            .box {{
+                background: white;
+                border-radius: 1rem;
+                padding: 1rem;
+                max-width: 650px;         /* max-width: 600px */
+                width: 100%;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                text-align: center;
+                overflow-y: auto;
+                margin: 0 auto;
+            }}       
+            h1 {{
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+                color: #333;
+            }}
+            .emoji {{
+                font-size: 1.0rem;
+                margin-bottom: 1rem;
+            }}
+            .stat {{
+                font-size: 0.9rem;
+                margin: 0.3rem 0;
+            }}
+            .updated {{
+                font-size: 0.8rem;
+                color: #888;
+                margin-top: 1rem;
+            }}          
+            @media (max-width: 480px) {{
+                body{{
+                    max-height: 70vh;
+                }}
+                .box {{
+                    max-height: 100vh;  /* 화면 높이의 90%까지 확장 */
+                }}
+            }}                
+        </style>
     </head>
     <body>
         <div class="box">
