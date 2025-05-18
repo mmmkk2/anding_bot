@@ -324,7 +324,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 .box {{
                 max-width: 95vw;
                 /* padding: 1.2rem;
-                min-height: 80vh;  /* 화면 높이의 90%까지 확장 */
+                max-height: 600;  /* 화면 높이의 90%까지 확장 */
                 }}
             }}                
         </style>
