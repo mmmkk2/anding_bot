@@ -86,18 +86,14 @@ def check_studyroom(driver):
         for i, col in enumerate(cols):
             print(f"[DEBUG] col[{i}] text: {col.text.strip()}")
         if len(cols) >= 6:
-            reserve_date = cols[0].text.strip()
-            reserve_time = cols[1].text.strip()
+            room_type = cols[1].text.strip()
             name = cols[2].text.strip()
-            room_type = cols[3].text.strip()
             start_time = cols[4].text.strip()
             end_time = cols[5].text.strip()
 
             print("[DEBUG] 추출된 값:", {
-                "reserve_date": reserve_date,
-                "reserve_time": reserve_time,
-                "name": name,
                 "room_type": room_type,
+                "name": name,
                 "start_time": start_time,
                 "end_time": end_time
             })
