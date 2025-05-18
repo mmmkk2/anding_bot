@@ -223,15 +223,18 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         line_color = 'rgba(75, 192, 192, 1)'  # green
     chart_script = f"""
     <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns'></script>
     <script>
         const ctx = document.getElementById('seatChart').getContext('2d');
         new Chart(ctx, {{
             type: 'line',
             data: {{
-                labels: {timestamps},
+                labels: [],
                 datasets: [{{
                     label: '자유석 사용 수',
-                    data: {used_frees},
+                    data: [
+                        {''.join([f"{{ x: '{t}', y: {y} }}," for t, y in zip(timestamps, used_frees)])}
+                    ],
                     borderColor: '{line_color}',
                     tension: 0.1
                 }}]
@@ -239,6 +242,20 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             options: {{
                 responsive: true,
                 scales: {{
+                    x: {{
+                        type: 'time',
+                        time: {{
+                            parser: 'HH:mm',
+                            unit: 'hour',
+                            displayFormats: {{
+                                hour: 'HH:mm'
+                            }}
+                        }},
+                        title: {{
+                            display: true,
+                            text: '시간대'
+                        }}
+                    }},
                     y: {{
                         beginAtZero: true,
                         max: {total_free}
