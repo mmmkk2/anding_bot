@@ -206,28 +206,17 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     from datetime import timedelta
 
     history_rows = []
-    from datetime import timedelta
-    cutoff_time = datetime.now(kst).replace(minute=0, second=0, microsecond=0) - timedelta(hours=12)
-    now = datetime.now(kst)
-    now_floor = now.replace(minute=(0 if now.minute < 30 else 30), second=0, microsecond=0)
-    # 6.5시간 = 13개 슬롯 (30분 단위)
-    time_slots = [cutoff_time + timedelta(minutes=30 * i) for i in range(13)]
-
-    data_map = {}
     if os.path.exists(history_path):
+        cutoff_time = datetime.now(kst) - timedelta(hours=12)
         with open(history_path, "r", encoding="utf-8") as f:
-            for line in f:
+            for line in reversed(f.readlines()):
                 parts = line.strip().split(",")
                 if len(parts) >= 2:
-                    timestamp_obj = kst.localize(datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S"))
-                    key_time = timestamp_obj.replace(minute=(0 if timestamp_obj.minute < 30 else 30), second=0, microsecond=0)
-                    data_map[key_time] = int(parts[1])
-
-    for t in time_slots:
-        if t in data_map:
-            history_rows.append(f"{t.strftime('%Y-%m-%d %H:%M:%S')},{data_map[t]}")
-        else:
-            history_rows.append(f"{t.strftime('%Y-%m-%d %H:%M:%S')},-1")
+                    timestamp_obj = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
+                    if timestamp_obj >= cutoff_time:
+                        history_rows.insert(0, line)
+                    else:
+                        break
     timestamps = []
     used_frees = []
     for line in history_rows:
@@ -235,10 +224,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         if len(parts) >= 2:
             timestamp_obj = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
             timestamps.append(timestamp_obj.strftime("%Y-%m-%dT%H:%M:%S"))
-            try:
-                used_frees.append(int(parts[1]))
-            except ValueError:
-                used_frees.append(None)
+            used_frees.append(int(parts[1]))
     # Determine line color based on status_emoji
     if status_emoji == "🔴":
         line_color = 'rgba(255, 99, 132, 1)'  # red
