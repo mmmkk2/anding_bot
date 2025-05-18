@@ -107,11 +107,18 @@ def check_studyroom(driver):
             })
 
             if date_part == today_str and ("2인" in room_type or "4인" in room_type):
+                if "2인" in room_type:
+                    room_label = "2인실"
+                elif "4인" in room_type:
+                    room_label = "4인실"
+                else:
+                    room_label = room_type
+
                 reservations.append({
                     "date": date_part,
                     "time": reservation_time,
                     "name": name,
-                    "room": room_type
+                    "room": room_label
                 })
             else:
                 print("[DEBUG] 필터 제외됨:", {
