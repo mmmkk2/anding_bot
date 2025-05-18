@@ -252,7 +252,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         }},
                         title: {{
                             display: true,
-                            text: '시간대'
+                            text: '시간'
                         }}
                     }},
                     y: {{
@@ -293,7 +293,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 background: white;
                 border-radius: 1rem;
                 padding: 1rem;
-                max-width: 95vw;         /* max-width: 600px */
+                max-width: 650px;         /* max-width: 600px */
                 width: 100%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 text-align: center;
