@@ -212,7 +212,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             for line in reversed(f.readlines()):
                 parts = line.strip().split(",")
                 if len(parts) >= 2:
-                    timestamp_obj = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
+                    timestamp_obj = kst.localize(datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S"))
                     if timestamp_obj >= cutoff_time:
                         history_rows.insert(0, line)
                     else:
