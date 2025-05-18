@@ -247,14 +247,15 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     x: {{
                         type: 'time',
                         time: {{
+                            unit: 'minute',
+                            unitStepSize: 30,
                             displayFormats: {{
                                 minute: 'HH:mm'
                             }},
                             tooltipFormat: 'HH:mm'
                         }},
                         ticks: {{
-                            stepSize: 30,
-                            source: 'auto',
+                            autoSkip: false,
                             callback: function(value, index, ticks) {{
                                 const date = new Date(value);
                                 const hour = date.getHours();
@@ -266,10 +267,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                                 }}
                                 return '';
                             }}
-                        }},
-                        title: {{
-                            display: false,
-                            text: '시간'
                         }}
                     }},
                     y: {{
