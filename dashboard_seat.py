@@ -235,10 +235,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         if len(parts) >= 2:
             timestamp_obj = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
             timestamps.append(timestamp_obj.strftime("%Y-%m-%dT%H:%M:%S"))
-            try:
-                used_frees.append(int(parts[1]))
-            except ValueError:
-                used_frees.append(None)
+            used_frees.append(int(parts[1]))
     # Determine line color based on status_emoji
     if status_emoji == "🔴":
         line_color = 'rgba(255, 99, 132, 1)'  # red
