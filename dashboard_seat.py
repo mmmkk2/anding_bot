@@ -285,7 +285,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 margin: 0;
                 display: flex;
                 align-items: flex-start;
-                max-height: 80vh;
+                max-height: 70vh;
                 box-sizing: border-box;
                 justify-content: center;
                 text-align: center;  /* 텍스트 정렬 보정 */
@@ -321,9 +321,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 margin-top: 1rem;
             }}          
             @media (max-width: 480px) {{
-                body {{
-
-                }}
                 .box {{
                     max-height: 100vh;  /* 화면 높이의 90%까지 확장 */
                 }}
