@@ -43,13 +43,16 @@ def check_studyroom(driver):
     today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
 
     # Set the 종료일 input field
-    end_input = driver.find_element(By.CSS_SELECTOR, "input[name='s_end_dt']")
-    print("[DEBUG] 종료일 input 태그 구조 (name='s_end_dt'):", end_input.get_attribute("outerHTML"))
+    end_input = driver.find_element(By.CSS_SELECTOR, "input[name='s_end_date']")
+    print("[DEBUG] 종료일 input 태그 구조 (name='s_end_date'):", end_input.get_attribute("outerHTML"))
     end_input.clear()
+    end_input.send_keys(Keys.CONTROL + "a")
+    end_input.send_keys(Keys.DELETE)
     end_input.send_keys(today_date_str)
+    end_input.send_keys(Keys.ENTER)
+    end_input.send_keys(Keys.TAB)
+    time.sleep(0.5)
     print("[DEBUG] 종료일 입력 필드 현재 값:", end_input.get_attribute("value"))
-    end_input.send_keys(Keys.RETURN)
-    time.sleep(1)
     
     # Click the 검색 버튼 (parent of <i class="fas fa-search"></i>)
     search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
