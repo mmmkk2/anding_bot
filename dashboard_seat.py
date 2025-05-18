@@ -248,13 +248,30 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         type: 'time',
                         time: {{
                             unit: 'minute',
+<<<<<<< HEAD
                             displayFormats: {{
                                 minute: 'HH:mm'
-                            }}
+=======
+                            unitStepSize: 30,
+                            displayFormats: {{
+                                minute: 'HH:mm'
+                            }},
+                            tooltipFormat: 'HH:mm'
                         }},
-                        title: {{
-                            display: false,
-                            text: '시간'
+                        ticks: {{
+                            autoSkip: false,
+                            callback: function(value, index, ticks) {{
+                                const date = new Date(value);
+                                const hour = date.getHours();
+                                const minute = date.getMinutes();
+                                const formattedHour = hour % 12 || 12;
+                                const ampm = hour < 12 ? "AM" : "PM";
+                                if (minute === 0 || minute === 30) {{
+                                    return `${{formattedHour}}:${{('0' + minute).slice(-2)}} ${{ampm}}`;
+                                }}
+                                return '';
+>>>>>>> 4c97ab05df36f777c2012eba5902910d9e6608e7
+                            }}
                         }}
                     }},
                     y: {{
