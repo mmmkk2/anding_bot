@@ -106,7 +106,7 @@ def check_studyroom(driver):
                 "end_time": end_time, "date_part": date_part, "today": today_str
             })
 
-            if today_str in date_part and ("2인실" in room_type or "4인실" in room_type):
+            if date_part == today_str and ("2인" in room_type or "4인" in room_type):
                 reservations.append({
                     "date": date_part,
                     "time": reservation_time,
