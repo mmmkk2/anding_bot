@@ -47,14 +47,17 @@ def check_studyroom(driver):
 
     for row in rows:
         cols = row.find_all("td")
+        print(cols)
         if len(cols) >= 6:
-            room_type = cols[0].text.strip()
-            name = cols[1].text.strip()
-            user_count = cols[2].text.strip()
-            start_time = cols[3].text.strip()
-            end_time = cols[4].text.strip()
-            reservation_time = f"{start_time} ~ {end_time}"
+            reserve_date = cols[0].text.strip()
+            reserve_time = cols[1].text.strip()
+            name = cols[2].text.strip()
+            room_type = cols[3].text.strip()
+            start_time = cols[4].text.strip()
+            end_time = cols[5].text.strip()
+
             date_part = end_time.split(" ")[0]
+            reservation_time = f"{start_time} ~ {end_time}"
 
             if date_part == today_str and ("2인실" in room_type or "4인실" in room_type):
                 reservations.append({
