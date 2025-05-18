@@ -203,11 +203,20 @@ import socket
 
 def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
     history_path = "/home/mmkkshim/anding_bot/log/seat_history.csv"
+    from datetime import timedelta
+
     history_rows = []
     if os.path.exists(history_path):
+        cutoff_time = datetime.now(kst) - timedelta(hours=6)
         with open(history_path, "r", encoding="utf-8") as f:
-            lines = f.readlines()
-            history_rows = lines[-20:]
+            for line in reversed(f.readlines()):
+                parts = line.strip().split(",")
+                if len(parts) >= 2:
+                    timestamp_obj = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
+                    if timestamp_obj >= cutoff_time:
+                        history_rows.insert(0, line)
+                    else:
+                        break
     timestamps = []
     used_frees = []
     for line in history_rows:
