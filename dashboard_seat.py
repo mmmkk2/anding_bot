@@ -207,7 +207,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     from datetime import timedelta
 
     history_rows = []
-    cutoff_time = datetime.now(kst) - timedelta(hours=3)
+    cutoff_time = datetime.now(kst) - timedelta(hours=12)
 
     with open(history_path, "r", encoding="utf-8") as f:
         for line in reversed(f.readlines()):
