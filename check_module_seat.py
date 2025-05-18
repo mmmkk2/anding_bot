@@ -263,8 +263,8 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             body {{
                 font-family: 'Apple SD Gothic Neo', 'Arial', sans-serif;
                 background: #f1f3f5;
-                padding: 1rem;
-                margin: 0.5;
+                padding: 0.5rem;
+                margin: 0;
                 display: flex;
                 align-items: flex-start;
                 min-height: 100vh;
@@ -277,7 +277,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 background: white;
                 border-radius: 1rem;
                 padding: 1rem;
-                max-width: 600px;         /* 데스크탑 기준 최대 폭 */
+                max-width: 95vw;         /* 데스크탑 기준 최대 폭 */
                 width: 100%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 text-align: center;
