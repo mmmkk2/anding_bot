@@ -248,6 +248,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         type: 'time',
                         time: {{
                             unit: 'minute',
+                            stepSize: 30,
                             displayFormats: {{
                                 minute: 'HH:mm'
                             }}
