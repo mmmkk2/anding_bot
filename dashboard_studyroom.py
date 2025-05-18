@@ -99,6 +99,14 @@ def check_studyroom(driver):
                     "name": name,
                     "room": room_type
                 })
+            else:
+                print("[DEBUG] 필터 제외됨:", {
+                    "room_type": room_type,
+                    "name": name,
+                    "end_time": end_time,
+                    "date_part": date_part,
+                    "today_str": today_str
+                })
 
     count_2 = sum(1 for r in reservations if "2인실" in r["room"])
     count_4 = sum(1 for r in reservations if "4인실" in r["room"])
