@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import pytz
 import os
+import time
 from module.set import login, find_location, create_driver, send_broadcast_and_update, send_telegram_and_log
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -16,23 +17,44 @@ ROOM_URL = f"{BASE_URL}/use/studyUse"
 kst = pytz.timezone("Asia/Seoul")
 today_str = datetime.now(kst).strftime("%Y.%m.%d")
 
-
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
+# --- Set 종료일 to today, click 검색, and wait for table update ---
+from selenium.webdriver.common.keys import Keys
+from datetime import datetime
 
 def check_studyroom(driver):
 
+    print("[DEBUG] 예약룸 페이지 진입 시도 중:", ROOM_URL)
+    time.sleep(2)  # 로그인 후 쿠키 세팅 대기
     driver.get(ROOM_URL)
-    # --- Set 종료일 to today, click 검색, and wait for table update ---
-    from selenium.webdriver.common.keys import Keys
-    from datetime import datetime
+    print("[DEBUG] 예약룸 진입 완료")
+
+    try:
+        # '이름' 컬럼이 있는 테이블이 로드될 때까지 대기 (페이지의 결제 테이블에는 id="m_table_1"가 있음)
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.XPATH, "//table[@id='m_table_1']//th[contains(text(), '이름')]"))
+        )
+        print("[DEBUG] 예약룸 테이블 로딩 완료")
+        time.sleep(1.5)  # JS에서 row 생성 시간 확보
+    except TimeoutException:
+        with open("debug_payment_timeout.html", "w", encoding="utf-8") as f:
+            f.write(driver.page_source)
+        raise Exception("❌ [예약룸 오류] 예약룸 테이블을 찾을 수 없습니다.")
+    
     today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
+
+    print(today_date_str)
+
     # Set the 종료일 input field
     end_input = driver.find_element(By.CSS_SELECTOR, "div.col-sm-4.mb-sm-2 input")
     end_input.clear()
     end_input.send_keys(today_date_str)
     end_input.send_keys(Keys.RETURN)
+    
     # Click the 검색 버튼 (parent of <i class="fas fa-search"></i>)
     search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
     search_button.click()
+    
     # Wait for table to update
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
     # ---------------------------------------------------------------
