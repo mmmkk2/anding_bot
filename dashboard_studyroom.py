@@ -46,6 +46,7 @@ def check_studyroom(driver):
     end_input.send_keys(today_date_str)
     end_input.send_keys(Keys.RETURN)
     print("[DEBUG] 종료일 입력 완료 및 엔터 전송")
+    time.sleep(0.5)
     
     # Click the 검색 버튼 (parent of <i class="fas fa-search"></i>)
     search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
