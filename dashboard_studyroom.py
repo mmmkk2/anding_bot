@@ -75,7 +75,8 @@ def check_studyroom(driver):
     rows = driver.find_elements(By.CSS_SELECTOR, "table#m_table_1 tbody tr")
     if DEBUG: print(f"[DEBUG] 검색 결과 행 수: {len(rows)}")
 
-    reservations = []
+    reservations_2 = []
+    reservations_4 = []
 
 
     for row in rows:
@@ -109,20 +110,23 @@ def check_studyroom(driver):
                     "end_time": end_time, "date_part": date_part, "today": today_str
                 })
 
-            if date_part == today_str and ("2인" in room_type or "4인" in room_type):
+            if date_part == today_str:
                 if "2인" in room_type:
                     room_label = "2인실"
+                    reservations_2.append({
+                        "date": date_part,
+                        "time": reservation_time,
+                        "name": name,
+                        "room": room_label
+                    })
                 elif "4인" in room_type:
                     room_label = "4인실"
-                else:
-                    room_label = room_type
-
-                reservations.append({
-                    "date": date_part,
-                    "time": reservation_time,
-                    "name": name,
-                    "room": room_label
-                })
+                    reservations_4.append({
+                        "date": date_part,
+                        "time": reservation_time,
+                        "name": name,
+                        "room": room_label
+                    })
             else:
                 if DEBUG:
                     print("[DEBUG] 필터 제외됨:", {
@@ -133,12 +137,16 @@ def check_studyroom(driver):
                         "today_str": today_str
                     })
 
-    count_2 = sum(1 for r in reservations if "2인실" in r["room"])
-    count_4 = sum(1 for r in reservations if "4인실" in r["room"])
+    count_2 = len(reservations_2)
+    count_4 = len(reservations_4)
 
-    html_rows = "\n".join(
-        f"<tr><td>{r['time']}</td><td>{r['name']}</td><td>{r['room']}</td></tr>"
-        for r in reservations
+    html_rows_2 = "\n".join(
+        f"<tr><td>{r['time']}</td><td>{r['name']}</td></tr>"
+        for r in reservations_2
+    )
+    html_rows_4 = "\n".join(
+        f"<tr><td>{r['time']}</td><td>{r['name']}</td></tr>"
+        for r in reservations_4
     )
 
     now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
@@ -191,6 +199,20 @@ def check_studyroom(driver):
                 margin-top: 1rem;
                 text-align: center;
             }}
+            .tables {{
+                display: flex;
+                justify-content: space-around;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }}
+            .table-box {{
+                flex: 1;
+                min-width: 280px;
+            }}
+            .table-box h2 {{
+                font-size: 1rem;
+                margin: 0.5rem 0;
+            }}
             table {{
                 width: 100%;
                 border-collapse: collapse;
@@ -219,24 +241,41 @@ def check_studyroom(driver):
                 👨‍👨‍👧‍👦 4인실 예약: {count_4}건
             </div>
             <div class="updated">업데이트 시각: {now_str}</div>
-            <table>
-                <thead>
-                    <tr><th>시간</th><th>이름</th><th>룸</th></tr>
-                </thead>
-                <tbody>
-                    {html_rows}
-                </tbody>
-            </table>
+            <div class="tables">
+                <div class="table-box">
+                    <h2>2인실</h2>
+                    <table>
+                        <thead>
+                            <tr><th>시간</th><th>이름</th></tr>
+                        </thead>
+                        <tbody>
+                            {html_rows_2}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-box">
+                    <h2>4인실</h2>
+                    <table>
+                        <thead>
+                            <tr><th>시간</th><th>이름</th></tr>
+                        </thead>
+                        <tbody>
+                            {html_rows_4}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </body>
     </html>
     """
 
     # Always print a summary, even if DEBUG is False
-    if not reservations and not DEBUG:
+    total_reservations = count_2 + count_4
+    if total_reservations == 0 and not DEBUG:
         print("[INFO] 완료: 예약 건수가 없어 출력하지 않았습니다.")
     elif not DEBUG:
-        print(f"[INFO] 완료: {len(reservations)}건의 예약 정보를 HTML로 저장했습니다.")
+        print(f"[INFO] 완료: {total_reservations}건의 예약 정보를 HTML로 저장했습니다.")
 
     with open("/home/mmkkshim/anding_bot/studyroom_dashboard.html", "w", encoding="utf-8") as f:
         f.write(html)
