@@ -30,16 +30,16 @@ def check_studyroom(driver):
     print("[DEBUG] 예약룸 진입 완료")
 
     try:
-        # '이름' 컬럼이 있는 테이블이 로드될 때까지 대기 (페이지의 결제 테이블에는 id="m_table_1"가 있음)
+        # 테이블 ID가 존재하지만 '이름' 컬럼 기준 말고 전체 테이블 로딩 대기
         WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.XPATH, "//table[@id='m_table_1']//th[contains(text(), '이름')]"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, "table#m_table_1 tbody tr"))
         )
         print("[DEBUG] 예약룸 테이블 로딩 완료")
         time.sleep(1.5)  # JS에서 row 생성 시간 확보
     except TimeoutException:
-        with open("debug_payment_timeout.html", "w", encoding="utf-8") as f:
+        with open("debug_studyroom_timeout.html", "w", encoding="utf-8") as f:
             f.write(driver.page_source)
-        raise Exception("❌ [예약룸 오류] 예약룸 테이블을 찾을 수 없습니다.")
+        raise Exception("❌ [예약룸 오류] 예약 테이블을 찾지 못했습니다.")
     
     today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
 
