@@ -207,7 +207,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
 
     history_rows = []
     from datetime import timedelta
-    cutoff_time = datetime.now(kst).replace(minute=0, second=0, microsecond=0) - timedelta(hours=6)
+    cutoff_time = datetime.now(kst).replace(minute=0, second=0, microsecond=0) - timedelta(hours=12)
     now = datetime.now(kst)
     now_floor = now.replace(minute=(0 if now.minute < 30 else 30), second=0, microsecond=0)
     # 6.5시간 = 13개 슬롯 (30분 단위)
