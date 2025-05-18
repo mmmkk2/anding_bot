@@ -271,22 +271,21 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         type: 'time',
                         time: {{
                             unit: 'minute',
-                            stepSize: 30,
+                            stepSize: 1,
                             displayFormats: {{
                                 minute: 'HH:mm'
+                            }}
+                        }},
+                        ticks: {{
+                            callback: function(value) {{
+                                const date = new Date(value);
+                                const minutes = date.getMinutes();
+                                return (minutes === 0 || minutes === 30) ? date.toTimeString().slice(0,5) : '';
                             }}
                         }},
                         title: {{
                             display: false,
                             text: '시간'
-                        }},
-                        ticks: {{
-                            source: 'auto',
-                            callback: function(value, index, ticks) {{
-                                const date = new Date(value);
-                                const minutes = date.getMinutes();
-                                return (minutes === 0 || minutes === 30) ? date.toTimeString().slice(0,5) : '';
-                            }}
                         }}
                     }},
                     y: {{
