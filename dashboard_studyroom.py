@@ -48,16 +48,18 @@ def check_studyroom(driver):
     for row in rows:
         cols = row.find_all("td")
         if len(cols) >= 6:
-            date = cols[0].text.strip()
-            time_range = cols[1].text.strip()
-            name = cols[2].text.strip()
-            room_type = cols[3].text.strip()
+            room_type = cols[0].text.strip()
+            name = cols[1].text.strip()
+            user_count = cols[2].text.strip()
+            start_time = cols[3].text.strip()
+            end_time = cols[4].text.strip()
+            reservation_time = f"{start_time} ~ {end_time}"
+            date_part = end_time.split(" ")[0]
 
-            date_part = date.split(" ")[0]
             if date_part == today_str and ("2인실" in room_type or "4인실" in room_type):
                 reservations.append({
-                    "date": date,
-                    "time": time_range,
+                    "date": date_part,
+                    "time": reservation_time,
                     "name": name,
                     "room": room_type
                 })
