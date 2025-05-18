@@ -116,6 +116,12 @@ def check_payment_status(driver):
                 f.write(driver.page_source)
             raise Exception(f"❌ [결제 파싱 오류] {e}")
 
+    # 날짜 기준 필터링 (오늘 날짜만 유지)
+    today_only = []
+    for payment in payments:
+        if payment["date"].startswith(today_str):
+            today_only.append(payment)
+
     # 마지막으로 읽은 결제 ID와 새 결제 내역 비교
     last_payment_id = None
     if os.path.exists(PAYMENT_CACHE_FILE):
@@ -123,17 +129,17 @@ def check_payment_status(driver):
             last_payment_id = pickle.load(f)
 
     new_payments = []
-    for payment in payments:
+    for payment in today_only:
         if last_payment_id is None or payment["id"] > last_payment_id:
             new_payments.append(payment)
 
     # 가장 최신의 결제 ID 저장
-    if payments:
+    if today_only:
         with open(PAYMENT_CACHE_FILE, "wb") as f:
-            pickle.dump(payments[0]["id"], f)
+            pickle.dump(today_only[0]["id"], f)
 
     # 대시보드 HTML 저장 함수 호출 (기존 구현)
-    save_payment_dashboard_html(payments)
+    save_payment_dashboard_html(today_only)
 
 
 def save_payment_dashboard_html(payments):
