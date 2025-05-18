@@ -29,21 +29,8 @@ def check_studyroom(driver):
     driver.get(ROOM_URL)
     print("[DEBUG] 예약룸 진입 완료")
 
-    try:
-        # 테이블 ID가 존재하지만 '이름' 컬럼 기준 말고 전체 테이블 로딩 대기
-        WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "table#m_table_1 tbody tr"))
-        )
-        print("[DEBUG] 예약룸 테이블 로딩 완료")
-        time.sleep(1.5)  # JS에서 row 생성 시간 확보
-    except TimeoutException:
-        with open("debug_studyroom_timeout.html", "w", encoding="utf-8") as f:
-            f.write(driver.page_source)
-        raise Exception("❌ [예약룸 오류] 예약 테이블을 찾지 못했습니다.")
-    
+    # (테이블 대기 삭제됨: 검색 버튼 클릭 이후로 이동)
     today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
-
-    print(today_date_str)
 
     # Set the 종료일 input field
     end_input = driver.find_element(By.CSS_SELECTOR, "div.col-sm-4.mb-sm-2 input")
@@ -54,10 +41,18 @@ def check_studyroom(driver):
     # Click the 검색 버튼 (parent of <i class="fas fa-search"></i>)
     search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
     search_button.click()
-    
-    # Wait for table to update
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
-    # ---------------------------------------------------------------
+
+    # 검색 버튼 클릭 후, 테이블 행이 로드될 때까지 대기
+    try:
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "table#m_table_1 tbody tr"))
+        )
+        print("[DEBUG] 예약룸 테이블 로딩 완료")
+        time.sleep(1.5)  # JS에서 row 생성 시간 확보
+    except TimeoutException:
+        with open("debug_studyroom_timeout.html", "w", encoding="utf-8") as f:
+            f.write(driver.page_source)
+        raise Exception("❌ [예약룸 오류] 예약 테이블을 찾지 못했습니다.")
 
     soup = BeautifulSoup(driver.page_source, "html.parser")
 
