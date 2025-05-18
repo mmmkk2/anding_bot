@@ -44,15 +44,14 @@ def check_studyroom(driver):
     end_input = driver.find_element(By.CSS_SELECTOR, "div.col-sm-4.mb-sm-2 input")
     end_input.clear()
     end_input.send_keys(today_date_str)
+    print("[DEBUG] 종료일 입력 필드 현재 값:", end_input.get_attribute("value"))
     end_input.send_keys(Keys.RETURN)
-    print("[DEBUG] 종료일 입력 완료 및 엔터 전송")
-    time.sleep(0.5)
+    time.sleep(1)
     
     # Click the 검색 버튼 (parent of <i class="fas fa-search"></i>)
     search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
     search_button.click()
     print("[DEBUG] 검색 버튼 클릭 완료")
-
     time.sleep(1.5)  # Ensure search results load fully before parsing
 
     # 검색 버튼 클릭 후, 테이블 행이 로드될 때까지 대기
@@ -88,7 +87,12 @@ def check_studyroom(driver):
             date_part = end_time.split(" ")[0]
             reservation_time = f"{start_time} ~ {end_time}"
 
-            if date_part == today_str and ("2인실" in room_type or "4인실" in room_type):
+            print("[DEBUG] 예약행:", {
+                "room_type": room_type, "name": name,
+                "end_time": end_time, "date_part": date_part, "today": today_str
+            })
+
+            if today_str in date_part and ("2인실" in room_type or "4인실" in room_type):
                 reservations.append({
                     "date": date_part,
                     "time": reservation_time,
