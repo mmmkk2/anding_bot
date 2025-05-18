@@ -264,7 +264,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 font-family: 'Apple SD Gothic Neo', 'Arial', sans-serif;
                 background: #f1f3f5;
                 padding: 1rem;
-                margin: 1.1;
+                margin: 0.5;
                 display: flex;
                 align-items: flex-start;
                 min-height: 100vh;
