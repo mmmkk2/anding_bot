@@ -260,7 +260,8 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                             callback: function(value, index, ticks) {{
                                 const date = new Date(value);
                                 const minutes = date.getMinutes();
-                                return (minutes === 0 || minutes === 30) ? date.toTimeString().slice(0, 5) : '';
+                                const label = date.toTimeString().slice(0, 5);
+                                return (minutes % 30 === 0) ? label : '';
                             }}
                         }},
                         title: {{
