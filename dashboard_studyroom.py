@@ -202,6 +202,7 @@ def check_studyroom(driver):
     <body>
         <div class="box">
             <h1>📋 스터디룸 예약 현황</h1>
+            <div class="updated">📅 기준 날짜: <b>{today_str}</b></div>
             <div class="summary">
                 🧑‍🤝‍🧑 2인실 예약: {count_2}건<br>
                 👨‍👨‍👧‍👦 4인실 예약: {count_4}건
