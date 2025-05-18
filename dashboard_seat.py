@@ -257,7 +257,12 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                                 const date = new Date(value);
                                 const hours = date.getHours();
                                 const minutes = date.getMinutes();
-                                return `${{('0' + hours).slice(-2)}}:${{('0' + minutes).slice(-2)}}`;
+                                if (minutes === 0 || minutes === 30) {{
+                                    const hour12 = hours % 12 || 12;
+                                    const suffix = hours < 12 ? 'AM' : 'PM';
+                                    return `${{hour12}}:${{('0' + minutes).slice(-2)}} ${{suffix}}`;
+                                }}
+                                return '';
                             }}
                         }},
                         title: {{
