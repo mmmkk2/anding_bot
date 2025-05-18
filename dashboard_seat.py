@@ -184,6 +184,8 @@ from datetime import datetime
 import pytz
 
 kst = pytz.timezone("Asia/Seoul")
+
+today_str = datetime.now(kst).strftime("%Y.%m.%d")
 now = datetime.now(kst)
 
 
@@ -306,11 +308,11 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 color: #333;
             }}
             .emoji {{
-                font-size: 1.1rem;
+                font-size: 1.0rem;
                 margin-bottom: 1rem;
             }}
             .stat {{
-                font-size: 1.0rem;
+                font-size: 0.9rem;
                 margin: 0.3rem 0;
             }}
             .updated {{
@@ -322,7 +324,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     </head>
     <body>
         <div class="box">
-            <div class="stat"><b>{now_str[:10]}</b></div>
+            <div class="updated">📅 기준 날짜: <b>{today_str}</b></div>
             <div class="updated">업데이트 시각: {now_str}</div>
             <div class="emoji">{status_emoji}</div>
             <div class="stat">자유석: {used_free}/{total_free}</div>
