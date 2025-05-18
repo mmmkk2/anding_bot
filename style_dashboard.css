@@ -65,14 +65,26 @@ table {
     font-size: 0.9rem;
 }
 
-table th, table td {
-    border: 1px solid #ddd;
-    padding: 6px;
-    text-align: center;
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  font-size: 0.9rem;
 }
 
-table th {
-    background-color: #f0f0f0;
+th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+/* 테이블 wrapper 박스 */
+.tables {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.table-box {
+  flex: 1;
 }
 
 canvas {
