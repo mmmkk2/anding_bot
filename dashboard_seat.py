@@ -227,7 +227,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         if t in data_map:
             history_rows.append(f"{t.strftime('%Y-%m-%d %H:%M:%S')},{data_map[t]}")
         else:
-            history_rows.append(f"{t.strftime('%Y-%m-%d %H:%M:%S')},NA")
+            history_rows.append(f"{t.strftime('%Y-%m-%d %H:%M:%S')},None")
     timestamps = []
     used_frees = []
     for line in history_rows:
