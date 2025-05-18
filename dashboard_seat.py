@@ -261,7 +261,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                                 const date = new Date(value);
                                 const minutes = date.getMinutes();
                                 const hours = date.getHours();
-                                return (minutes === 0 || minutes === 30) ? ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) : '';
+                                return (minutes % 30 === 0) ? ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) : '';
                             }}
                         }},
                         title: {{
