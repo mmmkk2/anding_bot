@@ -1,3 +1,5 @@
+DEBUG = False
+
 from bs4 import BeautifulSoup
 from datetime import datetime
 import pytz
@@ -24,18 +26,18 @@ from datetime import datetime
 
 def check_studyroom(driver):
 
-    print("[DEBUG] 예약룸 페이지 진입 시도 중:", ROOM_URL)
+    if DEBUG: print("[DEBUG] 예약룸 페이지 진입 시도 중:", ROOM_URL)
     time.sleep(2)  # 로그인 후 쿠키 세팅 대기
     driver.get(ROOM_URL)
-    print("[DEBUG] 현재 페이지 URL:", driver.current_url)
-    print("[DEBUG] 현재 페이지 TITLE:", driver.title)
-    print("[DEBUG] 예약룸 진입 완료")
+    if DEBUG: print("[DEBUG] 현재 페이지 URL:", driver.current_url)
+    if DEBUG: print("[DEBUG] 현재 페이지 TITLE:", driver.title)
+    if DEBUG: print("[DEBUG] 예약룸 진입 완료")
     try:
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "div.col-sm-4.mb-sm-2 input"))
         )
-        print("[DEBUG] 종료일 입력 필드 로딩 완료")
-        print("[DEBUG] 종료일 입력 필드에 날짜 입력 시도:", datetime.now(kst).strftime("%Y.%m.%d"))
+        if DEBUG: print("[DEBUG] 종료일 입력 필드 로딩 완료")
+        if DEBUG: print("[DEBUG] 종료일 입력 필드에 날짜 입력 시도:", datetime.now(kst).strftime("%Y.%m.%d"))
     except TimeoutException:
         raise Exception("❌ [예약룸 오류] 종료일 입력 필드를 찾을 수 없습니다.")
 
@@ -44,18 +46,18 @@ def check_studyroom(driver):
 
     # Set the 종료일 input field using JavaScript
     end_input = driver.find_element(By.CSS_SELECTOR, "input[name='s_end_date']")
-    print("[DEBUG] 종료일 input 태그 구조 (name='s_end_date'):", end_input.get_attribute("outerHTML"))
+    if DEBUG: print("[DEBUG] 종료일 input 태그 구조 (name='s_end_date'):", end_input.get_attribute("outerHTML"))
     script = f"document.querySelector('input[name=\"s_end_date\"]').value = '{today_date_str}';"
     driver.execute_script(script)
     time.sleep(0.5)
     value_after = driver.execute_script("return document.querySelector('input[name=\"s_end_date\"]').value;")
-    print("[DEBUG] JS로 설정된 종료일 값:", value_after)
+    if DEBUG: print("[DEBUG] JS로 설정된 종료일 값:", value_after)
     
     # Click the 검색 버튼 (parent of <i class="fas fa-search"></i>)
     search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
-    print("[DEBUG] 검색 버튼 태그 구조:", search_button.get_attribute("outerHTML"))
+    if DEBUG: print("[DEBUG] 검색 버튼 태그 구조:", search_button.get_attribute("outerHTML"))
     search_button.click()
-    print("[DEBUG] 검색 버튼 클릭 완료")
+    if DEBUG: print("[DEBUG] 검색 버튼 클릭 완료")
     time.sleep(1.5)  # Ensure search results load fully before parsing
 
     # 검색 버튼 클릭 후, 테이블 행이 로드될 때까지 대기
@@ -63,7 +65,7 @@ def check_studyroom(driver):
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "//table[@id='m_table_1']//tbody/tr[not(contains(@class, 'dataTables_empty'))]"))
         )
-        print("[DEBUG] 예약룸 테이블 로딩 완료")
+        if DEBUG: print("[DEBUG] 예약룸 테이블 로딩 완료")
         time.sleep(1.5)  # JS에서 row 생성 시간 확보
     except TimeoutException:
         with open("debug_studyroom_timeout.html", "w", encoding="utf-8") as f:
@@ -71,7 +73,7 @@ def check_studyroom(driver):
         raise Exception("❌ [예약룸 오류] 유효한 예약 데이터를 포함한 행이 나타나지 않았습니다.")
 
     rows = driver.find_elements(By.CSS_SELECTOR, "table#m_table_1 tbody tr")
-    print(f"[DEBUG] 검색 결과 행 수: {len(rows)}")
+    if DEBUG: print(f"[DEBUG] 검색 결과 행 수: {len(rows)}")
 
     reservations = []
 
@@ -81,17 +83,17 @@ def check_studyroom(driver):
             continue
 
         cols = row.find_elements(By.TAG_NAME, "td")
-        print("[DEBUG] row HTML:", row.get_attribute("outerHTML"))
-        print("[DEBUG] col count:", len(cols))
+        if DEBUG: print("[DEBUG] row HTML:", row.get_attribute("outerHTML"))
+        if DEBUG: print("[DEBUG] col count:", len(cols))
         for i, col in enumerate(cols):
-            print(f"[DEBUG] col[{i}] text: {col.text.strip()}")
+            if DEBUG: print(f"[DEBUG] col[{i}] text: {col.text.strip()}")
         if len(cols) >= 6:
             room_type = cols[1].text.strip()
             name = cols[2].text.strip()
             start_time = cols[4].text.strip()
             end_time = cols[5].text.strip()
 
-            print("[DEBUG] 추출된 값:", {
+            if DEBUG: print("[DEBUG] 추출된 값:", {
                 "room_type": room_type,
                 "name": name,
                 "start_time": start_time,
@@ -101,10 +103,11 @@ def check_studyroom(driver):
             date_part = end_time.split(" ")[0]
             reservation_time = f"{start_time} ~ {end_time}"
 
-            print("[DEBUG] 예약행:", {
-                "room_type": room_type, "name": name,
-                "end_time": end_time, "date_part": date_part, "today": today_str
-            })
+            if DEBUG:
+                print("[DEBUG] 예약행:", {
+                    "room_type": room_type, "name": name,
+                    "end_time": end_time, "date_part": date_part, "today": today_str
+                })
 
             if date_part == today_str and ("2인" in room_type or "4인" in room_type):
                 if "2인" in room_type:
@@ -121,13 +124,14 @@ def check_studyroom(driver):
                     "room": room_label
                 })
             else:
-                print("[DEBUG] 필터 제외됨:", {
-                    "room_type": room_type,
-                    "name": name,
-                    "end_time": end_time,
-                    "date_part": date_part,
-                    "today_str": today_str
-                })
+                if DEBUG:
+                    print("[DEBUG] 필터 제외됨:", {
+                        "room_type": room_type,
+                        "name": name,
+                        "end_time": end_time,
+                        "date_part": date_part,
+                        "today_str": today_str
+                    })
 
     count_2 = sum(1 for r in reservations if "2인실" in r["room"])
     count_4 = sum(1 for r in reservations if "4인실" in r["room"])
