@@ -350,9 +350,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 color: #888;
                 margin-top: 1rem;
             }}          
-            canvas {{
-               height: 230px;
-            }}
             @media (max-width: 480px) {{
                 body {{
                     max-height: 50vh;
@@ -374,7 +371,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             <div class="stat">남은 자유석: {remaining}석</div>            
             <div class="updated">업데이트 시각: {now_str}</div>
             <div style="margin-top:0.5rem;">            
-                 <canvas id="seatChart"></canvas>
+                 <canvas id="seatChart"  height="230"></canvas>
                 {chart_script}
             </div>
         </div>
