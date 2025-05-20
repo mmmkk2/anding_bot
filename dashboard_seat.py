@@ -239,13 +239,13 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             timestamps.append(timestamp_obj.strftime("%Y-%m-%dT%H:%M:%S"))
             used_frees.append(int(parts[1]))
     point_colors = []
-    for _ in used_frees:
-        if status_emoji == "🔴":
-            point_colors.append('rgba(255, 99, 132, 1)')
-        elif status_emoji == "🟡":
-            point_colors.append('rgba(255, 206, 86, 1)')
+    for y in used_frees:
+        if total_free - y <= 5:
+            point_colors.append('rgba(255, 99, 132, 1)')  # Red
+        elif total_free - y <= 7:
+            point_colors.append('rgba(255, 206, 86, 1)')  # Yellow
         else:
-            point_colors.append('rgba(75, 192, 192, 1)')
+            point_colors.append('rgba(75, 192, 192, 1)')  # Green
 
     chart_script = f"""
     <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
