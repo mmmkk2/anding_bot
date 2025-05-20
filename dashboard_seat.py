@@ -237,13 +237,15 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             timestamp_obj = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
             timestamps.append(timestamp_obj.strftime("%Y-%m-%dT%H:%M:%S"))
             used_frees.append(int(parts[1]))
-    # Determine line color based on status_emoji
-    if status_emoji == "🔴":
-        line_color = 'rgba(255, 99, 132, 1)'  # red
-    elif status_emoji == "🟡":
-        line_color = 'rgba(255, 206, 86, 1)'  # yellow
-    else:
-        line_color = 'rgba(75, 192, 192, 1)'  # green
+    point_colors = []
+    for _ in used_frees:
+        if status_emoji == "🔴":
+            point_colors.append('rgba(255, 99, 132, 1)')
+        elif status_emoji == "🟡":
+            point_colors.append('rgba(255, 206, 86, 1)')
+        else:
+            point_colors.append('rgba(75, 192, 192, 1)')
+
     chart_script = f"""
     <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns'></script>
@@ -252,13 +254,13 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         new Chart(ctx, {{
             type: 'line',
             data: {{
-                labels: [],
                 datasets: [{{
                     label: '자유석 사용 수',
                     data: [
                         {''.join([f"{{ x: '{t}', y: {y} }}," for t, y in zip(timestamps, used_frees)])}
                     ],
-                    borderColor: '{line_color}',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    pointBackgroundColor: {point_colors},
                     tension: 0.1
                 }}]
             }},
@@ -275,8 +277,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                             }}
                         }},
                         title: {{
-                            display: false,
-                            text: '시간'
+                            display: false
                         }}
                     }},
                     y: {{
