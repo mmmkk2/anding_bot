@@ -316,7 +316,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 display: flex;
                 align-items: flex-start;
                 min-height: 400px; /* max-height: 25vh; */
-                min-height: 500px; 
+                max-height: 500px; 
                 box-sizing: border-box;
                 justify-content: center;
                 text-align: center;  /* 텍스트 정렬 보정 */
