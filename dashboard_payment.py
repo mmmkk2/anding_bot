@@ -208,12 +208,12 @@ def save_payment_dashboard_html(payments):
             .box {{
                 background: white;
                 border-radius: 1rem;
-                padding: 0.75rem;
-                max-width: 580px;         /* 데스크탑 기준 최대 폭 */
+                padding: 1rem;
+                max-width: 650px;         /* 데스크탑 기준 최대 폭 */
                 width: 100%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 text-align: center;
-                margin: 0 auto;                
+                margin: 0 auto;
             }}
             @media (max-width: 480px) {{
                 .box {{
