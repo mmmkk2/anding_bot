@@ -41,6 +41,7 @@ chart_timedelta = float(os.getenv("CHART_TIME_DELTA"))
 DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
 DEBUG_PATH = os.getenv("DEBUG_PATH")
 
+# Add DEBUG switch after loading .env
 parser = argparse.ArgumentParser()
 parser.add_argument("--hide", action="store_true", help="Disable debug output")
 args = parser.parse_args()
@@ -67,27 +68,23 @@ laptop_seat_numbers = LAPTOP_SEAT_NUMBERS
 
 # === 좌석 상태 체크 ===
 def check_seat_status(driver):
-    used_free_seats = 0
-    used_labtop_seats = 0
-    used_fixed_seats = 0
-    all_seat_numbers = []
+    retry_count = 0
+    max_retries = 2
 
-    driver.get(SEAT_URL)
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
+    while retry_count <= max_retries:
+        used_free_seats = 0
+        used_labtop_seats = 0
+        used_fixed_seats = 0
+        all_seat_numbers = []
 
+        driver.get(SEAT_URL)
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
+        time.sleep(2)
 
-    # Use browser's JS time for current time
-    # Use JS to get browser time in ISO format
-    timestamp = driver.execute_script("return new Date().toISOString();")
-    current_time = datetime.fromisoformat(timestamp[:-1]).astimezone(kst)
-    current_hour = current_time.hour
-
-    while True:
         rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
 
         for row in rows:
             cols = row.find_elements(By.TAG_NAME, "td")
-            if DEBUG: print("[DEBUG] columns parsed:", [c.text for c in cols])
             if len(cols) < 3:
                 continue
 
@@ -100,8 +97,6 @@ def check_seat_status(driver):
             except:
                 continue
 
-            if DEBUG: print(f"[DEBUG] Parsed seat_type: {seat_type}, seat_number: {seat_number}")
-
             if seat_type == "개인석":
                 if seat_number in fixed_seat_numbers:
                     used_fixed_seats += 1
@@ -110,17 +105,26 @@ def check_seat_status(driver):
                 else:
                     used_free_seats += 1
 
-            # End of for row in rows: loop, before pagination try:
-        if DEBUG: print(f"[DEBUG] used_free_seats: {used_free_seats}, used_fixed_seats: {used_fixed_seats}, used_labtop_seats: {used_labtop_seats}")
-
-        try:
-            next_btn = driver.find_element(By.CSS_SELECTOR, 'ul.pagination li.active + li a')
-            if "javascript:;" in next_btn.get_attribute("href"):
-                break
-            next_btn.click()
-            time.sleep(1)
-        except:
+        total_used = used_free_seats + used_labtop_seats + used_fixed_seats
+        if total_used > 0 or retry_count == max_retries:
             break
+        retry_count += 1
+        time.sleep(3)
+
+    if DEBUG and total_used == 0:
+        debug_file = os.path.join(DEBUG_PATH, f"debug_seat_zero_{datetime.now(kst).strftime('%Y%m%d_%H%M%S')}.html")
+        with open(debug_file, "w", encoding="utf-8") as f:
+            f.write(driver.page_source)
+        print(f"[DEBUG] 좌석이 0 → 페이지 소스 저장됨: {debug_file}")
+
+    # Use browser's JS time for current time
+    # Use JS to get browser time in ISO format
+    timestamp = driver.execute_script("return new Date().toISOString();")
+    current_time = datetime.fromisoformat(timestamp[:-1]).astimezone(kst)
+    current_hour = current_time.hour
+
+    # The above pagination and seat parsing logic has already processed all rows,
+    # so we do not need to process again here.
 
     TOTAL_FREE_SEATS = TOTAL_SEATS - len(fixed_seat_numbers) - len(laptop_seat_numbers)
     remaining_seats = TOTAL_FREE_SEATS - used_free_seats
