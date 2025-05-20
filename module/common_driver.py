@@ -92,7 +92,7 @@ def login(driver):
         )
         alert_text = driver.find_element(By.CLASS_NAME, "swal2-html-container").text
         if "휴대폰 인증번호" in alert_text:
-            send_telegram_and_log("🔒 인증번호 입력이 필요합니다. auth_code.txt에 입력해주세요.")
+            send_telegram_and_log(f"🔒 인증번호 입력이 필요합니다.\n👤 로그인 ID: {LOGIN_ID}\nauth_code.txt에 입력해주세요.")
             driver.find_element(By.CLASS_NAME, "swal2-confirm").click()
 
             for _ in range(60):
