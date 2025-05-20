@@ -11,17 +11,16 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
-import threading
-import telegram_auth_listener
-
+from datetime import datetime
 import argparse
+import pytz
 
-# === CLI 인자 파싱 ===
-parser = argparse.ArgumentParser()
-parser.add_argument("--hide", action="store_true", help="Disable debug output")
-args = parser.parse_args()
+from datetime import timedelta
 
+
+kst = pytz.timezone("Asia/Seoul")
+now = datetime.now(kst)
+today_str = datetime.now(kst).strftime("%Y.%m.%d")
 
 try:
     load_dotenv("/home/mmkkshim/anding_bot/.env")
@@ -32,16 +31,20 @@ FIXED_SEAT_NUMBERS = list(map(int, os.getenv("FIXED_SEAT_NUMBERS").split(",")))
 LAPTOP_SEAT_NUMBERS = list(map(int, os.getenv("LAPTOP_SEAT_NUMBERS").split(",")))
 
 # === 좌석 색상 상태 정의 (기준값 .env에서 설정)
-WARNING_THRESHOLD = int(os.getenv("WARNING_THRESHOLD", 7))
-DANGER_THRESHOLD = int(os.getenv("DANGER_THRESHOLD", 5))
+WARNING_THRESHOLD = int(os.getenv("WARNING_THRESHOLD"))
+DANGER_THRESHOLD = int(os.getenv("DANGER_THRESHOLD"))
 
 
+chart_timedelta = float(os.getenv("CHART_TIME_DELTA"))
 
 # Dashboard path for logs and HTML
 DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
 DEBUG_PATH = os.getenv("DEBUG_PATH")
 
 # Add DEBUG switch after loading .env
+parser = argparse.ArgumentParser()
+parser.add_argument("--hide", action="store_true", help="Disable debug output")
+args = parser.parse_args()
 DEBUG = "--hide" not in sys.argv and os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
 
 # KST
@@ -205,33 +208,14 @@ def main_check_seat():
         driver.quit()
 
 
-from datetime import datetime
-import pytz
+# def start_telegram_listener():
+#     loop = asyncio.new_event_loop()
+#     asyncio.set_event_loop(loop)
+#     loop.run_until_complete(telegram_auth_listener.run_listener_async())
 
-kst = pytz.timezone("Asia/Seoul")
-
-today_str = datetime.now(kst).strftime("%Y.%m.%d")
-now = datetime.now(kst)
-
-
-import asyncio
-
-
-def start_telegram_listener():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(telegram_auth_listener.run_listener_async())
-
-
-import requests
-import socket
-
-chart_timedelta = float(os.getenv("CHART_TIME_DELTA", "12"))
 
 def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
     history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
-
-    from datetime import timedelta
 
     history_rows = []
     cutoff_time = datetime.now(kst) - timedelta(hours=chart_timedelta)

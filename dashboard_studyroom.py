@@ -1,8 +1,7 @@
 
-
+import sys
 from bs4 import BeautifulSoup
 from datetime import datetime
-import pytz
 import os
 import time
 from module.set import login, find_location, create_driver, send_broadcast_and_update, send_telegram_and_log
@@ -10,20 +9,41 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-DEBUG_PATH = os.getenv("DEBUG_PATH", "/home/mmkkshim/anding_bot/log/")
-DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes")
-DASHBOARD_PATH = os.getenv("DASHBOARD_PATH", "/home/mmkkshim/anding_bot/dashboard_log/")
-
-BASE_URL = "https://partner.cobopay.co.kr"
-ROOM_URL = f"{BASE_URL}/use/studyUse"
-
-kst = pytz.timezone("Asia/Seoul")
-today_str = datetime.now(kst).strftime("%Y.%m.%d")
-
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 # --- Set 종료일 to today, click 검색, and wait for table update ---
 from selenium.webdriver.common.keys import Keys
 from datetime import datetime
+
+from datetime import datetime
+import argparse
+import pytz
+from dotenv import load_dotenv
+
+# === 설정 ===
+try:
+    load_dotenv("/home/mmkkshim/anding_bot/.env")
+except:
+    pass
+
+# Dashboard path for logs and HTML
+DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
+DEBUG_PATH = os.getenv("DEBUG_PATH")
+
+# Add DEBUG switch after loading .env
+parser = argparse.ArgumentParser()
+parser.add_argument("--hide", action="store_true", help="Disable debug output")
+args = parser.parse_args()
+DEBUG = "--hide" not in sys.argv and os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
+
+# KST
+kst = pytz.timezone("Asia/Seoul")
+today_str = datetime.now(kst).strftime("%Y.%m.%d")
+
+BASE_URL = os.getenv("BASE_URL")
+ROOM_URL = f"{BASE_URL}/use/studyUse"
+
+
+
 
 def check_studyroom(driver):
 

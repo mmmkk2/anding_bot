@@ -4,19 +4,20 @@ from module.set import login, find_location, create_driver, send_broadcast_and_u
 import os
 import time
 import pickle
-import csv
-import requests
 from datetime import datetime
-import pytz
 from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
+from datetime import datetime
+import argparse
+import pytz
 
-import threading
-import telegram_auth_listener
-
+kst = pytz.timezone("Asia/Seoul")
+now = datetime.now(kst)
+today_str = datetime.now(kst).strftime("%Y.%m.%d")
 
 
 # === 설정 ===
@@ -25,31 +26,26 @@ try:
 except:
     pass
 
-DEBUG_PATH = os.getenv("DEBUG_PATH", "/home/mmkkshim/anding_bot/log/")
-DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes")
+# Dashboard path for logs and HTML
+DEBUG_PATH = os.getenv("DEBUG_PATH")
+DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
 
-DASHBOARD_PATH = os.getenv("DASHBOARD_PATH", "/home/mmkkshim/anding_bot/dashboard_log/")
+# Add DEBUG switch after loading .env
+parser = argparse.ArgumentParser()
+parser.add_argument("--hide", action="store_true", help="Disable debug output")
+args = parser.parse_args()
+DEBUG = "--hide" not in sys.argv and os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
 
-COOKIE_FILE = os.getenv("COOKIE_FILE") or "/home/mmkkshim/anding_bot/log/last_payment_id.pkl"
-BASE_URL = "https://partner.cobopay.co.kr"
+
+PAYMENT_CACHE_FILE = os.getenv("COOKIE_FILE")
 
 
-from datetime import datetime
-import pytz
+BASE_URL = os.getenv("BASE_URL")
+PAYMENT_URL = f"{BASE_URL}/pay/payHist"
 
-kst = pytz.timezone("Asia/Seoul")
-now = datetime.now(kst)
-today_str = datetime.now(kst).strftime("%Y.%m.%d")
 
-import requests
 
 # === Payment logic merged from main_payment.py ===
-
-PAYMENT_URL = f"{BASE_URL}/pay/payHist"
-PAYMENT_CACHE_FILE = COOKIE_FILE
-
-
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 
 def check_payment_status(driver):
