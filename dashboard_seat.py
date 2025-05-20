@@ -25,8 +25,10 @@ try:
 except:
     pass
 
-# Add DEBUG_PATH after loading environment variables
 DEBUG_PATH = os.getenv("DEBUG_PATH", "/home/mmkkshim/anding_bot/log/")
+
+# Add DEBUG switch after loading .env
+DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes")
 
 COOKIE_FILE = os.getenv("COOKIE_FILE") or "/home/mmkkshim/anding_bot/log/last_payment_id.pkl"
 SEAT_CACHE_FILE = os.getenv("SEAT_CACHE_FILE") or "/home/mmkkshim/anding_bot/log/last_seat_state.pkl"
@@ -67,7 +69,7 @@ def check_seat_status(driver):
 
         for row in rows:
             cols = row.find_elements(By.TAG_NAME, "td")
-            print("[DEBUG] columns parsed:", [c.text for c in cols])
+            if DEBUG: print("[DEBUG] columns parsed:", [c.text for c in cols])
             if len(cols) < 3:
                 continue
 
@@ -80,7 +82,7 @@ def check_seat_status(driver):
             except:
                 continue
 
-            print(f"[DEBUG] Parsed seat_type: {seat_type}, seat_number: {seat_number}")
+            if DEBUG: print(f"[DEBUG] Parsed seat_type: {seat_type}, seat_number: {seat_number}")
 
             if seat_type == "개인석":
                 if seat_number in fixed_seat_numbers:
@@ -91,7 +93,7 @@ def check_seat_status(driver):
                     used_free_seats += 1
 
             # End of for row in rows: loop, before pagination try:
-        print(f"[DEBUG] used_free_seats: {used_free_seats}, used_fixed_seats: {used_fixed_seats}, used_labtop_seats: {used_labtop_seats}")
+        if DEBUG: print(f"[DEBUG] used_free_seats: {used_free_seats}, used_fixed_seats: {used_fixed_seats}, used_labtop_seats: {used_labtop_seats}")
 
         try:
             next_btn = driver.find_element(By.CSS_SELECTOR, 'ul.pagination li.active + li a')

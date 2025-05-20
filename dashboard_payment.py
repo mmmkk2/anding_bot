@@ -26,6 +26,7 @@ except:
     pass
 
 DEBUG_PATH = os.getenv("DEBUG_PATH", "/home/mmkkshim/anding_bot/log/")
+DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes")
 
 COOKIE_FILE = os.getenv("COOKIE_FILE") or "/home/mmkkshim/anding_bot/log/last_payment_id.pkl"
 BASE_URL = "https://partner.cobopay.co.kr"

@@ -1,4 +1,4 @@
-DEBUG = False
+
 
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -11,6 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 DEBUG_PATH = os.getenv("DEBUG_PATH", "/home/mmkkshim/anding_bot/log/")
+DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes")
 
 BASE_URL = "https://partner.cobopay.co.kr"
 ROOM_URL = f"{BASE_URL}/use/studyUse"
