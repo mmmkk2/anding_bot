@@ -22,9 +22,11 @@ import telegram_auth_listener
 # === 설정 ===
 try:
     load_dotenv("/home/mmkkshim/anding_bot/.env")
-    
 except:
     pass
+
+# Add DEBUG_PATH after loading environment variables
+DEBUG_PATH = os.getenv("DEBUG_PATH", "/home/mmkkshim/anding_bot/log/")
 
 COOKIE_FILE = os.getenv("COOKIE_FILE") or "/home/mmkkshim/anding_bot/log/last_payment_id.pkl"
 SEAT_CACHE_FILE = os.getenv("SEAT_CACHE_FILE") or "/home/mmkkshim/anding_bot/log/last_seat_state.pkl"

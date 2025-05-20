@@ -22,9 +22,10 @@ import telegram_auth_listener
 # === 설정 ===
 try:
     load_dotenv("/home/mmkkshim/anding_bot/.env")
-
 except:
     pass
+
+DEBUG_PATH = os.getenv("DEBUG_PATH", "/home/mmkkshim/anding_bot/log/")
 
 COOKIE_FILE = os.getenv("COOKIE_FILE") or "/home/mmkkshim/anding_bot/log/last_payment_id.pkl"
 BASE_URL = "https://partner.cobopay.co.kr"
@@ -62,7 +63,7 @@ def check_payment_status(driver):
         print("[DEBUG] 결제 테이블 로딩 완료")
         time.sleep(1.5)  # JS에서 row 생성 시간 확보
     except TimeoutException:
-        with open("debug_payment_timeout.html", "w", encoding="utf-8") as f:
+        with open(os.path.join(DEBUG_PATH, "debug_payment_timeout.html"), "w", encoding="utf-8") as f:
             f.write(driver.page_source)
         raise Exception("❌ [결제 오류] 결제 테이블의 유효한 데이터를 찾을 수 없습니다.")
 
@@ -112,7 +113,7 @@ def check_payment_status(driver):
             print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
             break
         except Exception as e:
-            with open("debug_payment_error.html", "w", encoding="utf-8") as f:
+            with open(os.path.join(DEBUG_PATH, "debug_payment_error.html"), "w", encoding="utf-8") as f:
                 f.write(driver.page_source)
             raise Exception(f"❌ [결제 파싱 오류] {e}")
 

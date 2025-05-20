@@ -10,8 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
-
+DEBUG_PATH = os.getenv("DEBUG_PATH", "/home/mmkkshim/anding_bot/log/")
 
 BASE_URL = "https://partner.cobopay.co.kr"
 ROOM_URL = f"{BASE_URL}/use/studyUse"
@@ -68,7 +67,7 @@ def check_studyroom(driver):
         if DEBUG: print("[DEBUG] 예약룸 테이블 로딩 완료")
         time.sleep(1.5)  # JS에서 row 생성 시간 확보
     except TimeoutException:
-        with open("debug_studyroom_timeout.html", "w", encoding="utf-8") as f:
+        with open(os.path.join(DEBUG_PATH, "debug_studyroom_timeout.html"), "w", encoding="utf-8") as f:
             f.write(driver.page_source)
         raise Exception("❌ [예약룸 오류] 유효한 예약 데이터를 포함한 행이 나타나지 않았습니다.")
 
