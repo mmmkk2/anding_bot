@@ -29,6 +29,7 @@ except:
 # Dashboard path for logs and HTML
 DEBUG_PATH = os.getenv("DEBUG_PATH")
 DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
+print(f"[DEBUG] DASHBOARD_PATH = {DASHBOARD_PATH}")
 
 
 # Add DEBUG switch after loading .env
@@ -127,6 +128,7 @@ def check_payment_status(driver):
     for payment in payments:
         if payment["date"].startswith(today_str):
             today_only.append(payment)
+    print(f"[DEBUG] 오늘 결제 내역 개수: {len(today_only)}")
 
     # 마지막으로 읽은 결제 ID와 새 결제 내역 비교
     last_payment_id = None
@@ -146,6 +148,7 @@ def check_payment_status(driver):
 
     # 대시보드 HTML 저장 함수 호출 (기존 구현)
     save_payment_dashboard_html(today_only)
+    print("[DEBUG] 대시보드 HTML 저장 완료 요청됨.")
 
 
 def save_payment_dashboard_html(payments):
