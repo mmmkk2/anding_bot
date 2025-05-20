@@ -1,4 +1,5 @@
 import sys
+import json
 from module.set import login, find_location, create_driver, send_broadcast_and_update, send_telegram_and_log
 
 import os
@@ -276,7 +277,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     elif remaining <= 7:
         lineColor = 'rgba(255, 206, 86, 1)'  # yellow
 
-    data_points = ",\n                        ".join([f'{{ x: "{t}", y: {y} }}' for t, y in zip(timestamps, used_frees)])
+    data_points = [{"x": t, "y": y} for t, y in zip(timestamps, used_frees)]
 
     chart_script = f"""
     <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
@@ -288,11 +289,9 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             data: {{
                 datasets: [{{
                     label: '자유석 사용 수',
-                    data: [
-                        {data_points}
-                    ],
-                    borderColor: lineColor,
-                    pointBackgroundColor: {point_colors},
+                    data: {json.dumps(data_points)},
+                    borderColor: '{lineColor}',
+                    pointBackgroundColor: {json.dumps(point_colors)},
                     pointRadius: window.innerWidth > 768 ? 2 : 4,
                     tension: 0.1
                 }}]
