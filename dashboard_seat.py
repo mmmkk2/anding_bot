@@ -315,12 +315,11 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 margin: 0;
                 display: flex;
                 align-items: flex-start;
-                min-height: 400px; /* max-height: 25vh; */
-                max-height: 400px; 
+                min-height: 300px; /* max-height: 25vh; */
+                max-height: 300px; /*   max-width: 100vw; */ 
                 box-sizing: border-box;
                 justify-content: center;
-                text-align: center;  /* 텍스트 정렬 보정 */
-                max-width: 100vw;
+                text-align: center;  /* 텍스트 정렬 보정 */               
             }}
             .box {{
                 background: white;
