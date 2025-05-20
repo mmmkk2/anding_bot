@@ -86,9 +86,15 @@ def check_seat_status(driver):
 
         driver.get(SEAT_URL)
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
-        time.sleep(2)
-
+        time.sleep(1)
         rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+
+        # 추가 대기: td 수가 3 미만인 행만 있는 경우
+        attempts = 0
+        while attempts < 3 and all(len(r.find_elements(By.TAG_NAME, "td")) < 3 for r in rows):
+            time.sleep(1.5)
+            rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+            attempts += 1
 
         for row in rows:
             cols = row.find_elements(By.TAG_NAME, "td")
