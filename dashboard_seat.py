@@ -53,7 +53,8 @@ def check_seat_status(driver):
     laptop_seat_numbers = [34, 35, 36, 37, 38]
 
     driver.get(SEAT_URL)
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//table//tbody//tr/td[3][normalize-space(text()) != '']")))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
+
 
     # Use browser's JS time for current time
     # Use JS to get browser time in ISO format
