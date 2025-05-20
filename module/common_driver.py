@@ -13,11 +13,31 @@ try:
 except:
     pass
 
+# Add DEBUG switch after loading .env
+import argparse
+# Add manual mode switch after loading .env
+parser = argparse.ArgumentParser()
+parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 비활성화)")
+args = parser.parse_args()
+
+
 # 설정값
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
+
 LOGIN_ID = os.getenv("LOGIN_ID")
 LOGIN_PWD = os.getenv("LOGIN_PWD")
+
+if args.manual:
+    LOGIN_ID = os.getenv("MANUAL_LOGIN_ID", LOGIN_ID)
+    LOGIN_PWD = os.getenv("MANUAL_LOGIN_PWD", LOGIN_PWD)
+    
+if args.manual:
+    print("[INFO] 수동 모드 실행 중: MANUAL_LOGIN_ID 사용됨")
+else:
+    print("[INFO] 자동 실행 모드: 기본 LOGIN_ID 사용됨")
+
+
 BASE_URL = "https://partner.cobopay.co.kr"
 
 import sys

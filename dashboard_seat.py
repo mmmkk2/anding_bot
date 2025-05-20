@@ -22,10 +22,20 @@ kst = pytz.timezone("Asia/Seoul")
 now = datetime.now(kst)
 today_str = datetime.now(kst).strftime("%Y.%m.%d")
 
+
 try:
     load_dotenv("/home/mmkkshim/anding_bot/.env")
 except:
     pass
+
+# Add manual mode switch after loading .env
+parser = argparse.ArgumentParser()
+parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 비활성화)")
+args = parser.parse_args()
+
+# Default: DEBUG is True unless --manual is passed
+DEBUG = not args.manual and os.getenv("DEBUG", "true").lower() != "false"
+
 
 FIXED_SEAT_NUMBERS = list(map(int, os.getenv("FIXED_SEAT_NUMBERS").split(",")))
 LAPTOP_SEAT_NUMBERS = list(map(int, os.getenv("LAPTOP_SEAT_NUMBERS").split(",")))
@@ -41,13 +51,6 @@ chart_timedelta = float(os.getenv("CHART_TIME_DELTA"))
 DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
 DEBUG_PATH = os.getenv("DEBUG_PATH")
 
-# Add DEBUG switch after loading .env
-parser = argparse.ArgumentParser()
-parser.add_argument("--hide", action="store_true", help="Disable debug output")
-args = parser.parse_args()
-
-# Default debug is True unless --hide is passed
-DEBUG = not args.hide
 
 # KST
 kst = pytz.timezone("Asia/Seoul")
