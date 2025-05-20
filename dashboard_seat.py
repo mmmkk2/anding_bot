@@ -34,7 +34,10 @@ parser.add_argument("--manual", action="store_true", help="수동 실행 모드 
 args = parser.parse_args()
 
 # Default: DEBUG is True unless --manual is passed
-DEBUG = not args.manual and os.getenv("DEBUG", "true").lower() != "false"
+DEBUG = not args.manual and os.getenv("DEBUG", "true").lower() == "true"
+print(f"[DEBUG CHECK] args.manual = {args.manual}")
+print(f"[DEBUG CHECK] os.getenv('DEBUG') = {os.getenv('DEBUG')}")
+print(f"[DEBUG CHECK] DEBUG = {DEBUG}")
 print(f"[DEBUG MODE] {'ON' if DEBUG else 'OFF'}")
 
 
