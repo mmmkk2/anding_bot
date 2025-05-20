@@ -198,11 +198,12 @@ def save_payment_dashboard_html(payments):
                 margin: 0;
                 display: flex;
                 align-items: flex-start;
-                min-height: 50vh;
-                box-sizing: border-box;
                 justify-content: center;
-                text-align: center;  /* 텍스트 정렬 보정 */
+                text-align: center;
                 max-width: 100vw;
+                height: auto;
+                min-height: 0;
+                box-sizing: border-box;
             }}
             .box {{
                 background: white;

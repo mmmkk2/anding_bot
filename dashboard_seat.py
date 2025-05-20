@@ -46,6 +46,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--hide", action="store_true", help="Disable debug output")
 args = parser.parse_args()
 DEBUG = "--hide" not in sys.argv and os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
+DEBUG = "--debug" in sys.argv and os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
 
 # KST
 kst = pytz.timezone("Asia/Seoul")
