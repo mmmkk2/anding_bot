@@ -267,6 +267,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     ],
                     borderColor: 'rgba(54, 162, 235, 1)',
                     pointBackgroundColor: {point_colors},
+                    pointRadius: window.innerWidth > 768 ? 2 : 4,
                     tension: 0.1
                 }}]
             }},
