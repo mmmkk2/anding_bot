@@ -213,13 +213,13 @@ def save_payment_dashboard_html(payments):
                 width: 100%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 text-align: center;
-                margin: 0 auto;
+                margin: 0 auto;                
             }}
-                        @media (max-width: 480px) {{
+            @media (max-width: 480px) {{
                 .box {{
                 max-width: 95vw;
                 /* padding: 1.2rem; */
-                min-height: 85vh;  /* 화면 높이의 85%까지 확장 */
+                min-height: 90vh;  /* 화면 높이의 90%까지 확장 */
                 }}
             }} 
             h1 {{
