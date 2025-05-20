@@ -30,6 +30,7 @@ except:
 DEBUG_PATH = os.getenv("DEBUG_PATH")
 DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
 
+
 # Add DEBUG switch after loading .env
 parser = argparse.ArgumentParser()
 parser.add_argument("--hide", action="store_true", help="Disable debug output")
@@ -295,11 +296,13 @@ def save_payment_dashboard_html(payments):
     </html>
     """
 
-    DASHBOARD_PATH = os.getenv("DASHBOARD_PATH", "/home/mmkkshim/anding_bot/dashboard_log/")
     output_path = os.path.join(DASHBOARD_PATH, "payment_dashboard.html")
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(html)
-
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(html)
+        print(f"[완료] 결제 대시보드 HTML 저장됨: {output_path}")
+    except Exception as e:
+        print(f"[오류] 결제 대시보드 HTML 저장 실패: {e}")
 
 def main_check_payment():
 
