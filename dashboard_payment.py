@@ -28,6 +28,8 @@ except:
 DEBUG_PATH = os.getenv("DEBUG_PATH", "/home/mmkkshim/anding_bot/log/")
 DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes")
 
+DASHBOARD_PATH = os.getenv("DASHBOARD_PATH", "/home/mmkkshim/anding_bot/dashboard_log/")
+
 COOKIE_FILE = os.getenv("COOKIE_FILE") or "/home/mmkkshim/anding_bot/log/last_payment_id.pkl"
 BASE_URL = "https://partner.cobopay.co.kr"
 
@@ -296,7 +298,9 @@ def save_payment_dashboard_html(payments):
     </html>
     """
 
-    with open("/home/mmkkshim/anding_bot/payment_dashboard.html", "w", encoding="utf-8") as f:
+    DASHBOARD_PATH = os.getenv("DASHBOARD_PATH", "/home/mmkkshim/anding_bot/dashboard_log/")
+    output_path = os.path.join(DASHBOARD_PATH, "payment_dashboard.html")
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(html)
 
 

@@ -25,6 +25,9 @@ try:
 except:
     pass
 
+# Dashboard path for logs and HTML
+DASHBOARD_PATH = os.getenv("DASHBOARD_PATH", "/home/mmkkshim/anding_bot/dashboard_log/")
+
 DEBUG_PATH = os.getenv("DEBUG_PATH", "/home/mmkkshim/anding_bot/log/")
 
 # Add DEBUG switch after loading .env
@@ -118,7 +121,7 @@ def check_seat_status(driver):
         status_emoji = "🟢"
 
     # === 좌석 기록 저장
-    log_path = "/home/mmkkshim/anding_bot/log/seat_history.csv"
+    log_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
     with open(log_path, "a", encoding="utf-8") as f:
         now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
@@ -215,7 +218,7 @@ import socket
 chart_timedelta = float(os.getenv("CHART_TIME_DELTA", "12"))
 
 def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
-    history_path = "/home/mmkkshim/anding_bot/log/seat_history.csv"
+    history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
 
     from datetime import timedelta
 
@@ -368,6 +371,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     </body>
     </html>
     """
-    with open("/home/mmkkshim/anding_bot/seat_dashboard.html", "w", encoding="utf-8") as f:
+    with open(os.path.join(DASHBOARD_PATH, "seat_dashboard.html"), "w", encoding="utf-8") as f:
         f.write(html)
         

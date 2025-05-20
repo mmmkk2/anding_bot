@@ -12,6 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 DEBUG_PATH = os.getenv("DEBUG_PATH", "/home/mmkkshim/anding_bot/log/")
 DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes")
+DASHBOARD_PATH = os.getenv("DASHBOARD_PATH", "/home/mmkkshim/anding_bot/dashboard_log/")
 
 BASE_URL = "https://partner.cobopay.co.kr"
 ROOM_URL = f"{BASE_URL}/use/studyUse"
@@ -283,7 +284,7 @@ def check_studyroom(driver):
     elif not DEBUG:
         print(f"[INFO] 완료: {total_reservations}건의 예약 정보를 HTML로 저장했습니다.")
 
-    with open("/home/mmkkshim/anding_bot/studyroom_dashboard.html", "w", encoding="utf-8") as f:
+    with open(os.path.join(os.getenv("DASHBOARD_PATH", "/home/mmkkshim/anding_bot/dashboard_log/"), "studyroom_dashboard.html"), "w", encoding="utf-8") as f:
         f.write(html)
 
 
