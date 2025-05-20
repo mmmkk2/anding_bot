@@ -41,12 +41,12 @@ chart_timedelta = float(os.getenv("CHART_TIME_DELTA"))
 DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
 DEBUG_PATH = os.getenv("DEBUG_PATH")
 
-# Add DEBUG switch after loading .env
 parser = argparse.ArgumentParser()
 parser.add_argument("--hide", action="store_true", help="Disable debug output")
 args = parser.parse_args()
-DEBUG = "--hide" not in sys.argv and os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
-DEBUG = "--debug" in sys.argv and os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
+
+# Default debug is True unless --hide is passed
+DEBUG = not args.hide
 
 # KST
 kst = pytz.timezone("Asia/Seoul")
