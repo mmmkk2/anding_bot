@@ -208,8 +208,8 @@ def save_payment_dashboard_html(payments):
             .box {{
                 background: white;
                 border-radius: 1rem;
-                padding: 1rem;
-                max-width: 650px;         /* 데스크탑 기준 최대 폭 */
+                padding: 0.75rem;
+                max-width: 580px;         /* 데스크탑 기준 최대 폭 */
                 width: 100%;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
                 text-align: center;
@@ -219,7 +219,7 @@ def save_payment_dashboard_html(payments):
                 .box {{
                 max-width: 95vw;
                 /* padding: 1.2rem; */
-                min-height: 90vh;  /* 화면 높이의 90%까지 확장 */
+                min-height: 85vh;  /* 화면 높이의 85%까지 확장 */
                 }}
             }} 
             h1 {{
