@@ -19,7 +19,7 @@ import argparse
 
 # === CLI 인자 파싱 ===
 parser = argparse.ArgumentParser()
-parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+parser.add_argument("--hide", action="store_true", help="Disable debug output")
 args = parser.parse_args()
 
 
