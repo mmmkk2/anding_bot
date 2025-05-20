@@ -103,8 +103,12 @@ def check_payment_status(driver):
         # 페이지네이션: '다음' 버튼이 활성화되어 있으면 클릭, 아니면 종료
         try:
             next_li = driver.find_element(By.CSS_SELECTOR, 'ul.pagination li.next')
-            if "disabled" in next_li.get_attribute("class"):
-                print("[DEBUG] 다음 페이지 없음 → 루프 종료")
+            next_class = next_li.get_attribute("class")
+            if DEBUG:
+                print(f"[DEBUG] 다음 버튼 class 속성: {next_class}")
+            if "disabled" in next_class:
+                if DEBUG:
+                    print("[DEBUG] 다음 페이지 없음 → 루프 종료")
                 break
             next_btn = next_li.find_element(By.TAG_NAME, "a")
             next_btn.click()
