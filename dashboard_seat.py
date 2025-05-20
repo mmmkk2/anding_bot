@@ -3,9 +3,6 @@ from module.set import login, find_location, create_driver, send_broadcast_and_u
 
 import os
 import time
-import pickle
-import csv
-import requests
 from datetime import datetime
 import pytz
 from dotenv import load_dotenv
@@ -17,33 +14,49 @@ from selenium.webdriver.support import expected_conditions as EC
 import threading
 import telegram_auth_listener
 
+import argparse
+
+# === CLI 인자 파싱 ===
+parser = argparse.ArgumentParser()
+parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+args = parser.parse_args()
 
 
-# === 설정 ===
 try:
     load_dotenv("/home/mmkkshim/anding_bot/.env")
 except:
     pass
 
-# Dashboard path for logs and HTML
-DASHBOARD_PATH = os.getenv("DASHBOARD_PATH", "/home/mmkkshim/anding_bot/dashboard_log/")
+FIXED_SEAT_NUMBERS = list(map(int, os.getenv("FIXED_SEAT_NUMBERS").split(",")))
+LAPTOP_SEAT_NUMBERS = list(map(int, os.getenv("LAPTOP_SEAT_NUMBERS").split(",")))
 
-DEBUG_PATH = os.getenv("DEBUG_PATH", "/home/mmkkshim/anding_bot/log/")
+# === 좌석 색상 상태 정의 (기준값 .env에서 설정)
+WARNING_THRESHOLD = int(os.getenv("WARNING_THRESHOLD", 7))
+DANGER_THRESHOLD = int(os.getenv("DANGER_THRESHOLD", 5))
+
+
+
+# Dashboard path for logs and HTML
+DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
+DEBUG_PATH = os.getenv("DEBUG_PATH")
 
 # Add DEBUG switch after loading .env
-DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes")
+DEBUG = "--hide" not in sys.argv and os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
 
-COOKIE_FILE = os.getenv("COOKIE_FILE") or "/home/mmkkshim/anding_bot/log/last_payment_id.pkl"
-SEAT_CACHE_FILE = os.getenv("SEAT_CACHE_FILE") or "/home/mmkkshim/anding_bot/log/last_seat_state.pkl"
-
-FIX_SEATS = int(os.getenv("FIX_SEATS", 5))
-LAPTOP_SEATS = int(os.getenv("LAPTOP_SEATS", 6))
-
-BASE_URL = "https://partner.cobopay.co.kr"
-SEAT_URL = f"{BASE_URL}/use/seatUse"
-TOTAL_FREE_SEATS = 39 - FIX_SEATS - LAPTOP_SEATS
-
+# KST
 kst = pytz.timezone("Asia/Seoul")
+
+
+# URL
+BASE_URL = os.getenv("BASE_URL")
+SEAT_URL = f"{BASE_URL}/use/seatUse"
+
+# TOTAL 
+TOTAL_SEATS = int(os.getenv("TOTAL_SEATS", 5))
+
+
+fixed_seat_numbers = FIXED_SEAT_NUMBERS
+laptop_seat_numbers = LAPTOP_SEAT_NUMBERS
 
 
 
@@ -53,9 +66,6 @@ def check_seat_status(driver):
     used_labtop_seats = 0
     used_fixed_seats = 0
     all_seat_numbers = []
-
-    fixed_seat_numbers = [19, 20, 21, 22, 23, 39]
-    laptop_seat_numbers = [34, 35, 36, 37, 38]
 
     driver.get(SEAT_URL)
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
@@ -107,15 +117,16 @@ def check_seat_status(driver):
         except:
             break
 
-    TOTAL_FREE_SEATS = 39 - len(fixed_seat_numbers) - len(laptop_seat_numbers)
+    TOTAL_FREE_SEATS = TOTAL_SEATS - len(fixed_seat_numbers) - len(laptop_seat_numbers)
     remaining_seats = TOTAL_FREE_SEATS - used_free_seats
     all_free_seat_numbers = [n for n in range(1, 34) if n not in fixed_seat_numbers and n not in laptop_seat_numbers]
     available_free_seat_numbers = sorted(set(all_free_seat_numbers) - set([n for n in all_seat_numbers if n not in laptop_seat_numbers and n not in fixed_seat_numbers]))
 
-    # === 좌석 색상 상태 정의
-    if remaining_seats <= 5:
+
+
+    if remaining_seats <= DANGER_THRESHOLD:
         status_emoji = "🔴"
-    elif remaining_seats <= 7:
+    elif remaining_seats <= WARNING_THRESHOLD:
         status_emoji = "🟡"
     else:
         status_emoji = "🟢"
@@ -190,6 +201,10 @@ def main_check_seat():
             send_broadcast_and_update("❌ [좌석] 로그인 실패", broadcast=False, category="seat")
     except Exception as e:
         send_broadcast_and_update(f"❌ [좌석 오류] {e}", broadcast=False, category="seat")
+        # Save debug HTML on failure
+        debug_file = os.path.join(DEBUG_PATH, f"debug_seat_{datetime.now(kst).strftime('%Y%m%d_%H%M%S')}.html")
+        with open(debug_file, "w", encoding="utf-8") as f:
+            f.write(driver.page_source)
     finally:
         driver.quit()
 
