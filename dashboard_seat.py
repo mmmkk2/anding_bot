@@ -245,7 +245,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         elif total_free - y <= 7:
             point_colors.append('rgba(255, 206, 86, 1)')  # Yellow
         else:
-            point_colors.append('rgba(75, 192, 192, 1)')  # Green
+            point_colors.append('rgba(200, 200, 200, 1)')  # Light gray transparent for normal usage
 
     chart_script = f"""
     <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
