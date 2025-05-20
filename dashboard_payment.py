@@ -29,7 +29,6 @@ except:
 # Dashboard path for logs and HTML
 DEBUG_PATH = os.getenv("DEBUG_PATH")
 DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
-print(f"[DEBUG] DASHBOARD_PATH = {DASHBOARD_PATH}")
 
 
 # Add DEBUG switch after loading .env
@@ -52,17 +51,20 @@ PAYMENT_URL = f"{BASE_URL}/pay/payHist"
 
 
 def check_payment_status(driver):
-    print("[DEBUG] 결제 페이지 진입 시도 중:", PAYMENT_URL)
+    if DEBUG:
+        print("[DEBUG] 결제 페이지 진입 시도 중:", PAYMENT_URL)
     time.sleep(2)  # 로그인 후 쿠키 세팅 대기
     driver.get(PAYMENT_URL)
-    print("[DEBUG] 페이지 진입 완료")
+    if DEBUG:
+        print("[DEBUG] 페이지 진입 완료")
 
     try:
         # 실제 데이터가 채워진 row가 나타날 때까지 대기 (빈 값이 아닌 이름 칸)
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.XPATH, "//table[@id='m_table_1']//tbody//tr/td[2][normalize-space(text()) != '']"))
         )
-        print("[DEBUG] 결제 테이블 로딩 완료")
+        if DEBUG:
+            print("[DEBUG] 결제 테이블 로딩 완료")
         time.sleep(1.5)  # JS에서 row 생성 시간 확보
     except TimeoutException:
         with open(os.path.join(DEBUG_PATH, "debug_payment_timeout.html"), "w", encoding="utf-8") as f:
@@ -73,7 +75,8 @@ def check_payment_status(driver):
     while True:
         # 여기서는 id를 기준으로 테이블 내 tbody의 row들을 모두 가져옵니다.
         rows = driver.find_elements(By.CSS_SELECTOR, "table#m_table_1 tbody tr")
-        print(f"[DEBUG] 로드된 row 수: {len(rows)}")
+        if DEBUG:
+            print(f"[DEBUG] 로드된 row 수: {len(rows)}")
         for row in rows:
             cols = row.find_elements(By.TAG_NAME, "td")
             # 스크린샷으로 파악한 결제 내역 테이블은 12개의 열이 있어야 함
@@ -113,10 +116,12 @@ def check_payment_status(driver):
                 break
             next_btn = next_li.find_element(By.TAG_NAME, "a")
             next_btn.click()
-            print("[DEBUG] 다음 페이지 클릭")
+            if DEBUG:
+                print("[DEBUG] 다음 페이지 클릭")
             time.sleep(1.5)  # 다음 페이지 로딩 시간 확보
         except NoSuchElementException:
-            print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
+            if DEBUG:
+                print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
             break
         except Exception as e:
             with open(os.path.join(DEBUG_PATH, "debug_payment_error.html"), "w", encoding="utf-8") as f:
@@ -128,7 +133,8 @@ def check_payment_status(driver):
     for payment in payments:
         if payment["date"].startswith(today_str):
             today_only.append(payment)
-    print(f"[DEBUG] 오늘 결제 내역 개수: {len(today_only)}")
+    if DEBUG:
+        print(f"[DEBUG] 오늘 결제 내역 개수: {len(today_only)}")
 
     # 마지막으로 읽은 결제 ID와 새 결제 내역 비교
     last_payment_id = None
@@ -148,7 +154,8 @@ def check_payment_status(driver):
 
     # 대시보드 HTML 저장 함수 호출 (기존 구현)
     save_payment_dashboard_html(today_only)
-    print("[DEBUG] 대시보드 HTML 저장 완료 요청됨.")
+    if DEBUG:
+        print("[DEBUG] 대시보드 HTML 저장 완료 요청됨.")
 
 
 def save_payment_dashboard_html(payments):
@@ -307,7 +314,8 @@ def save_payment_dashboard_html(payments):
     try:
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(html)
-        print(f"[완료] 결제 대시보드 HTML 저장됨: {output_path}")
+        if DEBUG:
+            print(f"[완료] 결제 대시보드 HTML 저장됨: {output_path}")
     except Exception as e:
         print(f"[오류] 결제 대시보드 HTML 저장 실패: {e}")
 
