@@ -51,7 +51,7 @@ def check_seat_status(driver):
     laptop_seat_numbers = [34, 35, 36, 37, 38]
 
     driver.get(SEAT_URL)
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//table//tbody//tr/td[3][normalize-space(text()) != '']")))
 
     # Use browser's JS time for current time
     # Use JS to get browser time in ISO format
@@ -64,6 +64,7 @@ def check_seat_status(driver):
 
         for row in rows:
             cols = row.find_elements(By.TAG_NAME, "td")
+            print("[DEBUG] columns parsed:", [c.text for c in cols])
             if len(cols) < 3:
                 continue
 
@@ -76,6 +77,8 @@ def check_seat_status(driver):
             except:
                 continue
 
+            print(f"[DEBUG] Parsed seat_type: {seat_type}, seat_number: {seat_number}")
+
             if seat_type == "개인석":
                 if seat_number in fixed_seat_numbers:
                     used_fixed_seats += 1
@@ -83,6 +86,9 @@ def check_seat_status(driver):
                     used_labtop_seats += 1
                 else:
                     used_free_seats += 1
+
+            # End of for row in rows: loop, before pagination try:
+        print(f"[DEBUG] used_free_seats: {used_free_seats}, used_fixed_seats: {used_fixed_seats}, used_labtop_seats: {used_labtop_seats}")
 
         try:
             next_btn = driver.find_element(By.CSS_SELECTOR, 'ul.pagination li.active + li a')

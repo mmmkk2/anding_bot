@@ -55,16 +55,16 @@ def check_payment_status(driver):
     print("[DEBUG] 페이지 진입 완료")
 
     try:
-        # '이름' 컬럼이 있는 테이블이 로드될 때까지 대기 (페이지의 결제 테이블에는 id="m_table_1"가 있음)
+        # 실제 데이터가 채워진 row가 나타날 때까지 대기 (빈 값이 아닌 이름 칸)
         WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.XPATH, "//table[@id='m_table_1']//th[contains(text(), '이름')]"))
+            EC.presence_of_element_located((By.XPATH, "//table[@id='m_table_1']//tbody//tr/td[2][normalize-space(text()) != '']"))
         )
         print("[DEBUG] 결제 테이블 로딩 완료")
         time.sleep(1.5)  # JS에서 row 생성 시간 확보
     except TimeoutException:
         with open("debug_payment_timeout.html", "w", encoding="utf-8") as f:
             f.write(driver.page_source)
-        raise Exception("❌ [결제 오류] 결제 테이블을 찾을 수 없습니다.")
+        raise Exception("❌ [결제 오류] 결제 테이블의 유효한 데이터를 찾을 수 없습니다.")
 
     payments = []
     while True:
