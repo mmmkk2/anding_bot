@@ -126,10 +126,13 @@ def check_seat_status(driver):
 
     if remaining_seats <= DANGER_THRESHOLD:
         status_emoji = "🔴"
+        line_color = 'rgba(255, 99, 132, 1)'  # red
     elif remaining_seats <= WARNING_THRESHOLD:
         status_emoji = "🟡"
+        line_color = 'rgba(255, 206, 86, 1)'  # yellow
     else:
         status_emoji = "🟢"
+        line_color = 'rgba(75, 192, 192, 1)'  # green
 
     # === 좌석 기록 저장
     log_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
@@ -267,6 +270,14 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         else:
             point_colors.append('rgba(75, 192, 192, 1)')  # Light gray transparent for normal usage
 
+    lineColor = 'rgba(75, 192, 192, 1)'  # default green
+    if remaining <= 5:
+        lineColor = 'rgba(255, 99, 132, 1)'  # red
+    elif remaining <= 7:
+        lineColor = 'rgba(255, 206, 86, 1)'  # yellow
+
+    data_points = ",\n                        ".join([f'{{ x: "{t}", y: {y} }}' for t, y in zip(timestamps, used_frees)])
+
     chart_script = f"""
     <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns'></script>
@@ -278,9 +289,9 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 datasets: [{{
                     label: '자유석 사용 수',
                     data: [
-                        {''.join([f"{{ x: '{t}', y: {y} }}," for t, y in zip(timestamps, used_frees)])}
+                        {data_points}
                     ],
-                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderColor: lineColor,
                     pointBackgroundColor: {point_colors},
                     pointRadius: window.innerWidth > 768 ? 2 : 4,
                     tension: 0.1
