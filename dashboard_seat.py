@@ -159,19 +159,11 @@ def check_seat_status(driver):
         f"남은 자유석: {remaining_seats}석"
     )
 
-    # === 변경 체크해서 broadcast
-    changed = True
-
-    if changed:
-        send_broadcast_and_update(msg, broadcast=False,  category="seat")
-
     # === 주의/경고/복구 (broadcast only, no flag logic)
-    if remaining_seats <= 5:
-        send_broadcast_and_update("[경고] 🚨 자유석 5석 이하 - 일일권 제한 강화 필요", broadcast=True, category="seat")
-    elif remaining_seats <= 7:
-        send_broadcast_and_update("[주의] ⚠️ 자유석 7석 이하 - 이용 주의 필요", broadcast=True, category="seat")
-    elif current_hour >= 20 and remaining_seats >= 10:
-        send_broadcast_and_update("[안내] ✅ 자유석 여유 확보 (10석 이상) - 일일권 이용 제한 해제", broadcast=False, category="seat")
+    if remaining_seats <= DANGER_THRESHOLD:
+        send_broadcast_and_update(f"[경고] 🚨 자유석 {DANGER_THRESHOLD}석 이하 - 일일권 제한 강화 필요", broadcast=True, category="seat")
+    elif remaining_seats <= WARNING_THRESHOLD:
+        send_broadcast_and_update(f"[주의] ⚠️ 자유석 {WARNING_THRESHOLD}석 이하 - 이용 주의 필요", broadcast=True, category="seat")
 
     # === 최종 CSV 로그
     return msg
