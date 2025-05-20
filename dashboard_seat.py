@@ -351,7 +351,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 margin-top: 1rem;
             }}          
             canvas {{
-               height: 200px;
+               height: 230px;
             }}
             @media (max-width: 480px) {{
                 body {{
@@ -361,7 +361,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     max-height: 100vh;  /* 화면 높이의 90%까지 확장 */
                 }}
                 canvas {{
-                    height: 230px;
+                    height: 250px;
                 }}
             }}                
         </style>
