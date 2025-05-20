@@ -35,6 +35,7 @@ args = parser.parse_args()
 
 # Default: DEBUG is True unless --manual is passed
 DEBUG = not args.manual and os.getenv("DEBUG", "true").lower() != "false"
+print(f"[DEBUG MODE] {'ON' if DEBUG else 'OFF'}")
 
 
 FIXED_SEAT_NUMBERS = list(map(int, os.getenv("FIXED_SEAT_NUMBERS").split(",")))
@@ -209,9 +210,11 @@ def main_check_seat():
     except Exception as e:
         send_broadcast_and_update(f"❌ [좌석 오류] {e}", broadcast=False, category="seat")
         # Save debug HTML on failure
-        debug_file = os.path.join(DEBUG_PATH, f"debug_seat_{datetime.now(kst).strftime('%Y%m%d_%H%M%S')}.html")
-        with open(debug_file, "w", encoding="utf-8") as f:
-            f.write(driver.page_source)
+        if DEBUG:
+            debug_file = os.path.join(DEBUG_PATH, f"debug_seat_{datetime.now(kst).strftime('%Y%m%d_%H%M%S')}.html")
+            with open(debug_file, "w", encoding="utf-8") as f:
+                f.write(driver.page_source)
+            print(f"[DEBUG] 예외 발생 → 페이지 소스 저장됨: {debug_file}")
     finally:
         driver.quit()
 
