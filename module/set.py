@@ -66,7 +66,7 @@ def login(driver):
     BASE_URL = "https://partner.cobopay.co.kr"
 
     if not LOGIN_ID or not LOGIN_PWD:
-        send_telegram_and_log("[로그인 실패] ID/PWD 누락")
+        send_telegram_and_log("[로그인 실패] ID/PWD 누락", broadcast=True)
         return False
 
     print("로그인 시도 중...")
@@ -87,7 +87,7 @@ def login(driver):
         driver.find_element(By.CLASS_NAME, "btn_login").click()
         time.sleep(3)
     except Exception as e:
-        send_telegram_and_log(f"[로그인 실패] ID/PWD 입력 오류: {e}")
+        send_telegram_and_log(f"[로그인 실패] ID/PWD 입력 오류: {e}", broadcast=True)
         return False
 
     try:
@@ -105,7 +105,7 @@ def login(driver):
             try:
                 driver.find_element(By.CLASS_NAME, "swal2-confirm").click()
             except Exception as e:
-                send_telegram_and_log(f"❌ 확인 버튼 클릭 실패: {e}")
+                send_telegram_and_log(f"❌ 확인 버튼 클릭 실패: {e}", broadcast=True)
                 print(f"❌ swal2-confirm 클릭 실패: {e}")
                 return False
 
@@ -140,7 +140,7 @@ def login(driver):
                             )
                             error_text = driver.find_element(By.CLASS_NAME, "swal2-html-container").text
                             if "잘못" in error_text or "인증번호" in error_text:
-                                send_telegram_and_log(f"❌ 인증 실패: {error_text}")
+                                send_telegram_and_log(f"❌ 인증 실패: {error_text}", broadcast=True)
                                 return False
                         except:
                             pass
@@ -150,7 +150,7 @@ def login(driver):
                             send_telegram_and_log("❌ 인증번호 입력 후 여전히 입력창이 남아 있음", broadcast=True)
                             return False
 
-                        send_telegram_and_log("✅ 인증번호 자동 입력 완료 및 로그인 성공")
+                        print("✅ 인증번호 자동 입력 완료 및 로그인 성공")
                         return True
                 time.sleep(2)
 
@@ -164,7 +164,7 @@ def login(driver):
 
             current_url = driver.current_url
             if "/dashboard" in current_url:
-                send_telegram_and_log("✅ 인증 없이 로그인 성공 (Dashboard 접근 확인)")
+                print("✅ 인증 없이 로그인 성공 (Dashboard 접근 확인)")
                 return True
             else:
                 send_telegram_and_log(f"❌ 로그인 실패 - 이동한 URL 확인 필요: {current_url}", broadcast=True)
