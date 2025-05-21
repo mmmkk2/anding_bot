@@ -202,17 +202,20 @@ def save_payment_dashboard_html(payments):
     )
     
     now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
-    html_rows = ""
-    for row in payments:
-        html_rows += f"""
-            <tr>
-                <td class="number">{row['id']}</td>
-                <td class="user">{row['user']}</td>
-                <td class="amount">{row['amount']}</td>
-                <td class="seat">{row['seat_type']}</td>
-                <td class="time">{row['date'][:10]} {row['date'][11:19]}</td>
-            </tr>
-        """
+    if not payments:
+        html_rows = "<tr><td colspan='5'>오늘 결제 내역이 없습니다.</td></tr>"
+    else:
+        html_rows = ""
+        for row in payments:
+            html_rows += f"""
+                <tr>
+                    <td class="number">{row['id']}</td>
+                    <td class="user">{row['user']}</td>
+                    <td class="amount">{row['amount']}</td>
+                    <td class="seat">{row['seat_type']}</td>
+                    <td class="time">{row['date'][:10]} {row['date'][11:19]}</td>
+                </tr>
+            """
 
     html = f"""
     <!DOCTYPE html>
