@@ -31,12 +31,13 @@ DEBUG_PATH = os.getenv("DEBUG_PATH")
 DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
 
 
-# Add DEBUG switch after loading .env
+# Add manual mode switch after loading .env
 parser = argparse.ArgumentParser()
-parser.add_argument("--hide", action="store_true", help="Disable debug output")
+parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 비활성화)")
 args = parser.parse_args()
-DEBUG = "--hide" not in sys.argv and os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
-DEBUG = "--debug" in sys.argv and os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
+
+# Default: DEBUG is True unless --manual is passed
+DEBUG = not args.manual and os.getenv("DEBUG", "true").lower() == "true"
 
 
 PAYMENT_CACHE_FILE = os.getenv("COOKIE_FILE")
@@ -61,21 +62,14 @@ def check_payment_status(driver):
     # === 날짜 필터: 결제일자 시작~종료일을 오늘로 설정 ===
     today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
     try:
-        start_input = driver.find_element(By.NAME, "s_pay_date_start")
-        end_input = driver.find_element(By.NAME, "s_pay_date_end")
-        script_start = f"document.querySelector('input[name=\"s_pay_date_start\"]').value = '{today_date_str}';"
-        script_end = f"document.querySelector('input[name=\"s_pay_date_end\"]').value = '{today_date_str}';"
-        driver.execute_script(script_start)
-        driver.execute_script(script_end)
+        start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_pay_date_start']")))
+        driver.execute_script(f"document.querySelector('input[name=\"s_pay_date_start\"]').value = '{today_date_str}';")
+        end_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_pay_date_end']")))
+        driver.execute_script(f"document.querySelector('input[name=\"s_pay_date_end\"]').value = '{today_date_str}';")
         time.sleep(0.5)
-        if DEBUG:
-            value_start = driver.execute_script("return document.querySelector('input[name=\"s_pay_date_start\"]').value;")
-            value_end = driver.execute_script("return document.querySelector('input[name=\"s_pay_date_end\"]').value;")
-            print("[DEBUG] JS로 설정된 결제일자 시작일 값:", value_start)
-            print("[DEBUG] JS로 설정된 결제일자 종료일 값:", value_end)
     except Exception as e:
         if DEBUG:
-            print(f"[DEBUG] 결제일자 필드 설정 실패: {e}")
+            print(f"[DEBUG] 결제일자 필터 및 검색 실패: {e}")
 
     # 검색 버튼 클릭 (아이콘을 포함하는 부모 버튼 클릭)
     try:
