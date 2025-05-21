@@ -57,8 +57,18 @@ def check_payment_status(driver):
     if DEBUG:
         print("[DEBUG] 페이지 진입 완료")
 
+    # === 초기 테이블 존재 여부 확인 ===
+    table_rows = driver.find_elements(By.CSS_SELECTOR, "table#m_table_1 tbody tr")
+    if not table_rows:
+        if DEBUG:
+            print("[DEBUG] 결제 테이블이 비어 있음 → HTML 생성 시도")
+        save_payment_dashboard_html([])
+        return
+
     # === 날짜 필터: 결제일자 시작~종료일을 오늘로 설정 ===
     today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
+    if DEBUG:
+        print(f"[DEBUG] 오늘 날짜 기준 결제 필터: {today_date_str}")
     try:
         start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_pay_date_start']")))
         driver.execute_script(f"document.querySelector('input[name=\"s_pay_date_start\"]').value = '{today_date_str}';")
@@ -83,6 +93,7 @@ def check_payment_status(driver):
             print("[DEBUG] 검색 버튼 클릭 실패:", e)
 
     try:
+        # 데이터가 실제로 존재하는 경우를 감지 (이전 table row 확인은 사전 처리됨)
         # 실제 데이터가 채워진 row가 나타날 때까지 대기 (빈 값이 아닌 이름 칸)
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.XPATH, "//table[@id='m_table_1']//tbody//tr/td[2][normalize-space(text()) != '']"))
