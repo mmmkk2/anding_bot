@@ -6,3 +6,4 @@
 /web_app/app.py
 payment_run.sh
 seat_run.sh
+/credentials/
