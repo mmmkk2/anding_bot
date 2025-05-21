@@ -99,7 +99,7 @@ def login(driver):
 
         if "휴대폰 인증번호" in alert_text:
             print("인증번호 입력 대기 중...")
-            send_telegram_and_log("📲 인증번호 요청됨. 텔레그램으로 인증번호 입력 시 자동 처리됩니다.", broadcast=True)
+            send_telegram_and_log("📲 인증번호 요청됨. \n👤 로그인 ID: {LOGIN_ID}\n텔레그램으로 인증번호 입력 시 자동 처리됩니다.", broadcast=True)
 
             try:
                 driver.find_element(By.CLASS_NAME, "swal2-confirm").click()
