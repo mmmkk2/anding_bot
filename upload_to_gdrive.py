@@ -17,16 +17,17 @@ FOLDER_IDS = {
 }
 
 def upload_file(filepath, service, folder_id, dated_filename):
+    base_filename = dated_filename  # dated_filename is now just the filename without prefix
     file_metadata = {
-        "name": dated_filename,
+        "name": base_filename,
         "parents": [folder_id],
     }
     media = MediaFileUpload(filepath, resumable=True)
     try:
         file = service.files().create(body=file_metadata, media_body=media, fields="id").execute()
-        print(f"[업로드 완료] {dated_filename} → https://drive.google.com/file/d/{file.get('id')}")
+        print(f"[업로드 완료] {base_filename} → https://drive.google.com/file/d/{file.get('id')}")
     except Exception as e:
-        print(f"[업로드 실패] {dated_filename}: {e}")
+        print(f"[업로드 실패] {base_filename}: {e}")
 
 def main():
     creds = service_account.Credentials.from_service_account_file(
@@ -49,7 +50,7 @@ def main():
             if not folder_id:
                 print(f"[건너뜀] 알 수 없는 prefix: {prefix}")
                 continue
-            dated_filename = f"{prefix}/{file.split('.')[0]}_{today_str}.png"
+            dated_filename = f"{file.split('.')[0]}_{today_str}.png"
             upload_file(os.path.join(screenshot_folder, file), service, folder_id, dated_filename)
 
 if __name__ == "__main__":
