@@ -16,6 +16,17 @@ FOLDER_IDS = {
     "studyroom": "1BE8GLf2VrtOxqDvkEY_E2L6GDoZHeMXs",
 }
 
+def create_folder(service, name, parent_id=None):
+    file_metadata = {
+        "name": name,
+        "mimeType": "application/vnd.google-apps.folder",
+    }
+    if parent_id:
+        file_metadata["parents"] = [parent_id]
+    folder = service.files().create(body=file_metadata, fields="id").execute()
+    print(f"[폴더 생성 완료] {name} → ID: {folder.get('id')}")
+    return folder.get("id")
+
 def upload_file(filepath, service, folder_id, dated_filename):
     base_filename = dated_filename  # dated_filename is now just the filename without prefix
     file_metadata = {
@@ -36,6 +47,11 @@ def main():
     )
     service = build("drive", "v3", credentials=creds)
 
+    ROOT_FOLDER_ID = "1BE8GLf2VrtOxqDvkEY_E2L6GDoZHeMXs"
+    created_folder_ids = {}
+    for folder_name in ["seat", "main", "payment", "studyroom"]:
+        created_folder_ids[folder_name] = create_folder(service, folder_name, ROOT_FOLDER_ID)
+
     today_str = datetime.now().strftime("%Y-%m-%d")
     screenshot_folder = os.path.join(LOCAL_SCREENSHOT_DIR, today_str)
 
@@ -46,7 +62,7 @@ def main():
     for file in os.listdir(screenshot_folder):
         if file.endswith(".png"):
             prefix = file.split("_")[0]
-            folder_id = FOLDER_IDS.get(prefix)
+            folder_id = created_folder_ids.get(prefix)
             if not folder_id:
                 print(f"[건너뜀] 알 수 없는 prefix: {prefix}")
                 continue
