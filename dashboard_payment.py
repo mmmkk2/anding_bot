@@ -58,6 +58,38 @@ def check_payment_status(driver):
     if DEBUG:
         print("[DEBUG] 페이지 진입 완료")
 
+    # === 날짜 필터: 결제일자 시작~종료일을 오늘로 설정 ===
+    today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
+    try:
+        start_input = driver.find_element(By.NAME, "s_pay_date_start")
+        end_input = driver.find_element(By.NAME, "s_pay_date_end")
+        script_start = f"document.querySelector('input[name=\"s_pay_date_start\"]').value = '{today_date_str}';"
+        script_end = f"document.querySelector('input[name=\"s_pay_date_end\"]').value = '{today_date_str}';"
+        driver.execute_script(script_start)
+        driver.execute_script(script_end)
+        time.sleep(0.5)
+        if DEBUG:
+            value_start = driver.execute_script("return document.querySelector('input[name=\"s_pay_date_start\"]').value;")
+            value_end = driver.execute_script("return document.querySelector('input[name=\"s_pay_date_end\"]').value;")
+            print("[DEBUG] JS로 설정된 결제일자 시작일 값:", value_start)
+            print("[DEBUG] JS로 설정된 결제일자 종료일 값:", value_end)
+    except Exception as e:
+        if DEBUG:
+            print(f"[DEBUG] 결제일자 필드 설정 실패: {e}")
+
+    # 검색 버튼 클릭 (아이콘을 포함하는 부모 버튼 클릭)
+    try:
+        search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
+        if DEBUG:
+            print("[DEBUG] 검색 버튼 태그 구조:", search_button.get_attribute("outerHTML"))
+        search_button.click()
+        if DEBUG:
+            print("[DEBUG] 검색 버튼 클릭 완료")
+        time.sleep(1.5)
+    except Exception as e:
+        if DEBUG:
+            print("[DEBUG] 검색 버튼 클릭 실패:", e)
+
     try:
         # 실제 데이터가 채워진 row가 나타날 때까지 대기 (빈 값이 아닌 이름 칸)
         WebDriverWait(driver, 20).until(
