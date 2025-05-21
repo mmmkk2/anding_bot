@@ -17,7 +17,7 @@ import pytz
 
 kst = pytz.timezone("Asia/Seoul")
 now = datetime.now(kst)
-today_str = datetime.now(kst).strftime("%Y.%m.%d")
+today_str = now.strftime("%Y.%m.%d")
 
 
 # === 설정 ===
@@ -184,8 +184,8 @@ def check_payment_status(driver):
 
 
 def save_payment_dashboard_html(payments):
-    today = datetime.now(kst).strftime("%Y.%m.%d")
-    summary_time = datetime.now(kst).strftime("%H:%M")
+    today = now.strftime("%Y.%m.%d")
+    summary_time = now.strftime("%H:%M")
     summary_count = len(payments)
     # summary_amount = sum(int(p['amount'].replace(',', '').replace('원', '')) for p in payments if p['amount'])
     summary_amount = sum(
@@ -197,7 +197,7 @@ def save_payment_dashboard_html(payments):
         print(f"[DEBUG] save_payment_dashboard_html: 전달된 결제 내역 개수: {len(payments)}")
         if not payments:
             print("[DEBUG] save_payment_dashboard_html: 결제 내역이 비어 있음. HTML은 그래도 생성됨.")
-    now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
+    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
     if not payments:
         html_rows = "<tr><td colspan='5'>오늘 결제 내역이 없습니다.</td></tr>"
     else:
