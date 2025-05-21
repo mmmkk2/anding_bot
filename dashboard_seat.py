@@ -20,7 +20,7 @@ from datetime import timedelta
 
 kst = pytz.timezone("Asia/Seoul")
 now = datetime.now(kst)
-today_str = datetime.now(kst).strftime("%Y.%m.%d")
+today_str = now.strftime("%Y.%m.%d")
 
 
 try:
@@ -85,6 +85,24 @@ def check_seat_status(driver):
         all_seat_numbers = []
 
         driver.get(SEAT_URL)
+        # === 날짜 필터 추가 ===
+        today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
+        try:
+            # 시작일 입력
+            start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_start_date_start']")))
+            driver.execute_script(f"document.querySelector('input[name=\"s_start_date_start\"]').value = '{today_date_str}';")
+            # 종료일 입력
+            end_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_start_date_end']")))
+            driver.execute_script(f"document.querySelector('input[name=\"s_start_date_end\"]').value = '{today_date_str}';")
+            time.sleep(0.5)  # 안정화 대기
+            # 검색 버튼 클릭
+            search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
+            search_button.click()
+            time.sleep(1.5)  # 검색 결과 로딩 대기
+        except Exception as e:
+            if DEBUG:
+                print(f"[DEBUG] 날짜 필터 및 검색 실패: {e}")
+
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
         time.sleep(1)
         rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
