@@ -5,7 +5,7 @@ from googleapiclient.http import MediaFileUpload
 from datetime import datetime
 
 # --- 환경변수 및 설정 ---
-SERVICE_ACCOUNT_FILE = "credentials.json"  # OAuth 2.0 인증 JSON 파일 경로
+SERVICE_ACCOUNT_FILE = "credentials/credentials.json"  # OAuth 2.0 인증 JSON 파일 경로
 FOLDER_ID = "1BE8GLf2VrtOxqDvkEY_E2L6GDoZHeMXs"  # 업로드할 Google Drive 폴더 ID
 LOCAL_SCREENSHOT_DIR = os.getenv("DASHBOARD_PATH", "/home/mmkkshim/anding_bot/dashboard_log/") + "/screenshots"
 
