@@ -167,6 +167,7 @@ def check_payment_status(driver):
             today_only.append(payment)
     if DEBUG:
         print(f"[DEBUG] 오늘 결제 내역 개수: {len(today_only)}")
+        print(f"[DEBUG] 오늘 결제 내역 개수: {len(today_only)} (HTML 생성 여부 무관)")
 
     # 마지막으로 읽은 결제 ID와 새 결제 내역 비교
     last_payment_id = None
@@ -184,7 +185,7 @@ def check_payment_status(driver):
         with open(PAYMENT_CACHE_FILE, "wb") as f:
             pickle.dump(today_only[0]["id"], f)
 
-    # 대시보드 HTML 저장 함수 호출 (기존 구현)
+    # 대시보드 HTML 저장 함수 호출 (항상 호출, today_only가 비어도)
     save_payment_dashboard_html(today_only)
     if DEBUG:
         print("[DEBUG] 대시보드 HTML 저장 완료 요청됨.")
@@ -200,7 +201,10 @@ def save_payment_dashboard_html(payments):
         for p in payments
         if p['amount'] and '승인' in p['status']
     )
-    
+    if DEBUG:
+        print(f"[DEBUG] save_payment_dashboard_html: 전달된 결제 내역 개수: {len(payments)}")
+        if not payments:
+            print("[DEBUG] save_payment_dashboard_html: 결제 내역이 비어 있음. HTML은 그래도 생성됨.")
     now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
     if not payments:
         html_rows = "<tr><td colspan='5'>오늘 결제 내역이 없습니다.</td></tr>"
