@@ -26,6 +26,7 @@ LOGIN_PWD = os.getenv("LOGIN_PWD")
 EMERGENCY_CHAT_ID = os.getenv("EMERGENCY_CHAT_ID")
 
 
+
 import os
 import requests
 
@@ -261,9 +262,11 @@ def send_broadcast_message(msg):
 
 from datetime import datetime
 
+DASHBOARD_PATH = os.getenv("DASHBOARD_PATH", "/home/mmkkshim/anding_bot/dashboard_log/")
+
 def update_dashboard(category, msg, append=False):
-    os.makedirs("dashboard_log", exist_ok=True)
-    file_path = f"dashboard_log/{category}_dashboard.txt"
+    os.makedirs(DASHBOARD_PATH, exist_ok=True)
+    file_path = f"{DASHBOARD_PATH}/{category}_dashboard.txt"
     mode = "a" if append else "w"
     with open(file_path, mode, encoding="utf-8") as f:
         f.write(msg + "\n\n")
@@ -273,22 +276,22 @@ def send_broadcast_and_update(msg, broadcast=True, category="seat"):
     update_dashboard(category, msg)
 
 
-import os
-import pickle
+# import os
+# import pickle
 
-FLAGS_FILE = "log/broadcast_flags.pkl"
+# FLAGS_FILE = "log/broadcast_flags.pkl"
 
-def load_flags():
-    if os.path.exists(FLAGS_FILE):
-        with open(FLAGS_FILE, "rb") as f:
-            data = pickle.load(f)
-    else:
-        data = {"date": "", "warn_6": False, "warn_4": False, "recovery": False, "fixed_missing": False}
-    return data
+# def load_flags():
+#     if os.path.exists(FLAGS_FILE):
+#         with open(FLAGS_FILE, "rb") as f:
+#             data = pickle.load(f)
+#     else:
+#         data = {"date": "", "warn_6": False, "warn_4": False, "recovery": False, "fixed_missing": False}
+#     return data
 
-def save_flags(flags):
-    os.makedirs("log", exist_ok=True)
-    with open(FLAGS_FILE, "wb") as f:
-        pickle.dump(flags, f)
+# def save_flags(flags):
+#     os.makedirs("log", exist_ok=True)
+#     with open(FLAGS_FILE, "wb") as f:
+#         pickle.dump(flags, f)
 
 

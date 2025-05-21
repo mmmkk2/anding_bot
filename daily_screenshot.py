@@ -32,7 +32,7 @@ def create_driver():
     return driver
 
 def capture_dashboard(name, path, driver):
-    url = f"{BASE_URL}/{path}"
+    url = f"{BASE_URL}/{path}" if path else BASE_URL
     driver.get(url)
 
     if "login" in driver.current_url:
@@ -55,6 +55,7 @@ def main():
         capture_dashboard("seat_dashboard", "seat", driver)
         capture_dashboard("payment_dashboard", "payment", driver)
         capture_dashboard("studyroom_dashboard", "studyroom", driver)
+        capture_dashboard("main_dashboard", "", driver)
     finally:
         driver.quit()
 
