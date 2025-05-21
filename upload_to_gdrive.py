@@ -49,7 +49,7 @@ def main():
             if not folder_id:
                 print(f"[건너뜀] 알 수 없는 prefix: {prefix}")
                 continue
-            dated_filename = f"{file.split('.')[0]}_{today_str}.png"
+            dated_filename = f"{prefix}/{file.split('.')[0]}_{today_str}.png"
             upload_file(os.path.join(screenshot_folder, file), service, folder_id, dated_filename)
 
 if __name__ == "__main__":
