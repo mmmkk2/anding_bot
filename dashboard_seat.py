@@ -29,12 +29,12 @@ except:
     pass
 
 # Add manual mode switch after loading .env
+# Default: DEBUG is True unless --manual is passed
 parser = argparse.ArgumentParser()
 parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 비활성화)")
 args = parser.parse_args()
-
-# Default: DEBUG is True unless --manual is passed
 DEBUG = not args.manual and os.getenv("DEBUG", "true").lower() == "true"
+
 print(f"[DEBUG CHECK] args.manual = {args.manual}")
 print(f"[DEBUG CHECK] os.getenv('DEBUG') = {os.getenv('DEBUG')}")
 print(f"[DEBUG CHECK] DEBUG = {DEBUG}")
@@ -216,7 +216,7 @@ def main_check_seat():
 
 
     location_tag = find_location()
-    send_telegram_and_log(f"📢 [좌석 - 모니터링] 시작합니다.")
+    print(f"📢 [좌석 - 모니터링] 시작합니다.")
 
     driver = create_driver()
 
@@ -231,7 +231,7 @@ def main_check_seat():
             full_msg = loop_msg + "\n\n" + seat_status_msg
             send_broadcast_and_update(full_msg, broadcast=False, category="seat")
 
-            send_telegram_and_log(f"{location_tag} ✅ [좌석 - 모니터링] 정상 종료되었습니다.")
+            print(f"{location_tag} ✅ [좌석 - 모니터링] 정상 종료되었습니다.")
         else:
             send_broadcast_and_update("❌ [좌석] 로그인 실패", broadcast=False, category="seat")
     except Exception as e:

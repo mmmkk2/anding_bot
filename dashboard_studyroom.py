@@ -31,10 +31,9 @@ DEBUG_PATH = os.getenv("DEBUG_PATH")
 
 # Add DEBUG switch after loading .env
 parser = argparse.ArgumentParser()
-parser.add_argument("--hide", action="store_true", help="Disable debug output")
+parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 비활성화)")
 args = parser.parse_args()
-DEBUG = "--hide" not in sys.argv and os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
-DEBUG = "--debug" in sys.argv and os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
+DEBUG = not args.manual and os.getenv("DEBUG", "true").lower() == "true"
 
 # KST
 kst = pytz.timezone("Asia/Seoul")
@@ -326,9 +325,9 @@ def main_check_studyroom():
             check_studyroom(driver)
             # send_telegram_and_log(f"{location_tag} ✅ [결제 - 모니터링] 정상 종료되었습니다.")  # Disabled Telegram notification
         else:
-            send_broadcast_and_update("❌ [예약룸] 로그인 실패", broadcast=False, category="payment")
+            send_broadcast_and_update("❌ [예약룸] 로그인 실패", broadcast=True, category="studyroom")
     except Exception as e:
-        # send_broadcast_and_update(f"❌ [예약룸 오류] {e}", broadcast=False, category="payment")  # Disabled broadcast in except
+        # send_broadcast_and_update(f"❌ [예약룸 오류] {e}", broadcast=False, category="studyroom")  # Disabled broadcast in except
         pass
     finally:
         driver.quit()
