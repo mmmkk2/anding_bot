@@ -149,36 +149,37 @@ def check_seat_status(driver):
         for row in all_rows[:]:
             try:
                 cols = row.find_elements(By.TAG_NAME, "td")
-            except StaleElementReferenceException:
+
+                if len(cols) < 3:
+                    continue
+
+                seat_type = cols[1].text.strip()
+                seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
+
+                try:
+                    seat_number = int(seat_number_text)
+                    all_seat_numbers.append(seat_number)
+                except:
+                    continue
+
+                # Debugging print statements for seat classification
+                if seat_type == "개인석":
+                    if seat_number in fixed_set:
+                        used_fixed_seats += 1
+                        if DEBUG:
+                            print(f"[DEBUG] 고정석 사용됨: {seat_number}")
+                    elif seat_number in laptop_set:
+                        used_labtop_seats += 1
+                        if DEBUG:
+                            print(f"[DEBUG] 노트북석 사용됨: {seat_number}")
+                    else:
+                        used_free_seats += 1
+                        if DEBUG:
+                            print(f"[DEBUG] 자유석 사용됨: {seat_number}")
+            except Exception as e:
                 if DEBUG:
-                    print("[DEBUG] Stale element encountered, skipping row.")
+                    print(f"[DEBUG] 좌석 파싱 중 오류 발생 (해당 행 스킵): {e}")
                 continue
-            if len(cols) < 3:
-                continue
-
-            seat_type = cols[1].text.strip()
-            seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
-
-            try:
-                seat_number = int(seat_number_text)
-                all_seat_numbers.append(seat_number)
-            except:
-                continue
-
-            # Debugging print statements for seat classification
-            if seat_type == "개인석":
-                if seat_number in fixed_set:
-                    used_fixed_seats += 1
-                    if DEBUG:
-                        print(f"[DEBUG] 고정석 사용됨: {seat_number}")
-                elif seat_number in laptop_set:
-                    used_labtop_seats += 1
-                    if DEBUG:
-                        print(f"[DEBUG] 노트북석 사용됨: {seat_number}")
-                else:
-                    used_free_seats += 1
-                    if DEBUG:
-                        print(f"[DEBUG] 자유석 사용됨: {seat_number}")
 
         if DEBUG:
             print(f"[DEBUG] 전체 좌석번호(개인석): {all_seat_numbers}")
