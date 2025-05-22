@@ -159,10 +159,10 @@ def check_seat_status(driver):
 
     total_assigned_free_seats = TOTAL_SEATS - len(fixed_seat_numbers) - len(laptop_seat_numbers)
     used_total_seats = used_free_seats + used_labtop_seats + used_fixed_seats
-    remaining_seats = total_assigned_free_seats - used_free_seats
-    TOTAL_FREE_SEATS = total_assigned_free_seats
     all_free_seat_numbers = [n for n in range(1, 34) if n not in fixed_seat_numbers and n not in laptop_seat_numbers]
     available_free_seat_numbers = sorted(set(all_free_seat_numbers) - set([n for n in all_seat_numbers if n not in laptop_seat_numbers and n not in fixed_seat_numbers]))
+    remaining_seats = len(available_free_seat_numbers)
+    TOTAL_FREE_SEATS = total_assigned_free_seats
 
 
 
