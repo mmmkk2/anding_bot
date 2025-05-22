@@ -118,14 +118,15 @@ def check_seat_status(driver):
             rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
             all_rows.extend(rows)
 
-            # Check for pagination "다음" button
             try:
                 next_button = driver.find_element(By.CSS_SELECTOR, ".paginate_button.next:not(.disabled)")
-                if next_button and next_button.is_enabled():
+                if next_button.is_enabled():
                     next_button.click()
-                    WebDriverWait(driver, 5).until(
-                        EC.staleness_of(rows[0])
+                    # Wait for the new page to load
+                    WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr"))
                     )
+                    time.sleep(1)  # Stability wait
                 else:
                     break
             except:
