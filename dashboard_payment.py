@@ -57,11 +57,46 @@ def check_payment_status(driver):
     if DEBUG:
         print("[DEBUG] 페이지 진입 완료")
 
-    # === 초기 테이블 존재 여부 확인 ===
-    table_rows = driver.find_elements(By.CSS_SELECTOR, "table#m_table_1 tbody tr")
-    if not table_rows:
+    # === 날짜 필터: 결제일자 시작~종료일을 오늘로 설정 ===
+    today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
+    if DEBUG:
+        print(f"[DEBUG] 오늘 날짜 기준 결제 필터: {today_date_str}")
+    try:
+        start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_pay_date_start']")))
+        driver.execute_script(f"document.querySelector('input[name=\"s_pay_date_start\"]').value = '{today_date_str}';")
+        end_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_pay_date_end']")))
+        driver.execute_script(f"document.querySelector('input[name=\"s_pay_date_end\"]').value = '{today_date_str}';")
+        time.sleep(0.5)
+    except Exception as e:
         if DEBUG:
-            print("[DEBUG] 결제 테이블이 비어 있음 → HTML 생성 시도")
+            print(f"[DEBUG] 결제일자 필터 및 검색 실패: {e}")
+
+    # 검색 버튼 클릭 (아이콘을 포함하는 부모 버튼 클릭)
+    try:
+        search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
+        if DEBUG:
+            print("[DEBUG] 검색 버튼 태그 구조:", search_button.get_attribute("outerHTML"))
+        search_button.click()
+        if DEBUG:
+            print("[DEBUG] 검색 버튼 클릭 완료")
+        time.sleep(1.5)
+    except Exception as e:
+        if DEBUG:
+            print("[DEBUG] 검색 버튼 클릭 실패:", e)
+
+    # === 결제 테이블 유효 row 확인 ===
+    try:
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.XPATH, "//table[@id='m_table_1']//tbody//tr/td[2][normalize-space(text()) != '']"))
+        )
+        if DEBUG:
+            print("[DEBUG] 결제 테이블 로딩 완료")
+        time.sleep(1.5)
+    except TimeoutException:
+        with open(os.path.join(DEBUG_PATH, "debug_payment_timeout.html"), "w", encoding="utf-8") as f:
+            f.write(driver.page_source)
+        if DEBUG:
+            print("[DEBUG] 유효 row 없음 → HTML 생성 시도")
         save_payment_dashboard_html([])
         return
 
