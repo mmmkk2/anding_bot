@@ -161,7 +161,7 @@ def check_seat_status(driver):
     total_assigned_free_seats = TOTAL_SEATS - len(fixed_seat_numbers) - len(laptop_seat_numbers)
     used_total_seats = used_free_seats + used_labtop_seats + used_fixed_seats
     # remaining_seats is simply the difference between total seats and used seats
-    remaining_seats = TOTAL_SEATS - used_fixed_seats - used_labtop_seats - used_free_seats
+    remaining_seats = total_assigned_free_seats -  - used_free_seats
     TOTAL_FREE_SEATS = total_assigned_free_seats
 
 
