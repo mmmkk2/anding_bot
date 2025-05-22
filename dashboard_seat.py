@@ -170,7 +170,7 @@ def check_seat_status(driver):
                     print(f"[DEBUG] 좌석 유형 원본: '{seat_type}'")
                     
                 # Only log 자유석 (non-fixed, non-laptop) for all_seat_numbers
-                if seat_type.strip().startswith("개인석"):
+                if "개인석" in seat_type:
                     if seat_number in fixed_set:
                         used_fixed_seats += 1
                         if DEBUG:
