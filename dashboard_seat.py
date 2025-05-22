@@ -161,9 +161,17 @@ def check_seat_status(driver):
     total_assigned_free_seats = TOTAL_SEATS - len(fixed_seat_numbers) - len(laptop_seat_numbers)
     used_total_seats = used_free_seats + used_labtop_seats + used_fixed_seats
     # remaining_seats is simply the difference between total seats and used seats
-    remaining_seats = total_assigned_free_seats -  - used_free_seats
     TOTAL_FREE_SEATS = total_assigned_free_seats
+    remaining_seats = TOTAL_FREE_SEATS - used_free_seats
+    
 
+    # === 메시지 작성
+    msg = (
+        f"[좌석 알림] {status_emoji}\n"
+        f"자유석 현재 입실: {used_free_seats}/{TOTAL_FREE_SEATS}\n"
+        f"노트북석 현재 입실: {used_labtop_seats}/{len(laptop_seat_numbers)}\n"
+        f"남은 자유석: {remaining_seats}석"
+    )
 
 
     if remaining_seats <= DANGER_THRESHOLD:
@@ -192,13 +200,6 @@ def check_seat_status(driver):
         status_emoji=status_emoji
     )
 
-    # === 메시지 작성
-    msg = (
-        f"[좌석 알림] {status_emoji}\n"
-        f"자유석 현재 입실: {used_free_seats}/{TOTAL_FREE_SEATS}\n"
-        f"노트북석 현재 입실: {used_labtop_seats}/{len(laptop_seat_numbers)}\n"
-        f"남은 자유석: {remaining_seats}석"
-    )
 
     # === 주의/경고/복구 (broadcast only, no flag logic)
     if remaining_seats <= DANGER_THRESHOLD:
