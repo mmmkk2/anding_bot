@@ -118,28 +118,28 @@ def check_seat_status(driver):
         time.sleep(1)
         # --- Pagination logic ---
         all_rows = []
+        while True:
+            page_rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+            all_rows.extend(page_rows)
 
-
-        # 페이지네이션: '다음' 버튼이 활성화되어 있으면 클릭, 아니면 종료
-        try:
-            next_li = driver.find_element(By.CSS_SELECTOR, '.paginate_button.next')
-            next_class = next_li.get_attribute("class")
-            if DEBUG:
-                print(f"[DEBUG] 다음 버튼 class 속성: {next_class}")
-            if "disabled" in next_class:
+            try:
+                next_li = driver.find_element(By.CSS_SELECTOR, '.paginate_button.next')
+                next_class = next_li.get_attribute("class")
                 if DEBUG:
-                    print("[DEBUG] 다음 페이지 없음 → 루프 종료")
+                    print(f"[DEBUG] 다음 버튼 class 속성: {next_class}")
+                if "disabled" in next_class:
+                    if DEBUG:
+                        print("[DEBUG] 다음 페이지 없음 → 루프 종료")
+                    break
+                next_btn = next_li.find_element(By.TAG_NAME, "a")
+                next_btn.click()
+                if DEBUG:
+                    print("[DEBUG] 다음 페이지 클릭")
+                time.sleep(1.5)  # 다음 페이지 로딩 시간 확보
+            except NoSuchElementException:
+                if DEBUG:
+                    print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
                 break
-            next_btn = next_li.find_element(By.TAG_NAME, "a")
-            next_btn.click()
-            if DEBUG:
-                print("[DEBUG] 다음 페이지 클릭")
-            time.sleep(1.5)  # 다음 페이지 로딩 시간 확보
-        except NoSuchElementException:
-            if DEBUG:
-                print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
-            break
-        
 
         # 추가 대기: td 수가 3 미만인 행만 있는 경우
         attempts = 0
