@@ -131,6 +131,10 @@ def check_payment_status(driver):
                 "amount": amount,
                 "status": status
             })
+        if DEBUG:
+            for payment in payments:
+                pay_date = payment["date"].split()[0].replace("-", ".")
+                print(f"[DEBUG] 결제일자 원본: {payment['date']}, 변환 후: {pay_date}, 오늘 기준: {today_str}")
 
         try:
             next_li = driver.find_element(By.CSS_SELECTOR, 'ul.pagination li.next')
@@ -157,7 +161,8 @@ def check_payment_status(driver):
 
     today_only = []
     for payment in payments:
-        if payment["date"].startswith(today_str):
+        pay_date = payment["date"].split()[0].replace("-", ".")
+        if pay_date == today_str:
             today_only.append(payment)
 
     if DEBUG:
