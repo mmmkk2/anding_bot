@@ -145,7 +145,7 @@ def check_seat_status(driver):
             attempts += 1
 
         seat_debug_log = []
-        for row in all_rows:
+        for row in driver.find_elements(By.CSS_SELECTOR, "table tbody tr"):
             cols = row.find_elements(By.TAG_NAME, "td")
             if len(cols) < 3:
                 continue
