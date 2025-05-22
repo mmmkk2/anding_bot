@@ -108,27 +108,20 @@ def check_payment_status(driver):
 
     payments = []
     while True:
-        # 여기서는 id를 기준으로 테이블 내 tbody의 row들을 모두 가져옵니다.
         rows = driver.find_elements(By.CSS_SELECTOR, "table#m_table_1 tbody tr")
         if DEBUG:
             print(f"[DEBUG] 로드된 row 수: {len(rows)}")
         for row in rows:
             cols = row.find_elements(By.TAG_NAME, "td")
-            # 스크린샷으로 파악한 결제 내역 테이블은 12개의 열이 있어야 함
             if len(cols) < 12:
                 continue
 
-            # 스크린샷 기반 열 인덱스
-            payment_id = cols[0].text.strip()    # No (결제 ID)
-            user_name = cols[1].text.strip()       # 이름
-            # cols[2]는 전화번호, cols[3]는 결제방법, cols[4]는 결제수단
-            status = cols[5].text.strip()          # 결제상태 (예: 승인완료)
-            amount = cols[6].text.strip()          # 결제금액
-            payment_date = cols[7].text.strip()    # 결제일시
-            seat_type = cols[8].text.strip().split("/")[0] + " / " + cols[9].text.strip()      # 결제상품 (예: 스터디룸(2인) 등)
-            
-
-            # cols[9]는 시작시간, cols[10]는 종료시간, cols[11]는 가입일
+            payment_id = cols[0].text.strip()
+            user_name = cols[1].text.strip()
+            status = cols[5].text.strip()
+            amount = cols[6].text.strip()
+            payment_date = cols[7].text.strip()
+            seat_type = cols[8].text.strip().split("/")[0] + " / " + cols[9].text.strip()
 
             payments.append({
                 "id": payment_id,
@@ -143,7 +136,6 @@ def check_payment_status(driver):
                 pay_date = payment["date"].split()[0].replace("-", ".")
                 print(f"[DEBUG] 결제일자 원본: {payment['date']}, 변환 후: {pay_date}, 오늘 기준: {today_str}")
 
-        # 페이지네이션: '다음' 버튼이 활성화되어 있으면 클릭, 아니면 종료
         try:
             next_li = driver.find_element(By.CSS_SELECTOR, 'ul.pagination li.next')
             next_class = next_li.get_attribute("class")
@@ -157,7 +149,7 @@ def check_payment_status(driver):
             next_btn.click()
             if DEBUG:
                 print("[DEBUG] 다음 페이지 클릭")
-            time.sleep(1.5)  # 다음 페이지 로딩 시간 확보
+            time.sleep(1.5)
         except NoSuchElementException:
             if DEBUG:
                 print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
@@ -167,17 +159,15 @@ def check_payment_status(driver):
                 f.write(driver.page_source)
             raise Exception(f"❌ [결제 파싱 오류] {e}")
 
-    # 날짜 기준 필터링 (오늘 날짜만 유지)
     today_only = []
     for payment in payments:
         pay_date = payment["date"].split()[0].replace("-", ".")
         if pay_date == today_str:
             today_only.append(payment)
+
     if DEBUG:
-        print(f"[DEBUG] 오늘 결제 내역 개수: {len(today_only)}")
         print(f"[DEBUG] 오늘 결제 내역 개수: {len(today_only)} (HTML 생성 여부 무관)")
 
-    # 마지막으로 읽은 결제 ID와 새 결제 내역 비교
     last_payment_id = None
     if os.path.exists(PAYMENT_CACHE_FILE):
         with open(PAYMENT_CACHE_FILE, "rb") as f:
@@ -188,12 +178,10 @@ def check_payment_status(driver):
         if last_payment_id is None or payment["id"] > last_payment_id:
             new_payments.append(payment)
 
-    # 가장 최신의 결제 ID 저장
     if today_only:
         with open(PAYMENT_CACHE_FILE, "wb") as f:
             pickle.dump(today_only[0]["id"], f)
 
-    # 대시보드 HTML 저장 함수 호출 (항상 호출, today_only가 비어도)
     save_payment_dashboard_html(today_only)
     if DEBUG:
         print("[DEBUG] 대시보드 HTML 저장 완료 요청됨.")
