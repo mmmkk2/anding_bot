@@ -116,12 +116,20 @@ def check_seat_status(driver):
 
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
         time.sleep(1)
-        # --- Pagination logic ---
-        all_rows = []
+        # --- Pagination logic (safe seat data extraction) ---
+        all_rows_data = []
         while True:
             page_rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
-            all_rows.extend(page_rows)
-
+            for row in page_rows:
+                try:
+                    cols = row.find_elements(By.TAG_NAME, "td")
+                    if len(cols) < 3:
+                        continue
+                    seat_type = cols[1].text.strip()
+                    seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
+                    all_rows_data.append((seat_type, seat_number_text))
+                except Exception:
+                    continue
             try:
                 next_li = driver.find_element(By.CSS_SELECTOR, '.paginate_button.next')
                 next_class = next_li.get_attribute("class")
@@ -141,53 +149,50 @@ def check_seat_status(driver):
                     print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
                 break
 
-        # 추가 대기: td 수가 3 미만인 행만 있는 경우
+        # 추가 대기: td 수가 3 미만인 행만 있는 경우 (not strictly needed with all_rows_data, but can reload if needed)
         attempts = 0
-        while attempts < 3 and all(len(r.find_elements(By.TAG_NAME, "td")) < 3 for r in all_rows):
+        while attempts < 3 and all(len(row) < 2 or not row[1] for row in all_rows_data):
             time.sleep(1.5)
-            # reload all_rows (repeat the pagination logic if needed)
-            # For simplicity, just reload the first page's rows
-            all_rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+            # reload all_rows_data (repeat first page)
+            all_rows_data = []
+            page_rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+            for row in page_rows:
+                try:
+                    cols = row.find_elements(By.TAG_NAME, "td")
+                    if len(cols) < 3:
+                        continue
+                    seat_type = cols[1].text.strip()
+                    seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
+                    all_rows_data.append((seat_type, seat_number_text))
+                except Exception:
+                    continue
             attempts += 1
 
         seat_debug_log = []
-        for row in all_rows[:]:
+        for seat_type, seat_number_text in all_rows_data:
             try:
-                cols = row.find_elements(By.TAG_NAME, "td")
-
-                if len(cols) < 3:
-                    continue
-
-                seat_type = cols[1].text.strip()
-                seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
-
-                try:
-                    seat_number = int(seat_number_text)
-                except:
-                    continue
-
-                if DEBUG:
-                    print(f"[DEBUG] 좌석 유형 원본: '{seat_type}'")
-                    
-                # Only log 자유석 (non-fixed, non-laptop) for all_seat_numbers
-                if "개인석" in seat_type:
-                    if seat_number in fixed_set:
-                        used_fixed_seats += 1
-                        if DEBUG:
-                            print(f"[DEBUG] 고정석 사용됨: {seat_number}")
-                    elif seat_number in laptop_set:
-                        used_labtop_seats += 1
-                        if DEBUG:
-                            print(f"[DEBUG] 노트북석 사용됨: {seat_number}")
-                    else:
-                        used_free_seats += 1
-                        if DEBUG:
-                            print(f"[DEBUG] 자유석 사용됨: {seat_number}")
-                        all_seat_numbers.append(seat_number)  # Only 자유석 tracked here
-            except Exception as e:
-                if DEBUG:
-                    print(f"[DEBUG] 좌석 파싱 중 오류 발생 (해당 행 스킵): {e}")
+                seat_number = int(seat_number_text)
+            except Exception:
                 continue
+
+            if DEBUG:
+                print(f"[DEBUG] 좌석 유형 원본: '{seat_type}'")
+
+            # Only log 자유석 (non-fixed, non-laptop) for all_seat_numbers
+            if "개인석" in seat_type:
+                if seat_number in fixed_set:
+                    used_fixed_seats += 1
+                    if DEBUG:
+                        print(f"[DEBUG] 고정석 사용됨: {seat_number}")
+                elif seat_number in laptop_set:
+                    used_labtop_seats += 1
+                    if DEBUG:
+                        print(f"[DEBUG] 노트북석 사용됨: {seat_number}")
+                else:
+                    used_free_seats += 1
+                    if DEBUG:
+                        print(f"[DEBUG] 자유석 사용됨: {seat_number}")
+                    all_seat_numbers.append(seat_number)  # Only 자유석 tracked here
 
         if DEBUG:
             print(f"[DEBUG] 전체 좌석번호(자유석): {all_seat_numbers}")
