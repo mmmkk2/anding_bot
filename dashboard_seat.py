@@ -224,7 +224,7 @@ def main_check_seat():
     try:
         if login(driver):
             seat_status_msg = check_seat_status(driver)
-            now_full_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            now_full_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
             loop_msg = (
                 f"\n\n🪑 좌석 모니터링 정상 동작 중\n"
                 f"⏰ 날짜 + 실행 시각: {now_full_str}"
