@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import StaleElementReferenceException
 
 from datetime import datetime
 import argparse
@@ -145,8 +146,13 @@ def check_seat_status(driver):
             attempts += 1
 
         seat_debug_log = []
-        for row in all_rows:
-            cols = row.find_elements(By.TAG_NAME, "td")
+        for row in all_rows[:]:
+            try:
+                cols = row.find_elements(By.TAG_NAME, "td")
+            except StaleElementReferenceException:
+                if DEBUG:
+                    print("[DEBUG] Stale element encountered, skipping row.")
+                continue
             if len(cols) < 3:
                 continue
 
