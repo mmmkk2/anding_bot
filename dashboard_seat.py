@@ -165,14 +165,6 @@ def check_seat_status(driver):
     remaining_seats = TOTAL_FREE_SEATS - used_free_seats
     
 
-    # === 메시지 작성
-    msg = (
-        f"[좌석 알림] {status_emoji}\n"
-        f"자유석 현재 입실: {used_free_seats}/{TOTAL_FREE_SEATS}\n"
-        f"노트북석 현재 입실: {used_labtop_seats}/{len(laptop_seat_numbers)}\n"
-        f"남은 자유석: {remaining_seats}석"
-    )
-
 
     if remaining_seats <= DANGER_THRESHOLD:
         status_emoji = "🔴"
@@ -183,6 +175,15 @@ def check_seat_status(driver):
     else:
         status_emoji = "🟢"
         line_color = 'rgba(75, 192, 192, 1)'  # green
+
+
+    # === 메시지 작성
+    msg = (
+        f"[좌석 알림] {status_emoji}\n"
+        f"자유석 현재 입실: {used_free_seats}/{TOTAL_FREE_SEATS}\n"
+        f"노트북석 현재 입실: {used_labtop_seats}/{len(laptop_seat_numbers)}\n"
+        f"남은 자유석: {remaining_seats}석"
+    )
 
     # === 좌석 기록 저장
     log_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
