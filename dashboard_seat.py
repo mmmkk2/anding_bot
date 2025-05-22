@@ -10,7 +10,8 @@ from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import StaleElementReferenceException
+# from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 from datetime import datetime
 import argparse
@@ -117,24 +118,47 @@ def check_seat_status(driver):
         time.sleep(1)
         # --- Pagination logic ---
         all_rows = []
-        while True:
-            time.sleep(1)
-            rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
-            all_rows.extend(rows)
 
-            try:
-                next_button = driver.find_element(By.CSS_SELECTOR, ".paginate_button.next:not(.disabled)")
-                if next_button.is_enabled():
-                    next_button.click()
-                    # Wait for the new page to load
-                    WebDriverWait(driver, 10).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr"))
-                    )
-                    time.sleep(1)  # Stability wait
-                else:
-                    break
-            except:
+
+        # 페이지네이션: '다음' 버튼이 활성화되어 있으면 클릭, 아니면 종료
+        try:
+            next_li = driver.find_element(By.CSS_SELECTOR, '.paginate_button.next')
+            next_class = next_li.get_attribute("class")
+            if DEBUG:
+                print(f"[DEBUG] 다음 버튼 class 속성: {next_class}")
+            if "disabled" in next_class:
+                if DEBUG:
+                    print("[DEBUG] 다음 페이지 없음 → 루프 종료")
                 break
+            next_btn = next_li.find_element(By.TAG_NAME, "a")
+            next_btn.click()
+            if DEBUG:
+                print("[DEBUG] 다음 페이지 클릭")
+            time.sleep(1.5)  # 다음 페이지 로딩 시간 확보
+        except NoSuchElementException:
+            if DEBUG:
+                print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
+            break
+        
+
+        # while True:
+        #     time.sleep(1)
+        #     rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+        #     all_rows.extend(rows)
+
+        #     try:
+        #         next_button = driver.find_element(By.CSS_SELECTOR, ".paginate_button.next:not(.disabled)")
+        #         if next_button.is_enabled():
+        #             next_button.click()
+        #             # Wait for the new page to load
+        #             WebDriverWait(driver, 10).until(
+        #                 EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr"))
+        #             )
+        #             time.sleep(1)  # Stability wait
+        #         else:
+        #             break
+        #     except:
+        #         break
 
         # 추가 대기: td 수가 3 미만인 행만 있는 경우
         attempts = 0
