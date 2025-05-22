@@ -85,6 +85,11 @@ def check_seat_status(driver):
         used_fixed_seats = 0
         all_seat_numbers = []
 
+        # Cast to sets for faster lookup and deduplication
+        fixed_set = set(fixed_seat_numbers)
+        laptop_set = set(laptop_seat_numbers)
+        excluded_seats = fixed_set.union(laptop_set)
+
         driver.get(SEAT_URL)
         # === 날짜 필터 추가 ===
         today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
@@ -106,16 +111,37 @@ def check_seat_status(driver):
 
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
         time.sleep(1)
-        rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+        # --- Pagination logic ---
+        all_rows = []
+        while True:
+            time.sleep(1)
+            rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+            all_rows.extend(rows)
+
+            # Check for pagination "다음" button
+            try:
+                next_button = driver.find_element(By.CSS_SELECTOR, ".paginate_button.next:not(.disabled)")
+                if next_button and next_button.is_enabled():
+                    next_button.click()
+                    WebDriverWait(driver, 5).until(
+                        EC.staleness_of(rows[0])
+                    )
+                else:
+                    break
+            except:
+                break
 
         # 추가 대기: td 수가 3 미만인 행만 있는 경우
         attempts = 0
-        while attempts < 3 and all(len(r.find_elements(By.TAG_NAME, "td")) < 3 for r in rows):
+        while attempts < 3 and all(len(r.find_elements(By.TAG_NAME, "td")) < 3 for r in all_rows):
             time.sleep(1.5)
-            rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+            # reload all_rows (repeat the pagination logic if needed)
+            # For simplicity, just reload the first page's rows
+            all_rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
             attempts += 1
 
-        for row in rows:
+        seat_debug_log = []
+        for row in all_rows:
             cols = row.find_elements(By.TAG_NAME, "td")
             if len(cols) < 3:
                 continue
@@ -129,13 +155,26 @@ def check_seat_status(driver):
             except:
                 continue
 
+            # Debugging print statements for seat classification
             if seat_type == "개인석":
-                if seat_number in fixed_seat_numbers:
+                if seat_number in fixed_set:
                     used_fixed_seats += 1
-                elif seat_number in laptop_seat_numbers:
+                    if DEBUG:
+                        print(f"[DEBUG] 고정석 사용됨: {seat_number}")
+                elif seat_number in laptop_set:
                     used_labtop_seats += 1
+                    if DEBUG:
+                        print(f"[DEBUG] 노트북석 사용됨: {seat_number}")
                 else:
                     used_free_seats += 1
+                    if DEBUG:
+                        print(f"[DEBUG] 자유석 사용됨: {seat_number}")
+
+        if DEBUG:
+            print(f"[DEBUG] 전체 좌석번호(개인석): {all_seat_numbers}")
+            print(f"[DEBUG] 고정석 번호(set): {sorted(fixed_set)}")
+            print(f"[DEBUG] 노트북석 번호(set): {sorted(laptop_set)}")
+            print(f"[DEBUG] 제외된 좌석(set): {sorted(excluded_seats)}")
 
         total_used = used_free_seats + used_labtop_seats + used_fixed_seats
         if total_used > 0 or retry_count == max_retries:
@@ -158,13 +197,19 @@ def check_seat_status(driver):
     # The above pagination and seat parsing logic has already processed all rows,
     # so we do not need to process again here.
 
-    total_assigned_free_seats = TOTAL_SEATS - len(fixed_seat_numbers) - len(laptop_seat_numbers)
+    total_assigned_free_seats = TOTAL_SEATS - len(fixed_set) - len(laptop_set)
     used_total_seats = used_free_seats + used_labtop_seats + used_fixed_seats
     # remaining_seats is simply the difference between total seats and used seats
     TOTAL_FREE_SEATS = total_assigned_free_seats
     remaining_seats = TOTAL_FREE_SEATS - used_free_seats
     
+    # Use the earlier excluded_seats set directly (already deduplicated)
+    all_seats = set(range(1, TOTAL_SEATS + 1))
+    free_seat_numbers = sorted(all_seats - excluded_seats)
 
+    print(f"[DEBUG] 전체 좌석: {all_seats}")
+    print(f"[DEBUG] 제외된 좌석: {excluded_seats}")
+    print(f"[DEBUG] 자유석 (used): {used_free_seats}석")
 
     if remaining_seats <= DANGER_THRESHOLD:
         status_emoji = "🔴"
