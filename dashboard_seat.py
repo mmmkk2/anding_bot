@@ -34,10 +34,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (로그인 계정 변경)")
 parser.add_argument("--hide", action="store_true", help="디버그 메시지 숨김")
 args = parser.parse_args()
-DEBUG = not args.hide and os.getenv("DEBUG", "true").lower() == "true"
+DEBUG_ENV = os.getenv("DEBUG", "true").lower() == "true"
+DEBUG = not args.hide and DEBUG_ENV
 
 print(f"[DEBUG CHECK] args.manual = {args.manual}")
+print(f"[DEBUG CHECK] args.hide = {args.hide}")
 print(f"[DEBUG CHECK] os.getenv('DEBUG') = {os.getenv('DEBUG')}")
+print(f"[DEBUG CHECK] DEBUG_ENV = {DEBUG_ENV}")
 print(f"[DEBUG CHECK] DEBUG = {DEBUG}")
 print(f"[DEBUG MODE] {'ON' if DEBUG else 'OFF'}")
 
