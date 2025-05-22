@@ -21,8 +21,20 @@ except Exception as e:
 # === 필수 환경변수 ===
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
+
+# === 명령줄 인자 파서 (args.manual 사용을 위해) ===
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--manual", action="store_true", help="Use manual login credentials")
+args = parser.parse_args()
+
 LOGIN_ID = os.getenv("LOGIN_ID")
 LOGIN_PWD = os.getenv("LOGIN_PWD")
+
+if args.manual:
+    LOGIN_ID = os.getenv("MANUAL_LOGIN_ID")
+    LOGIN_PWD = os.getenv("MANUAL_LOGIN_PWD")
+
 EMERGENCY_CHAT_ID = os.getenv("EMERGENCY_CHAT_ID")
 
 
