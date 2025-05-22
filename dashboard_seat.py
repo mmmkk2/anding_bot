@@ -141,25 +141,6 @@ def check_seat_status(driver):
             break
         
 
-        # while True:
-        #     time.sleep(1)
-        #     rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
-        #     all_rows.extend(rows)
-
-        #     try:
-        #         next_button = driver.find_element(By.CSS_SELECTOR, ".paginate_button.next:not(.disabled)")
-        #         if next_button.is_enabled():
-        #             next_button.click()
-        #             # Wait for the new page to load
-        #             WebDriverWait(driver, 10).until(
-        #                 EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr"))
-        #             )
-        #             time.sleep(1)  # Stability wait
-        #         else:
-        #             break
-        #     except:
-        #         break
-
         # 추가 대기: td 수가 3 미만인 행만 있는 경우
         attempts = 0
         while attempts < 3 and all(len(r.find_elements(By.TAG_NAME, "td")) < 3 for r in all_rows):
@@ -185,8 +166,11 @@ def check_seat_status(driver):
                 except:
                     continue
 
+                if DEBUG:
+                    print(f"[DEBUG] 좌석 유형 원본: '{seat_type}'")
+                    
                 # Only log 자유석 (non-fixed, non-laptop) for all_seat_numbers
-                if seat_type == "개인석":
+                if seat_type.strip().startswith("개인석"):
                     if seat_number in fixed_set:
                         used_fixed_seats += 1
                         if DEBUG:
