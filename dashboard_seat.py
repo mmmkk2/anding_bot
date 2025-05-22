@@ -182,11 +182,10 @@ def check_seat_status(driver):
 
                 try:
                     seat_number = int(seat_number_text)
-                    all_seat_numbers.append(seat_number)
                 except:
                     continue
 
-                # Debugging print statements for seat classification
+                # Only log 자유석 (non-fixed, non-laptop) for all_seat_numbers
                 if seat_type == "개인석":
                     if seat_number in fixed_set:
                         used_fixed_seats += 1
@@ -200,13 +199,14 @@ def check_seat_status(driver):
                         used_free_seats += 1
                         if DEBUG:
                             print(f"[DEBUG] 자유석 사용됨: {seat_number}")
+                        all_seat_numbers.append(seat_number)  # Only 자유석 tracked here
             except Exception as e:
                 if DEBUG:
                     print(f"[DEBUG] 좌석 파싱 중 오류 발생 (해당 행 스킵): {e}")
                 continue
 
         if DEBUG:
-            print(f"[DEBUG] 전체 좌석번호(개인석): {all_seat_numbers}")
+            print(f"[DEBUG] 전체 좌석번호(자유석): {all_seat_numbers}")
             print(f"[DEBUG] 고정석 번호(set): {sorted(fixed_set)}")
             print(f"[DEBUG] 노트북석 번호(set): {sorted(laptop_set)}")
             print(f"[DEBUG] 제외된 좌석(set): {sorted(excluded_seats)}")
