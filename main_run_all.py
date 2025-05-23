@@ -1,8 +1,8 @@
 import requests
 import socket
-from module.dashboard_studyroom import main_check_studyroom
-from module.dashboard_payment import main_check_payment
-from module.dashboard_seat import main_check_seat
+from dashboard_studyroom import main_check_studyroom
+from dashboard_payment import main_check_payment
+from dashboard_seat import main_check_seat
 
 
 
