@@ -1,6 +1,7 @@
 import sys
 import json
 from module.set import login, find_location, create_driver, send_broadcast_and_update, send_telegram_and_log
+from flask import request
 
 import os
 import time
@@ -255,9 +256,9 @@ def check_seat_status(driver):
     )
 
     # === 좌석 기록 저장
-    log_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
-    with open(log_path, "a", encoding="utf-8") as f:
+    history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
+    os.makedirs(os.path.dirname(history_path), exist_ok=True)
+    with open(history_path, "a", encoding="utf-8") as f:
         now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
         f.write(f"{now_str},{used_free_seats}\n")
 
@@ -319,195 +320,117 @@ def main_check_seat():
         driver.quit()
 
 
-# def start_telegram_listener():
-#     loop = asyncio.new_event_loop()
-#     asyncio.set_event_loop(loop)
-#     loop.run_until_complete(telegram_auth_listener.run_listener_async())
-
 
 def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
-    history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
-
-    history_rows = []
-    # --- Daytime window calculation (KST 5:00 to next 5:00) ---
-    now_kst = datetime.now(kst)
-    if now_kst.hour < 5:
-        start_time = (now_kst - timedelta(days=1)).replace(hour=5, minute=0, second=0, microsecond=0)
-    else:
-        start_time = now_kst.replace(hour=5, minute=0, second=0, microsecond=0)
-    end_time = start_time + timedelta(days=1)
-    # ISO strings for Chart.js min/max x axis
-    min_ts = start_time.isoformat()
-    max_ts = end_time.isoformat()
-
-    #cutoff_time = datetime.now(kst) - timedelta(hours=chart_timedelta)
-    cutoff_time = start_time
-
-    with open(history_path, "r", encoding="utf-8") as f:
-        for line in reversed(f.readlines()):
-            parts = line.strip().split(",")
-            if len(parts) >= 2:
-                timestamp_obj = kst.localize(datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S"))
-                #if timestamp_obj >= cutoff_time:
-                if start_time <= timestamp_obj < end_time:
-                    history_rows.insert(0, line)
-                else:
-                    break
-                
-    timestamps = []
-    used_frees = []
-    for line in history_rows:
-        parts = line.strip().split(",")
-        if len(parts) >= 2:
-            timestamp_obj = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
-            timestamps.append(timestamp_obj.strftime("%Y-%m-%dT%H:%M:%S"))
-            used_frees.append(int(parts[1]))
-    point_colors = []
-    for y in used_frees:
-        if total_free - y <= 5:
-            point_colors.append('rgba(255, 99, 132, 1)')  # Red
-        elif total_free - y <= 7:
-            point_colors.append('rgba(255, 206, 86, 1)')  # Yellow
-        else:
-            point_colors.append('rgba(75, 192, 192, 0.1)')  # Light gray transparent for normal usage
-
-    lineColor = 'rgba(75, 192, 192, 1)'  # default green
-    if remaining <= 5:
-        lineColor = 'rgba(255, 99, 132, 1)'  # red
-    elif remaining <= 7:
-        lineColor = 'rgba(255, 206, 86, 1)'  # yellow
-
-    data_points = [{"x": t, "y": y} for t, y in zip(timestamps, used_frees)]
-
-    chart_script = f"""
-    <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns'></script>
-    <script>
-        const ctx = document.getElementById('seatChart').getContext('2d');
-        new Chart(ctx, {{
-            type: 'line',
-            data: {{
-                datasets: [{{
-                    label: '자유석 사용 수',
-                    data: {json.dumps(data_points)},
-                    borderColor: '{lineColor}',
-                    pointBackgroundColor: {json.dumps(point_colors)},
-                    pointRadius: window.innerWidth > 768 ? 2 : 4,
-                    tension: 0.1
-                }}]
-            }},
-            options: {{
-                responsive: true,
-                scales: {{
-                    x: {{
-                        type: 'time',
-                        time: {{
-                            unit: 'minute',
-                            stepSize: 30,
-                            round: 'minute',
-                            displayFormats: {{
-                                minute: 'HH:mm'
-                            }}
-                        }},
-                        ticks: {{
-                            source: 'auto',
-                            stepSize: 30,
-                            autoSkip: false
-                        }},
-                        min: '{min_ts}',
-                        max: '{max_ts}',
-                        title: {{
-                            display: false
-                        }}
-                    }},
-                    y: {{
-                        beginAtZero: true,
-                        max: {total_free}
-                    }}
-                }}
-            }}
-        }});
-    </script>
-    """
-
-    now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
-
-    html = f"""
-    <!DOCTYPE html>
-    <html lang="ko">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-        <title>좌석 현황</title>
-        <meta http-equiv="refresh" content="60">
-        <style>
-            body {{
-                font-family: 'Apple SD Gothic Neo', 'Arial', sans-serif;
-                background: #f1f3f5;
-                padding: 0.5rem;
-                margin: 0;
-                display: flex;
-                align-items: flex-start;
-                min-height: 250px; /* max-height: 25vh; */
-                max-height: 250px; /*   max-width: 100vw; */ 
-                box-sizing: border-box;
-                justify-content: center;
-                text-align: center;  /* 텍스트 정렬 보정 */               
-            }}
-            .box {{
-                background: white;
-                border-radius: 1rem;
-                padding: 1rem;
-                max-width: 650px;         /* max-width: 600px */
-                width: 100%;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                text-align: center;
-                overflow-y: auto;
-                margin: 0 auto;
-            }}       
-            h1 {{
-                font-size: 1.1rem;
-                margin-bottom: 1rem;
-                color: #333;
-            }}
-            .emoji {{
-                font-size: 1.0rem;
-                margin-bottom: 1rem;
-            }}
-            .stat {{
-                font-size: 0.9rem;
-                margin: 0.3rem 0;
-            }}
-            .updated {{
-                font-size: 0.8rem;
-                color: #888;
-                margin-top: 1rem;
-            }}          
-            @media (max-width: 480px) {{
+    output_path = os.path.join(DASHBOARD_PATH, "seat_dashboard.html")
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(f"""
+        <!DOCTYPE html>
+        <html lang="ko">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>좌석 현황</title>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+            <style>
                 body {{
-                    max-height: 50vh;
-                }}            
-                .box {{
-                    max-height: 100vh;  /* 화면 높이의 90%까지 확장 */
+                    font-family: 'Apple SD Gothic Neo', 'Arial', sans-serif;
+                    background: #f1f3f5;
+                    padding: 1rem;
+                    text-align: center;
                 }}
-            }}                
-        </style>
-    </head>
-    <body>
-        <div class="box">
-            <div class="updated">📅 기준 날짜: <b>{today_str}</b></div>
-            <div class="stat">자유석: {used_free}/{total_free}</div>
-            <div class="stat">노트북석: {used_laptop}/{total_laptop}</div>
-            <div class="stat">남은 자유석: {remaining}석</div>            
-            <div class="updated">업데이트 시각: {now_str}</div>
-            <div style="margin-top:0.5rem;">            
-                 <canvas id="seatChart"  height="210"></canvas>
-                {chart_script}
+                .chart-container {{
+                    max-width: 700px;
+                    margin: auto;
+                    background: white;
+                    padding: 1rem;
+                    border-radius: 1rem;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                }}
+                button {{
+                    margin: 0.5rem;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="chart-container">
+                <h3>📅 좌석 현황</h3>
+                <div id="summary"></div>
+                <canvas id="seatChart" height="200"></canvas>
+                <div>
+                    <button onclick="navigateDay(-1)">← 전일</button>
+                    <button onclick="navigateDay(1)">익일 →</button>
+                </div>
             </div>
-        </div>
-    </body>
-    </html>
-    """
-    with open(os.path.join(DASHBOARD_PATH, "seat_dashboard.html"), "w", encoding="utf-8") as f:
-        f.write(html)
-        
+
+            <script>
+            const kstOffset = 9 * 60 * 60 * 1000;
+            const now = new Date();
+            let dateParam = new URLSearchParams(window.location.search).get("date");
+            let baseDate = dateParam ? new Date(dateParam) : new Date(Date.now() + kstOffset);
+            baseDate.setUTCHours(0, 0, 0, 0);
+
+            function formatDate(date) {{
+                return date.toISOString().split('T')[0];
+            }}
+
+            function navigateDay(offset) {{
+                baseDate.setDate(baseDate.getDate() + offset);
+                const newDateStr = formatDate(baseDate);
+                const url = new URL(window.location.href);
+                url.searchParams.set("date", newDateStr);
+                window.location.href = url.toString();
+            }}
+
+            fetch('/dashboard_log/seat_history.csv')
+                .then(resp => resp.text())
+                .then(text => {{
+                    const rows = text.trim().split('\n').map(line => line.split(','));
+                    const filtered = rows.map(([ts, used]) => {{
+                    const chartConfig = {{
+                            type: 'line',
+                            data: {{
+                                datasets: [{{
+                                    label: '자유석 사용 수',
+                                    data: filtered,
+                                    borderColor: 'rgba(75,192,192,1)',
+                                    pointBackgroundColor: 'rgba(75,192,192,1)',
+                                    tension: 0.2
+                                }}]
+                            }},
+                            options: {{
+                                scales: {{
+                                    x: {{
+                                        type: 'time',
+                                        time: {{
+                                            unit: 'minute',
+                                            stepSize: 30,
+                                            displayFormats: {{
+                                                minute: 'HH:mm'
+                                            }}
+                                        }},
+                                        ticks: {{
+                                            source: 'auto',
+                                            autoSkip: false
+                                        }},
+                                        min: new Date(baseDate.getTime() + 5 * 3600 * 1000),
+                                        max: new Date(baseDate.getTime() + 29 * 3600 * 1000)
+                                    }},
+                                    y: {{
+                                        beginAtZero: true,
+                                        suggestedMax: 28
+                                    }}
+                                }}
+                            }}
+                        }};
+
+                    new Chart(ctx, chartConfig);
+
+                    document.getElementById("summary").innerHTML =
+                        "기준일: <b>" + baseDate.toLocaleDateString('ko-KR') + "</b> / 총 기록: " + filtered.length + "건";
+                }});
+            </script>
+        </body>
+        </html>
+        """)
