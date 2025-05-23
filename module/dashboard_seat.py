@@ -255,9 +255,9 @@ def check_seat_status(driver):
     )
 
     # === 좌석 기록 저장
-    log_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
-    with open(log_path, "a", encoding="utf-8") as f:
+    history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
+    os.makedirs(os.path.dirname(history_path), exist_ok=True)
+    with open(history_path, "a", encoding="utf-8") as f:
         now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
         f.write(f"{now_str},{used_free_seats}\n")
 
@@ -318,11 +318,6 @@ def main_check_seat():
     finally:
         driver.quit()
 
-
-# def start_telegram_listener():
-#     loop = asyncio.new_event_loop()
-#     asyncio.set_event_loop(loop)
-#     loop.run_until_complete(telegram_auth_listener.run_listener_async())
 
 
 def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
