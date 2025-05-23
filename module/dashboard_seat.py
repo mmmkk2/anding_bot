@@ -331,7 +331,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
 
     history_rows = []
     # --- Daytime window calculation (KST 5:00 to next 5:00), with ?date= param support ---
-    date_param = request.args.get("date")
+    date_param = request.args.get("date") if request else None
     if date_param:
         try:
             base_date = datetime.strptime(date_param, "%Y-%m-%d").replace(tzinfo=kst)
@@ -531,6 +531,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     </body>
     </html>
     """
-    with open(os.path.join(DASHBOARD_PATH, "seat_dashboard.html"), "w", encoding="utf-8") as f:
+    output_path = os.path.join(DASHBOARD_PATH, "seat_dashboard.html")
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(html)
         
