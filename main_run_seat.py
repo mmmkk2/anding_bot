@@ -1,6 +1,6 @@
 import requests
 import socket
-from module.dashboard_seat import main_check_seat
+from dashboard_seat import main_check_seat
 
 if __name__ == "__main__":
     ip = requests.get("https://api.ipify.org").text

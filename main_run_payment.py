@@ -1,6 +1,6 @@
 import requests
 import socket
-from module.dashboard_payment import main_check_payment
+from dashboard_payment import main_check_payment
 
 if __name__ == "__main__":
     ip = requests.get("https://api.ipify.org").text

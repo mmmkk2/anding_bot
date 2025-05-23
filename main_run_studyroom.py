@@ -1,6 +1,6 @@
 import requests
 import socket
-from module.dashboard_studyroom import main_check_studyroom
+from dashboard_studyroom import main_check_studyroom
 
 if __name__ == "__main__":
     ip = requests.get("https://api.ipify.org").text
