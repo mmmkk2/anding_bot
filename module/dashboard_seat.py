@@ -403,16 +403,15 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         type: 'time',
                         time: {{
                             unit: 'minute',
-                            stepSize: 30,
-                            round: 'minute',
                             displayFormats: {{
                                 minute: 'HH:mm'
-                            }}
+                            }},
+                            stepSize: 30
                         }},
                         ticks: {{
-                            source: 'auto',
+                            autoSkip: false,
                             stepSize: 30,
-                            autoSkip: false
+                            source: 'auto'
                         }},
                         min: '{min_ts}',
                         max: '{max_ts}',
@@ -500,9 +499,24 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             <div class="stat">노트북석: {used_laptop}/{total_laptop}</div>
             <div class="stat">남은 자유석: {remaining}석</div>            
             <div class="updated">업데이트 시각: {now_str}</div>
+            <div style="margin-bottom: 0.5rem;">
+                <button onclick="navigateDay(-1)">← 전일</button>
+                <button onclick="navigateDay(1)">익일 →</button>
+            </div>
             <div style="margin-top:0.5rem;">            
                  <canvas id="seatChart"  height="210"></canvas>
                 {chart_script}
+                <script>
+                    function navigateDay(offset) {{
+                        const url = new URL(window.location.href);
+                        const dateParam = url.searchParams.get("date");
+                        let baseDate = dateParam ? new Date(dateParam) : new Date();
+                        baseDate.setDate(baseDate.getDate() + offset);
+                        const newDateStr = baseDate.toISOString().split('T')[0];
+                        url.searchParams.set("date", newDateStr);
+                        window.location.href = url.toString();
+                    }}
+                </script>
             </div>
         </div>
     </body>
