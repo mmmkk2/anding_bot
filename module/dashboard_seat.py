@@ -10,7 +10,8 @@ from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import StaleElementReferenceException
+# from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 from datetime import datetime
 import argparse
@@ -115,74 +116,86 @@ def check_seat_status(driver):
 
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
         time.sleep(1)
-        # --- Pagination logic ---
-        all_rows = []
+        # --- Pagination logic (safe seat data extraction) ---
+        all_rows_data = []
         while True:
-            time.sleep(1)
-            rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
-            all_rows.extend(rows)
-
+            page_rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+            for row in page_rows:
+                try:
+                    cols = row.find_elements(By.TAG_NAME, "td")
+                    if len(cols) < 3:
+                        continue
+                    seat_type = cols[1].text.strip()
+                    seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
+                    all_rows_data.append((seat_type, seat_number_text))
+                except Exception:
+                    continue
             try:
-                next_button = driver.find_element(By.CSS_SELECTOR, ".paginate_button.next:not(.disabled)")
-                if next_button.is_enabled():
-                    next_button.click()
-                    # Wait for the new page to load
-                    WebDriverWait(driver, 10).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr"))
-                    )
-                    time.sleep(1)  # Stability wait
-                else:
+                next_li = driver.find_element(By.CSS_SELECTOR, '.paginate_button.next')
+                next_class = next_li.get_attribute("class")
+                if DEBUG:
+                    print(f"[DEBUG] 다음 버튼 class 속성: {next_class}")
+                if "disabled" in next_class:
+                    if DEBUG:
+                        print("[DEBUG] 다음 페이지 없음 → 루프 종료")
                     break
-            except:
+                next_btn = next_li.find_element(By.TAG_NAME, "a")
+                next_btn.click()
+                if DEBUG:
+                    print("[DEBUG] 다음 페이지 클릭")
+                time.sleep(1.5)  # 다음 페이지 로딩 시간 확보
+            except NoSuchElementException:
+                if DEBUG:
+                    print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
                 break
 
-        # 추가 대기: td 수가 3 미만인 행만 있는 경우
+        # 추가 대기: td 수가 3 미만인 행만 있는 경우 (not strictly needed with all_rows_data, but can reload if needed)
         attempts = 0
-        while attempts < 3 and all(len(r.find_elements(By.TAG_NAME, "td")) < 3 for r in all_rows):
+        while attempts < 3 and all(len(row) < 2 or not row[1] for row in all_rows_data):
             time.sleep(1.5)
-            # reload all_rows (repeat the pagination logic if needed)
-            # For simplicity, just reload the first page's rows
-            all_rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+            # reload all_rows_data (repeat first page)
+            all_rows_data = []
+            page_rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+            for row in page_rows:
+                try:
+                    cols = row.find_elements(By.TAG_NAME, "td")
+                    if len(cols) < 3:
+                        continue
+                    seat_type = cols[1].text.strip()
+                    seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
+                    all_rows_data.append((seat_type, seat_number_text))
+                except Exception:
+                    continue
             attempts += 1
 
         seat_debug_log = []
-        for row in all_rows[:]:
+        for seat_type, seat_number_text in all_rows_data:
             try:
-                cols = row.find_elements(By.TAG_NAME, "td")
-
-                if len(cols) < 3:
-                    continue
-
-                seat_type = cols[1].text.strip()
-                seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
-
-                try:
-                    seat_number = int(seat_number_text)
-                    all_seat_numbers.append(seat_number)
-                except:
-                    continue
-
-                # Debugging print statements for seat classification
-                if seat_type == "개인석":
-                    if seat_number in fixed_set:
-                        used_fixed_seats += 1
-                        if DEBUG:
-                            print(f"[DEBUG] 고정석 사용됨: {seat_number}")
-                    elif seat_number in laptop_set:
-                        used_labtop_seats += 1
-                        if DEBUG:
-                            print(f"[DEBUG] 노트북석 사용됨: {seat_number}")
-                    else:
-                        used_free_seats += 1
-                        if DEBUG:
-                            print(f"[DEBUG] 자유석 사용됨: {seat_number}")
-            except Exception as e:
-                if DEBUG:
-                    print(f"[DEBUG] 좌석 파싱 중 오류 발생 (해당 행 스킵): {e}")
+                seat_number = int(seat_number_text)
+            except Exception:
                 continue
 
+            if DEBUG:
+                print(f"[DEBUG] 좌석 유형 원본: '{seat_type}'")
+
+            # Only log 자유석 (non-fixed, non-laptop) for all_seat_numbers
+            if "개인석" in seat_type:
+                if seat_number in fixed_set:
+                    used_fixed_seats += 1
+                    if DEBUG:
+                        print(f"[DEBUG] 고정석 사용됨: {seat_number}")
+                elif seat_number in laptop_set:
+                    used_labtop_seats += 1
+                    if DEBUG:
+                        print(f"[DEBUG] 노트북석 사용됨: {seat_number}")
+                else:
+                    used_free_seats += 1
+                    if DEBUG:
+                        print(f"[DEBUG] 자유석 사용됨: {seat_number}")
+                    all_seat_numbers.append(seat_number)  # Only 자유석 tracked here
+
         if DEBUG:
-            print(f"[DEBUG] 전체 좌석번호(개인석): {all_seat_numbers}")
+            print(f"[DEBUG] 전체 좌석번호(자유석): {all_seat_numbers}")
             print(f"[DEBUG] 고정석 번호(set): {sorted(fixed_set)}")
             print(f"[DEBUG] 노트북석 번호(set): {sorted(laptop_set)}")
             print(f"[DEBUG] 제외된 좌석(set): {sorted(excluded_seats)}")
@@ -316,14 +329,27 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
 
     history_rows = []
-    cutoff_time = datetime.now(kst) - timedelta(hours=chart_timedelta)
+    # --- Daytime window calculation (KST 5:00 to next 5:00) ---
+    now_kst = datetime.now(kst)
+    if now_kst.hour < 5:
+        start_time = (now_kst - timedelta(days=1)).replace(hour=5, minute=0, second=0, microsecond=0)
+    else:
+        start_time = now_kst.replace(hour=5, minute=0, second=0, microsecond=0)
+    end_time = start_time + timedelta(days=1)
+    # ISO strings for Chart.js min/max x axis
+    min_ts = start_time.isoformat()
+    max_ts = end_time.isoformat()
+
+    #cutoff_time = datetime.now(kst) - timedelta(hours=chart_timedelta)
+    cutoff_time = start_time
 
     with open(history_path, "r", encoding="utf-8") as f:
         for line in reversed(f.readlines()):
             parts = line.strip().split(",")
             if len(parts) >= 2:
                 timestamp_obj = kst.localize(datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S"))
-                if timestamp_obj >= cutoff_time:
+                #if timestamp_obj >= cutoff_time:
+                if start_time <= timestamp_obj < end_time:
                     history_rows.insert(0, line)
                 else:
                     break
@@ -378,10 +404,18 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         time: {{
                             unit: 'minute',
                             stepSize: 30,
+                            round: 'minute',
                             displayFormats: {{
                                 minute: 'HH:mm'
                             }}
                         }},
+                        ticks: {{
+                            source: 'auto',
+                            stepSize: 30,
+                            autoSkip: false
+                        }},
+                        min: '{min_ts}',
+                        max: '{max_ts}',
                         title: {{
                             display: false
                         }}
