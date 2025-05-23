@@ -411,7 +411,8 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         }},
                         ticks: {{
                             source: 'auto',
-                            autoSkip: false
+                            maxRotation: 0,
+                            minRotation: 0
                         }},
                         min: '{min_ts}',
                         max: '{max_ts}',
