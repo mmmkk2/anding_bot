@@ -1,6 +1,7 @@
 import sys
 import json
 from module.set import login, find_location, create_driver, send_broadcast_and_update, send_telegram_and_log
+from flask import request
 
 import os
 import time
@@ -329,12 +330,20 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
 
     history_rows = []
-    # --- Daytime window calculation (KST 5:00 to next 5:00) ---
-    now_kst = datetime.now(kst)
-    if now_kst.hour < 5:
-        start_time = (now_kst - timedelta(days=1)).replace(hour=5, minute=0, second=0, microsecond=0)
+    # --- Daytime window calculation (KST 5:00 to next 5:00), with ?date= param support ---
+    date_param = request.args.get("date")
+    if date_param:
+        try:
+            base_date = datetime.strptime(date_param, "%Y-%m-%d").replace(tzinfo=kst)
+        except ValueError:
+            base_date = datetime.now(kst)
     else:
-        start_time = now_kst.replace(hour=5, minute=0, second=0, microsecond=0)
+        base_date = datetime.now(kst)
+
+    if base_date.hour < 5:
+        start_time = (base_date - timedelta(days=1)).replace(hour=5, minute=0, second=0, microsecond=0)
+    else:
+        start_time = base_date.replace(hour=5, minute=0, second=0, microsecond=0)
     end_time = start_time + timedelta(days=1)
     # ISO strings for Chart.js min/max x axis
     min_ts = start_time.isoformat()
