@@ -385,7 +385,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
 
             fetch('/dashboard_log/seat_history.csv')
                 .then(resp => resp.text())
-                .then(text => {{
+                .then(text => {
                     const rows = text.trim().split('\n').map(line => line.split(','));
                     const filtered = rows.map(([ts, used]) => {{
                         const d = new Date(ts + " KST");
@@ -437,7 +437,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
 
                     document.getElementById("summary").innerHTML =
                         "기준일: <b>" + formatDate(baseDate) + "</b> / 총 기록: " + filtered.length + "건";
-                }});
+                });
             </script>
         </body>
         </html>
