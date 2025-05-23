@@ -256,9 +256,9 @@ def check_seat_status(driver):
     )
 
     # === 좌석 기록 저장
-    log_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
-    with open(log_path, "a", encoding="utf-8") as f:
+    history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
+    os.makedirs(os.path.dirname(history_path), exist_ok=True)
+    with open(history_path, "a", encoding="utf-8") as f:
         now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
         f.write(f"{now_str},{used_free_seats}\n")
 
@@ -319,11 +319,6 @@ def main_check_seat():
     finally:
         driver.quit()
 
-
-# def start_telegram_listener():
-#     loop = asyncio.new_event_loop()
-#     asyncio.set_event_loop(loop)
-#     loop.run_until_complete(telegram_auth_listener.run_listener_async())
 
 
 def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
@@ -390,59 +385,59 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
 
             fetch('/dashboard_log/seat_history.csv')
                 .then(resp => resp.text())
-                .then(text => {
+                .then(text => {{
                     const rows = text.trim().split('\n').map(line => line.split(','));
-                    const filtered = rows.map(([ts, used]) => {
+                    const filtered = rows.map(([ts, used]) => {{
                         const d = new Date(ts + " KST");
-                        return { x: d, y: parseInt(used) };
-                    }).filter(pt => {
+                        return {{ x: d, y: parseInt(used) }};
+                    }}).filter(pt => {{
                         const start = new Date(baseDate.getTime() + 5 * 3600 * 1000);
                         const end = new Date(start.getTime() + 24 * 3600 * 1000);
                         return pt.x >= start && pt.x < end;
-                    });
+                    }});
 
-                    // Always set up the chart, even if filtered is empty
                     const ctx = document.getElementById('seatChart').getContext('2d');
-                    const chartConfig = {
+                    const chartConfig = {{
                         type: 'line',
-                        data: {
-                            datasets: [{
+                        data: {{
+                            datasets: [{{
                                 label: '자유석 사용 수',
                                 data: filtered,
                                 borderColor: 'rgba(75,192,192,1)',
                                 pointBackgroundColor: 'rgba(75,192,192,1)',
                                 tension: 0.2
-                            }]
-                        },
-                        options: {
-                            scales: {
-                                x: {
+                            }}]
+                        }},
+                        options: {{
+                            scales: {{
+                                x: {{
                                     type: 'time',
-                                    time: {
-                                        unit: 'hour',
-                                        stepSize: 1,
-                                        displayFormats: {
-                                            hour: 'HH:mm'
-                                        }
-                                    },
-                                    ticks: {
-                                        source: 'auto'
-                                    },
+                                    time: {{
+                                        unit: 'minute',
+                                        stepSize: 30,
+                                        displayFormats: {{
+                                            minute: 'HH:mm'
+                                        }}
+                                    }},
+                                    ticks: {{
+                                        source: 'auto',
+                                        autoSkip: false
+                                    }},
                                     min: new Date(baseDate.getTime() + 5 * 3600 * 1000),
                                     max: new Date(baseDate.getTime() + 29 * 3600 * 1000)
-                                },
-                                y: {
+                                }},
+                                y: {{
                                     beginAtZero: true,
                                     suggestedMax: 28
-                                }
-                            }
-                        }
-                    };
+                                }}
+                            }}
+                        }}
+                    }};
                     new Chart(ctx, chartConfig);
 
                     document.getElementById("summary").innerHTML =
                         "기준일: <b>" + formatDate(baseDate) + "</b> / 총 기록: " + filtered.length + "건";
-                });
+                }});
             </script>
         </body>
         </html>
