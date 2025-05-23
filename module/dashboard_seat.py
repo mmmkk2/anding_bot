@@ -403,16 +403,15 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         type: 'time',
                         time: {{
                             unit: 'minute',
-                            stepSize: 30,
-                            round: 'minute',
                             displayFormats: {{
                                 minute: 'HH:mm'
-                            }}
+                            }},
+                            stepSize: 30
                         }},
                         ticks: {{
-                            source: 'auto',
+                            autoSkip: false,
                             stepSize: 30,
-                            autoSkip: false
+                            source: 'auto'
                         }},
                         min: '{min_ts}',
                         max: '{max_ts}',
