@@ -336,6 +336,9 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     else:
         start_time = now_kst.replace(hour=5, minute=0, second=0, microsecond=0)
     end_time = start_time + timedelta(days=1)
+    # ISO strings for Chart.js min/max x axis
+    min_ts = start_time.isoformat()
+    max_ts = end_time.isoformat()
 
     #cutoff_time = datetime.now(kst) - timedelta(hours=chart_timedelta)
     cutoff_time = start_time
@@ -405,6 +408,8 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                                 minute: 'HH:mm'
                             }}
                         }},
+                        min: '{min_ts}',
+                        max: '{max_ts}',
                         title: {{
                             display: false
                         }}
