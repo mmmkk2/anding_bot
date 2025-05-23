@@ -390,57 +390,59 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
 
             fetch('/dashboard_log/seat_history.csv')
                 .then(resp => resp.text())
-                .then(text => {{
-                    const rows = text.trim().split('\\n').map(line => line.split(','));
-                    const filtered = rows.map(([ts, used]) => {{
+                .then(text => {
+                    const rows = text.trim().split('\n').map(line => line.split(','));
+                    const filtered = rows.map(([ts, used]) => {
                         const d = new Date(ts + " KST");
-                        return {{ x: d, y: parseInt(used) }};
-                    }}).filter(pt => {{
+                        return { x: d, y: parseInt(used) };
+                    }).filter(pt => {
                         const start = new Date(baseDate.getTime() + 5 * 3600 * 1000);
                         const end = new Date(start.getTime() + 24 * 3600 * 1000);
                         return pt.x >= start && pt.x < end;
-                    }});
+                    });
 
+                    // Always set up the chart, even if filtered is empty
                     const ctx = document.getElementById('seatChart').getContext('2d');
-                    new Chart(ctx, {{
+                    const chartConfig = {
                         type: 'line',
-                        data: {{
-                            datasets: [{{
+                        data: {
+                            datasets: [{
                                 label: '자유석 사용 수',
                                 data: filtered,
                                 borderColor: 'rgba(75,192,192,1)',
                                 pointBackgroundColor: 'rgba(75,192,192,1)',
                                 tension: 0.2
-                            }}]
-                        }},
-                        options: {{
-                            scales: {{
-                                x: {{
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                x: {
                                     type: 'time',
-                                    time: {{
+                                    time: {
                                         unit: 'hour',
                                         stepSize: 1,
-                                        displayFormats: {{
+                                        displayFormats: {
                                             hour: 'HH:mm'
-                                        }}
-                                    }},
-                                    ticks: {{
+                                        }
+                                    },
+                                    ticks: {
                                         source: 'auto'
-                                    }},
+                                    },
                                     min: new Date(baseDate.getTime() + 5 * 3600 * 1000),
                                     max: new Date(baseDate.getTime() + 29 * 3600 * 1000)
-                                }},
-                                y: {{
+                                },
+                                y: {
                                     beginAtZero: true,
                                     suggestedMax: 28
-                                }}
-                            }}
-                        }}
-                    }});
+                                }
+                            }
+                        }
+                    };
+                    new Chart(ctx, chartConfig);
 
                     document.getElementById("summary").innerHTML =
                         "기준일: <b>" + formatDate(baseDate) + "</b> / 총 기록: " + filtered.length + "건";
-                }});
+                });
             </script>
         </body>
         </html>
