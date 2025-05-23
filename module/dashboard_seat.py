@@ -329,14 +329,24 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
 
     history_rows = []
-    cutoff_time = datetime.now(kst) - timedelta(hours=chart_timedelta)
+    # --- Daytime window calculation (KST 5:00 to next 5:00) ---
+    now_kst = datetime.now(kst)
+    if now_kst.hour < 5:
+        start_time = (now_kst - timedelta(days=1)).replace(hour=5, minute=0, second=0, microsecond=0)
+    else:
+        start_time = now_kst.replace(hour=5, minute=0, second=0, microsecond=0)
+    end_time = start_time + timedelta(days=1)
+
+    #cutoff_time = datetime.now(kst) - timedelta(hours=chart_timedelta)
+    cutoff_time = start_time
 
     with open(history_path, "r", encoding="utf-8") as f:
         for line in reversed(f.readlines()):
             parts = line.strip().split(",")
             if len(parts) >= 2:
                 timestamp_obj = kst.localize(datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S"))
-                if timestamp_obj >= cutoff_time:
+                #if timestamp_obj >= cutoff_time:
+                if start_time <= timestamp_obj < end_time:
                     history_rows.insert(0, line)
                 else:
                     break
