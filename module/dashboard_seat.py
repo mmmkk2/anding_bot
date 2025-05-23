@@ -440,6 +440,20 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
 
     now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
 
+    # Calculate base_date, previous day, and next day strings for display
+    date_param = request.args.get("date") if request else None
+    if date_param:
+        try:
+            base_date = datetime.strptime(date_param, "%Y-%m-%d").replace(tzinfo=kst)
+        except ValueError:
+            base_date = datetime.now(kst)
+    else:
+        base_date = datetime.now(kst)
+
+    기준일_str = base_date.strftime('%Y-%m-%d')
+    전일_str = (base_date - timedelta(days=1)).strftime('%Y-%m-%d')
+    익일_str = (base_date + timedelta(days=1)).strftime('%Y-%m-%d')
+
     html = f"""
     <!DOCTYPE html>
     <html lang="ko">
@@ -503,7 +517,11 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     </head>
     <body>
         <div class="box">
-            <div class="updated">📅 기준 날짜: <b>{today_str}</b></div>
+            <div class="updated">
+                📅 기준일: <b>{기준일_str}</b><br>
+                전일: {전일_str} /
+                익일: {익일_str}
+            </div>
             <div class="stat">자유석: {used_free}/{total_free}</div>
             <div class="stat">노트북석: {used_laptop}/{total_laptop}</div>
             <div class="stat">남은 자유석: {remaining}석</div>            
