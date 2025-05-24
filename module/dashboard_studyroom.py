@@ -32,17 +32,21 @@ DEBUG_PATH = os.getenv("DEBUG_PATH")
 # Add DEBUG switch after loading .env
 parser = argparse.ArgumentParser()
 parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 비활성화)")
+parser.add_argument("--hide", action="store_true", help="디버그 메시지 숨김")
+parser.add_argument("--date", type=str, help="조회 기준 날짜 (예: '2025.05.21')")
 args = parser.parse_args()
-DEBUG = not args.manual and os.getenv("DEBUG", "true").lower() == "true"
+
+DEBUG_ENV = os.getenv("DEBUG", "true").lower() == "true"
+DEBUG = not args.hide and DEBUG_ENV
 
 # KST
 kst = pytz.timezone("Asia/Seoul")
 today_str = datetime.now(kst).strftime("%Y.%m.%d")
 
+target_date = args.date if args.date else today_str
+
 BASE_URL = os.getenv("BASE_URL")
 ROOM_URL = f"{BASE_URL}/use/studyUse"
-
-
 
 
 def check_studyroom(driver):
