@@ -32,7 +32,7 @@ DEBUG_PATH = os.getenv("DEBUG_PATH")
 parser = argparse.ArgumentParser()
 parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 비활성화)")
 parser.add_argument("--hide", action="store_true", help="디버그 메시지 숨김")
-parser.add_argument("--date", nargs="?", type=str, help="조회 기준 날짜 (예: '2025.05.21')")
+parser.add_argument("--date", nargs="?", type=str, default=None, help="조회 기준 날짜 (예: '2025.05.21')")
 
 args = parser.parse_args()
 print(args)
