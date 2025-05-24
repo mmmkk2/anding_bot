@@ -161,10 +161,16 @@ def check_studyroom(driver):
     count_2 = len(reservations_2)
     count_4 = len(reservations_4)
 
+    reservations_2.sort(key=lambda x: x['time'].split('~')[0].strip())
+    reservations_4.sort(key=lambda x: x['time'].split('~')[0].strip())
+    
+
     html_rows_2 = "\n".join(
         f"<tr><td>{r['time']}</td><td>{r['name']}</td></tr>"
         for r in reservations_2
     )
+    # Sort 4인실 예약 by start time before generating HTML rows
+    
     html_rows_4 = "\n".join(
         f"<tr><td>{r['time']}</td><td>{r['name']}</td></tr>"
         for r in reservations_4
