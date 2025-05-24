@@ -40,6 +40,13 @@ print(args)
 DEBUG_ENV = os.getenv("DEBUG", "true").lower() == "true"
 DEBUG = not args.hide and DEBUG_ENV
 
+print(f"[DEBUG CHECK] args.manual = {args.manual}")
+print(f"[DEBUG CHECK] args.hide = {args.hide}")
+print(f"[DEBUG CHECK] os.getenv('DEBUG') = {os.getenv('DEBUG')}")
+print(f"[DEBUG CHECK] DEBUG_ENV = {DEBUG_ENV}")
+print(f"[DEBUG CHECK] DEBUG = {DEBUG}")
+print(f"[DEBUG MODE] {'ON' if DEBUG else 'OFF'}")
+
 # KST
 kst = pytz.timezone("Asia/Seoul")
 today_str = datetime.now(kst).strftime("%Y.%m.%d")
