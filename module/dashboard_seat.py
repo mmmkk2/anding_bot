@@ -438,8 +438,8 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 margin: 0;
                 display: flex;
                 align-items: flex-start;
-                min-height: 250px; /* max-height: 25vh; */
-                max-height: 250px; /*   max-width: 100vw; */ 
+                min-height: 200px; /* max-height: 25vh; */
+                max-height: 230px; /*   max-width: 100vw; */ 
                 box-sizing: border-box;
                 justify-content: center;
                 text-align: center;  /* 텍스트 정렬 보정 */               
@@ -491,7 +491,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             <div class="stat">남은 자유석: {remaining}석</div>            
             <div class="updated">업데이트 시각: {now_str}</div>
             <div style="margin-top:0.5rem;">            
-                 <canvas id="seatChart"  height="180"></canvas>
+                 <canvas id="seatChart"  height="190"></canvas>
                 {chart_script}
             </div>
         </div>
