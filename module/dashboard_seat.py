@@ -367,11 +367,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             point_colors.append('rgba(75, 192, 192, 0.1)')  # Light gray transparent for normal usage
 
     lineColor = 'rgba(75, 192, 192, 1)'  # default green
-    # if remaining <= 5:
-    #     lineColor = 'rgba(255, 99, 132, 1)'  # red
-    # elif remaining <= 7:
-    #     lineColor = 'rgba(255, 206, 86, 1)'  # yellow
-
+    
     data_points = [{"x": t, "y": y} for t, y in zip(timestamps, used_frees)]
 
     chart_script = f"""
@@ -495,7 +491,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             <div class="stat">남은 자유석: {remaining}석</div>            
             <div class="updated">업데이트 시각: {now_str}</div>
             <div style="margin-top:0.5rem;">            
-                 <canvas id="seatChart"  height="210"></canvas>
+                 <canvas id="seatChart"  height="180"></canvas>
                 {chart_script}
             </div>
         </div>
