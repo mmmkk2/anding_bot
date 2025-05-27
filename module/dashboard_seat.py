@@ -295,6 +295,10 @@ def main_check_seat():
 
     try:
         if login(driver):
+
+            today_user_count = get_today_user_count(driver)
+            print(f"[DEBUG] 추출된 누적 사용자 수 텍스트: '{today_user_count}'")
+            
             seat_status_msg = check_seat_status(driver)
             now_full_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
             loop_msg = (
@@ -367,11 +371,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             point_colors.append('rgba(75, 192, 192, 0.1)')  # Light gray transparent for normal usage
 
     lineColor = 'rgba(75, 192, 192, 1)'  # default green
-    # if remaining <= 5:
-    #     lineColor = 'rgba(255, 99, 132, 1)'  # red
-    # elif remaining <= 7:
-    #     lineColor = 'rgba(255, 206, 86, 1)'  # yellow
-
+    
     data_points = [{"x": t, "y": y} for t, y in zip(timestamps, used_frees)]
 
     chart_script = f"""
@@ -442,8 +442,8 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 margin: 0;
                 display: flex;
                 align-items: flex-start;
-                min-height: 250px; /* max-height: 25vh; */
-                max-height: 250px; /*   max-width: 100vw; */ 
+                min-height: 180px; /* max-height: 25vh; */
+                max-height: 180px; /*   max-width: 100vw; */ 
                 box-sizing: border-box;
                 justify-content: center;
                 text-align: center;  /* 텍스트 정렬 보정 */               
@@ -479,10 +479,12 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             }}          
             @media (max-width: 480px) {{
                 body {{
-                    max-height: 50vh;
+                    /* max-height: 50vh; */
+                    min-height: 200px;
+                    max-height: 230px;
                 }}            
                 .box {{
-                    max-height: 100vh;  /* 화면 높이의 90%까지 확장 */
+                    max-height: 110vh;  /* 화면 높이의 90%까지 확장 */
                 }}
             }}                
         </style>
@@ -495,7 +497,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             <div class="stat">남은 자유석: {remaining}석</div>            
             <div class="updated">업데이트 시각: {now_str}</div>
             <div style="margin-top:0.5rem;">            
-                 <canvas id="seatChart"  height="210"></canvas>
+                 <canvas id="seatChart"  height="200"></canvas>
                 {chart_script}
             </div>
         </div>
@@ -505,3 +507,27 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     with open(os.path.join(DASHBOARD_PATH, "seat_dashboard.html"), "w", encoding="utf-8") as f:
         f.write(html)
         
+
+
+# 금일 누적 이용자 수 가져오기 함수
+def get_today_user_count(driver):
+    try:
+        driver.get(f"{BASE_URL}/dashboard")
+        if DEBUG:
+            print(f"[DEBUG] 현재 대시보드 URL: {driver.current_url}")
+
+        # 텍스트가 숫자일 때까지 대기
+        WebDriverWait(driver, 10).until(
+            lambda d: d.find_element(By.ID, "today_use_cnt").text.strip().isdigit()
+        )
+        user_count_text = driver.find_element(By.ID, "today_use_cnt").text.strip()
+
+        if DEBUG:
+            print(f"[DEBUG] 추출된 사용자 수 텍스트: '{user_count_text}'")
+
+        return int(user_count_text)
+
+    except Exception as e:
+        if DEBUG:
+            print(f"[DEBUG] 금일 누적 이용자 수 가져오기 실패 (Selenium): {e}")
+        return None

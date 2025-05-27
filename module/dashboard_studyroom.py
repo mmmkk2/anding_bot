@@ -1,4 +1,3 @@
-
 import sys
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -32,17 +31,30 @@ DEBUG_PATH = os.getenv("DEBUG_PATH")
 # Add DEBUG switch after loading .env
 parser = argparse.ArgumentParser()
 parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 비활성화)")
+parser.add_argument("--hide", action="store_true", help="디버그 메시지 숨김")
+parser.add_argument("--date", nargs="?", type=str, default=None, help="조회 기준 날짜 (예: '2025.05.21')")
+
 args = parser.parse_args()
-DEBUG = not args.manual and os.getenv("DEBUG", "true").lower() == "true"
+print(args)
+
+DEBUG_ENV = os.getenv("DEBUG", "true").lower() == "true"
+DEBUG = not args.hide and DEBUG_ENV
+
+print(f"[DEBUG CHECK] args.manual = {args.manual}")
+print(f"[DEBUG CHECK] args.hide = {args.hide}")
+print(f"[DEBUG CHECK] os.getenv('DEBUG') = {os.getenv('DEBUG')}")
+print(f"[DEBUG CHECK] DEBUG_ENV = {DEBUG_ENV}")
+print(f"[DEBUG CHECK] DEBUG = {DEBUG}")
+print(f"[DEBUG MODE] {'ON' if DEBUG else 'OFF'}")
 
 # KST
 kst = pytz.timezone("Asia/Seoul")
 today_str = datetime.now(kst).strftime("%Y.%m.%d")
 
+target_date = args.date if args.date else today_str
+
 BASE_URL = os.getenv("BASE_URL")
 ROOM_URL = f"{BASE_URL}/use/studyUse"
-
-
 
 
 def check_studyroom(driver):
@@ -161,10 +173,16 @@ def check_studyroom(driver):
     count_2 = len(reservations_2)
     count_4 = len(reservations_4)
 
+    reservations_2.sort(key=lambda x: x['time'].split('~')[0].strip())
+    reservations_4.sort(key=lambda x: x['time'].split('~')[0].strip())
+    
+
     html_rows_2 = "\n".join(
         f"<tr><td>{r['time']}</td><td>{r['name']}</td></tr>"
         for r in reservations_2
     )
+    # Sort 4인실 예약 by start time before generating HTML rows
+    
     html_rows_4 = "\n".join(
         f"<tr><td>{r['time']}</td><td>{r['name']}</td></tr>"
         for r in reservations_4
