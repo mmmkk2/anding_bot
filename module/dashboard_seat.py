@@ -293,17 +293,25 @@ def main_check_seat():
 
     driver = create_driver()
 
+    now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
     try:
         if login(driver):
-
+    
             today_user_count = get_today_user_count(driver)
             print(f"[DEBUG] 추출된 누적 사용자 수 텍스트: '{today_user_count}'")
-            
+
+            # ✅ 누적 이용자 수 저장
+            if today_user_count is not None:
+                cum_users_path = os.path.join(DASHBOARD_PATH, "cum_users_history.csv")
+                os.makedirs(os.path.dirname(cum_users_path), exist_ok=True)
+                with open(cum_users_path, "a", encoding="utf-8") as f:
+                    f.write(f"{now_str},{today_user_count}\n")
+                            
             seat_status_msg = check_seat_status(driver)
-            now_full_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
+            # Use the same now_str for the monitoring message
             loop_msg = (
                 f"\n\n🪑 좌석 모니터링 정상 동작 중\n"
-                f"⏰ 날짜 + 실행 시각: {now_full_str}"
+                f"⏰ 날짜 + 실행 시각: {now_str}"
             )
             full_msg = loop_msg + "\n\n" + seat_status_msg
             send_broadcast_and_update(full_msg, broadcast=False, category="seat")
