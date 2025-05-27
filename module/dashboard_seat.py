@@ -368,12 +368,13 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             used_frees.append(int(parts[1]))
     point_colors = []
     for y in used_frees:
-        if total_free - y <= 5:
+        if total_free - y <= DANGER_THRESHOLD:
             point_colors.append('rgba(255, 99, 132, 1)')  # Red
-        elif total_free - y <= 7:
+        elif total_free - y <= WARNING_THRESHOLD:
             point_colors.append('rgba(255, 206, 86, 1)')  # Yellow
         else:
             point_colors.append('rgba(75, 192, 192, 0.1)')  # Light gray transparent for normal usage
+
     lineColor = 'rgba(75, 192, 192, 1)'  # default green
     data_points = [{"x": t, "y": y} for t, y in zip(timestamps, used_frees)]
 
