@@ -503,3 +503,26 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     with open(os.path.join(DASHBOARD_PATH, "seat_dashboard.html"), "w", encoding="utf-8") as f:
         f.write(html)
         
+
+
+# 금일 누적 이용자 수 가져오기 함수
+def get_today_user_count(driver):
+    try:
+        driver.get(f"{BASE_URL}/dashboard")
+        if DEBUG:
+            print(f"[DEBUG] 현재 대시보드 URL: {driver.current_url}")
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div.dashboard_1_sum.color-info.mt-2"))
+        )
+        user_count_text = driver.find_element(By.CSS_SELECTOR, "div.dashboard_1_sum.color-info.mt-2").text.strip()
+        if DEBUG:
+            print(f"[DEBUG] 추출된 사용자 수 텍스트: '{user_count_text}'")
+        if not user_count_text or not user_count_text.isdigit():
+            if DEBUG:
+                print(f"[DEBUG] 금일 누적 이용자 수가 비어 있거나 숫자가 아님: '{user_count_text}'")
+            return None
+        return int(user_count_text)
+    except Exception as e:
+        if DEBUG:
+            print(f"[DEBUG] 금일 누적 이용자 수 가져오기 실패 (Selenium): {e}")
+        return None
