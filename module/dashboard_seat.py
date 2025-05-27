@@ -295,6 +295,10 @@ def main_check_seat():
 
     try:
         if login(driver):
+
+            today_user_count = get_today_user_count(driver)
+            print(f"[DEBUG] 추출된 누적 사용자 수 텍스트: '{today_user_count}'")
+            
             seat_status_msg = check_seat_status(driver)
             now_full_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
             loop_msg = (
