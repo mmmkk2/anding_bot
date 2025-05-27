@@ -372,8 +372,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     # --- 누적 이용자 수 이력 ---
     cum_users_rows = []
     cum_users_points = []
-    cum_users_min = None
-    cum_users_max = None
     try:
         with open(cum_users_path, "r", encoding="utf-8") as f:
             for line in reversed(f.readlines()):
@@ -387,26 +385,18 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         for line in cum_users_rows:
             parts = line.strip().split(",")
             if len(parts) >= 2:
-                timestamp_obj = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
-                t_str = timestamp_obj.strftime("%Y-%m-%dT%H:%M:%S")
-                try:
-                    user_count = int(parts[1])
-                    cum_users_points.append({"x": t_str, "y": user_count})
-                    if cum_users_min is None or user_count < cum_users_min:
-                        cum_users_min = user_count
-                    if cum_users_max is None or user_count > cum_users_max:
-                        cum_users_max = user_count
-                except Exception:
-                    continue
+                # Instead of parsing timestamp_obj, just use now_kst for t_str
+                t_str = now_kst.strftime("%Y-%m-%dT%H:%M:%S")
+                user_count = int(parts[1])
+                cum_users_points.append({"x": t_str, "y": user_count})
     except Exception:
         cum_users_points = []
-        cum_users_min = None
-        cum_users_max = None
 
     # y1 axis min/max for 누적 이용자 수
-    if cum_users_min is not None and cum_users_max is not None:
-        y1_suggested_min = max(0, cum_users_min - 1)
-        y1_suggested_max = cum_users_max + 1
+    if cum_users_points:
+        y_values = [pt["y"] for pt in cum_users_points]
+        y1_suggested_min = max(0, min(y_values) - 1)
+        y1_suggested_max = max(y_values) + 1
     else:
         y1_suggested_min = 0
         y1_suggested_max = 10
