@@ -515,10 +515,12 @@ def get_today_user_count(driver):
         driver.get(f"{BASE_URL}/dashboard")
         if DEBUG:
             print(f"[DEBUG] 현재 대시보드 URL: {driver.current_url}")
+
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "div.dashboard_1_sum.color-info.mt-2"))
+            EC.presence_of_element_located((By.ID, "today_use_cnt"))
         )
-        user_count_text = driver.find_element(By.CSS_SELECTOR, "div.dashboard_1_sum.color-info.mt-2").text.strip()
+        user_count_text = driver.find_element(By.ID, "today_use_cnt").text.strip()
+
         if DEBUG:
             print(f"[DEBUG] 추출된 사용자 수 텍스트: '{user_count_text}'")
         if not user_count_text or not user_count_text.isdigit():
