@@ -326,8 +326,8 @@ def main_check_seat():
 
 def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
     history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
+    cum_users_path = os.path.join(DASHBOARD_PATH, "cum_users_history.csv")
 
-    history_rows = []
     # --- Daytime window calculation (KST 5:00 to next 5:00) ---
     now_kst = datetime.now(kst)
     if now_kst.hour < 5:
@@ -339,20 +339,17 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     min_ts = start_time.isoformat()
     max_ts = end_time.isoformat()
 
-    #cutoff_time = datetime.now(kst) - timedelta(hours=chart_timedelta)
-    cutoff_time = start_time
-
+    # --- 자유석 이력 ---
+    history_rows = []
     with open(history_path, "r", encoding="utf-8") as f:
         for line in reversed(f.readlines()):
             parts = line.strip().split(",")
             if len(parts) >= 2:
                 timestamp_obj = kst.localize(datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S"))
-                #if timestamp_obj >= cutoff_time:
                 if start_time <= timestamp_obj < end_time:
                     history_rows.insert(0, line)
                 else:
                     break
-                
     timestamps = []
     used_frees = []
     for line in history_rows:
@@ -369,11 +366,52 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             point_colors.append('rgba(255, 206, 86, 1)')  # Yellow
         else:
             point_colors.append('rgba(75, 192, 192, 0.1)')  # Light gray transparent for normal usage
-
     lineColor = 'rgba(75, 192, 192, 1)'  # default green
-    
     data_points = [{"x": t, "y": y} for t, y in zip(timestamps, used_frees)]
 
+    # --- 누적 이용자 수 이력 ---
+    cum_users_rows = []
+    cum_users_points = []
+    cum_users_min = None
+    cum_users_max = None
+    try:
+        with open(cum_users_path, "r", encoding="utf-8") as f:
+            for line in reversed(f.readlines()):
+                parts = line.strip().split(",")
+                if len(parts) >= 2:
+                    timestamp_obj = kst.localize(datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S"))
+                    if start_time <= timestamp_obj < end_time:
+                        cum_users_rows.insert(0, line)
+                    else:
+                        break
+        for line in cum_users_rows:
+            parts = line.strip().split(",")
+            if len(parts) >= 2:
+                timestamp_obj = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
+                t_str = timestamp_obj.strftime("%Y-%m-%dT%H:%M:%S")
+                try:
+                    user_count = int(parts[1])
+                    cum_users_points.append({"x": t_str, "y": user_count})
+                    if cum_users_min is None or user_count < cum_users_min:
+                        cum_users_min = user_count
+                    if cum_users_max is None or user_count > cum_users_max:
+                        cum_users_max = user_count
+                except Exception:
+                    continue
+    except Exception:
+        cum_users_points = []
+        cum_users_min = None
+        cum_users_max = None
+
+    # y1 axis min/max for 누적 이용자 수
+    if cum_users_min is not None and cum_users_max is not None:
+        y1_suggested_min = max(0, cum_users_min - 1)
+        y1_suggested_max = cum_users_max + 1
+    else:
+        y1_suggested_min = 0
+        y1_suggested_max = 10
+
+    # --- 차트 스크립트 ---
     chart_script = f"""
     <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns'></script>
@@ -382,14 +420,26 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         new Chart(ctx, {{
             type: 'line',
             data: {{
-                datasets: [{{
-                    label: '자유석 사용 수',
-                    data: {json.dumps(data_points)},
-                    borderColor: '{lineColor}',
-                    pointBackgroundColor: {json.dumps(point_colors)},
-                    pointRadius: window.innerWidth > 768 ? 2 : 4,
-                    tension: 0.1
-                }}]
+                datasets: [
+                    {{
+                        label: '자유석 사용 수',
+                        data: {json.dumps(data_points)},
+                        borderColor: '{lineColor}',
+                        pointBackgroundColor: {json.dumps(point_colors)},
+                        pointRadius: window.innerWidth > 768 ? 2 : 4,
+                        tension: 0.1,
+                        yAxisID: 'y'
+                    }},
+                    {{
+                        label: '금일 누적 이용자 수',
+                        data: {json.dumps(cum_users_points)},
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                        borderDash: [5, 5],
+                        tension: 0.2,
+                        yAxisID: 'y1'
+                    }}
+                ]
             }},
             options: {{
                 responsive: true,
@@ -417,6 +467,16 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     y: {{
                         beginAtZero: true,
                         max: {total_free}
+                    }},
+                    y1: {{
+                        position: 'right',
+                        grid: {{ drawOnChartArea: false }},
+                        title: {{
+                            display: true,
+                            text: '누적 이용자 수'
+                        }},
+                        suggestedMin: {y1_suggested_min},
+                        suggestedMax: {y1_suggested_max}
                     }}
                 }}
             }}
