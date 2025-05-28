@@ -474,6 +474,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                             display: true,
                             text: '누적 이용자 수'
                         }},
+                        beginAtZero: true,
                         suggestedMin: {y1_suggested_min},
                         suggestedMax: {y1_suggested_max}
                     }}
