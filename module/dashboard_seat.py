@@ -237,13 +237,14 @@ def check_seat_status(driver):
 
     if remaining_seats <= DANGER_THRESHOLD:
         status_emoji = "🔴"
-        line_color = 'rgba(255, 99, 132, 1)'  # red
     elif remaining_seats <= WARNING_THRESHOLD:
         status_emoji = "🟡"
-        line_color = 'rgba(255, 206, 86, 1)'  # yellow
     else:
         status_emoji = "🟢"
-        line_color = 'rgba(75, 192, 192, 1)'  # green
+
+    # line_color = 'rgba(75, 192, 192, 1)'  # green
+    # line_color = 'rgba(255, 99, 132, 1)'  # red
+    # line_color = 'rgba(255, 206, 86, 1)'  # yellow
 
 
     # === 메시지 작성
@@ -434,8 +435,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         data: {json.dumps(cum_users_points)},
                         borderColor: 'rgba(153, 102, 255, 1)',
                         backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                        borderDash: [5, 5],
-                        tension: 0.2,
+                        tension: 0.1,
                         yAxisID: 'y1'
                     }}
                 ]
