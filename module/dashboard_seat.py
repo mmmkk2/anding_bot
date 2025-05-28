@@ -427,14 +427,16 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         borderColor: '{lineColor}',
                         pointBackgroundColor: {json.dumps(point_colors)},
                         pointRadius: window.innerWidth > 768 ? 2 : 4,
+                        borderWidth: 1,
                         tension: 0.1,
                         yAxisID: 'y'
                     }},
                     {{
                         label: '금일 누적 이용자 수',
                         data: {json.dumps(cum_users_points)},
-                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderColor: 'rgba(153, 102, 255, 0.1)',
                         backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                        borderWidth: 1,
                         tension: 0.1,
                         yAxisID: 'y1'
                     }}
