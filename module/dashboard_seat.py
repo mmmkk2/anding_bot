@@ -391,13 +391,15 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         cum_users_rows.insert(0, line)
                     else:
                         break
+        cum_timestamps = []
+        cum_user_counts = []
         for line in cum_users_rows:
             parts = line.strip().split(",")
             if len(parts) >= 2:
-                # Instead of parsing timestamp_obj, just use now_kst for t_str
                 timestamp_obj = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
-                user_count = int(parts[1])
-                cum_users_points.append({"x": timestamp_obj, "y": user_count})
+                cum_timestamps.append(timestamp_obj.strftime("%Y-%m-%dT%H:%M:%S"))
+                cum_user_counts.append(int(parts[1]))
+        cum_users_points = [{"x": t, "y": y} for t, y in zip(cum_timestamps, cum_user_counts)]
     except Exception:
         cum_users_points = []
 
