@@ -406,7 +406,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     # y1 axis min/max for 누적 이용자 수
     if cum_users_points:
         y_values = [pt["y"] for pt in cum_users_points]
-        y1_suggested_min = min(20, min(y_values) - 1)
+        y1_suggested_min = 0
         y1_suggested_max = max(70, max(y_values) + 1)
     
 
