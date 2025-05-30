@@ -431,7 +431,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         label: '자유석 사용 수',
                         data: {json.dumps(data_points)},
                         borderColor: '{lineColor}',
-                        pointBackgroundColor: '{cum_point_color}',
+                        pointBackgroundColor: {json.dumps(point_colors)},
                         pointRadius: window.innerWidth > 768 ? 2 : 4,
                         borderWidth: 1,
                         tension: 0.1,
@@ -441,7 +441,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         label: '금일 누적 이용자 수',
                         data: {json.dumps(cum_users_points)},
                         borderColor: '{cum_lineColor}',
-                        pointBackgroundColor: {json.dumps(point_colors)},
+                        pointBackgroundColor: '{cum_point_color}',
                         borderWidth: 1,
                         tension: 0.1,
                         yAxisID: 'y1'
