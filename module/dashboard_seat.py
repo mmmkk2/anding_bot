@@ -178,8 +178,8 @@ def check_seat_status(driver):
             except Exception:
                 continue
 
-            if DEBUG:
-                print(f"[DEBUG] 좌석 유형 원본: '{seat_type}'")
+            # if DEBUG:
+                # print(f"[DEBUG] 좌석 유형 원본: '{seat_type}'")
 
             # Only log 자유석 (non-fixed, non-laptop) for all_seat_numbers
             if "개인석" in seat_type:
