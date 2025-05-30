@@ -193,8 +193,8 @@ def check_seat_status(driver):
                         print(f"[DEBUG] 노트북석 사용됨: {seat_number}")
                 else:
                     used_free_seats += 1
-                    if DEBUG:
-                        print(f"[DEBUG] 자유석 사용됨: {seat_number}")
+                    # if DEBUG:
+                    #     print(f"[DEBUG] 자유석 사용됨: {seat_number}")
                     all_seat_numbers.append(seat_number)  # Only 자유석 tracked here
 
         if DEBUG:
