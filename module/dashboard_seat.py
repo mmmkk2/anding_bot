@@ -379,7 +379,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         else:
             point_colors.append('rgba(75, 192, 192, 0.1)')  # Light gray transparent for normal usage
 
-    lineColor = 'rgba(75, 192, 192, 1)'  # default green
+    
     data_points = [{"x": t, "y": y} for t, y in zip(timestamps, used_frees)]
 
     # --- 누적 이용자 수 이력 ---
@@ -415,6 +415,9 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     
 
     # --- 차트 스크립트 ---
+    lineColor = 'rgba(75, 192, 192, 1)'  # default green
+    cum_lineColor = 'rgba(153, 102, 255, 1)'
+    cum_point_colors='rgba(153, 102, 255, 0.1)'
     chart_script = f"""
     <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns'></script>
@@ -437,8 +440,8 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     {{
                         label: '금일 누적 이용자 수',
                         data: {json.dumps(cum_users_points)},
-                        borderColor: 'rgba(153, 102, 255, 1)',
-                        pointBackgroundColor: {json.dumps(point_colors)},
+                        borderColor: '{cum_lineColor}',
+                        pointBackgroundColor: {cum_point_colors},
                         borderWidth: 1,
                         tension: 0.1,
                         yAxisID: 'y1'
