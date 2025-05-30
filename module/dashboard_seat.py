@@ -556,9 +556,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     max-height: 230px;
                 }}            
                 .box {{
-                    min-height: 230px;
-                    max-height: 230px;
-                    /* max-height: 110vh;  /*  */
+                    max-height: 200vh;  /*  */
                 }}
             }}                
         </style>
