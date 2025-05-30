@@ -127,6 +127,9 @@ def check_seat_status(driver):
                         continue
                     seat_type = cols[1].text.strip()
                     seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
+                    identifier = cols[3].text.strip()
+                    if not identifier:
+                        continue  # 이름/휴대폰 비어 있으면 무시
                     all_rows_data.append((seat_type, seat_number_text))
                 except Exception:
                     continue
