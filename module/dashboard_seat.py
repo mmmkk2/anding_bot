@@ -428,7 +428,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             data: {{
                 datasets: [
                     {{
-                        label: '자유석 사용 수',
+                        label: '자유석 이용자 수',
                         data: {json.dumps(data_points)},
                         borderColor: '{lineColor}',
                         pointBackgroundColor: {json.dumps(point_colors)},
@@ -473,7 +473,11 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     }},
                     y: {{
                         beginAtZero: true,
-                        max: {total_free}
+                        max: {total_free},
+                        title: {{
+                            display: true,
+                            text: '자유석 이용자 수'
+                        }},                        
                     }},
                     y1: {{
                         position: 'right',
