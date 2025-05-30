@@ -552,11 +552,11 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             @media (max-width: 480px) {{
                 body {{
                     /* max-height: 50vh; */
-                    min-height: 200px;
-                    max-height: 230px;
+                    min-height: 250px;
+                    max-height: 250px;
                 }}            
                 .box {{
-                    max-height: 220px;  /*  */
+                    max-height: 250px;  /*  */
                 }}
             }}                
         </style>
