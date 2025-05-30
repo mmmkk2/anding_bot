@@ -438,7 +438,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         yAxisID: 'y'
                     }},
                     {{
-                        label: '금일 누적 이용자 수',
+                        label: '누적 이용자 수',
                         data: {json.dumps(cum_users_points)},
                         borderColor: '{cum_lineColor}',
                         pointBackgroundColor: '{cum_point_color}',
