@@ -223,6 +223,31 @@ def check_payment_status(driver):
         with open(PAYMENT_CACHE_FILE, "wb") as f:
             pickle.dump(today_only[0]["id"], f)
 
+    # 누적 결제 금액 계산 (승인된 결제만)
+    summary_amount = sum(
+        int(p['amount'].replace(',', '').replace('원', ''))
+        for p in today_only
+        if p['amount'] and '승인' in p['status']
+    )
+
+    # Broadcast on 100,000 KRW thresholds
+    try:
+        threshold_unit = 100_000
+        broadcast_file = os.path.join(DEBUG_PATH, "payment_threshold.pkl")
+        last_threshold = 0
+        if os.path.exists(broadcast_file):
+            with open(broadcast_file, "rb") as f:
+                last_threshold = pickle.load(f)
+
+        current_threshold = (summary_amount // threshold_unit) * threshold_unit
+        if current_threshold > last_threshold:
+            send_broadcast_and_update(f"✅ 오늘 누적 결제액 {summary_amount:,}원 돌파!", broadcast=True, category="payment")
+            with open(broadcast_file, "wb") as f:
+                pickle.dump(current_threshold, f)
+    except Exception as e:
+        if DEBUG:
+            print(f"[DEBUG] 누적 금액 알림 실패: {e}")
+
     # 대시보드 HTML 저장 함수 호출 (항상 호출, today_only가 비어도)
     save_payment_dashboard_html(today_only)
     if DEBUG:
