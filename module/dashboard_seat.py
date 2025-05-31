@@ -130,7 +130,7 @@ def check_seat_status(driver):
                     identifier = cols[3].text.strip()
                     if not identifier:
                         continue  # 이름/휴대폰 비어 있으면 무시
-                    all_rows_data.append((seat_type, seat_number_text))
+                    all_rows_data.append((seat_type, seat_number_text, identifier))
                 except Exception:
                     continue
             try:
@@ -166,13 +166,16 @@ def check_seat_status(driver):
                         continue
                     seat_type = cols[1].text.strip()
                     seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
-                    all_rows_data.append((seat_type, seat_number_text))
+                    identifier = cols[3].text.strip() if len(cols) > 3 else ""
+                    if not identifier:
+                        continue
+                    all_rows_data.append((seat_type, seat_number_text, identifier))
                 except Exception:
                     continue
             attempts += 1
 
         seat_debug_log = []
-        for seat_type, seat_number_text in all_rows_data:
+        for seat_type, seat_number_text, _ in all_rows_data:
             try:
                 seat_number = int(seat_number_text)
             except Exception:
@@ -618,12 +621,12 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 <h2>{title}</h2>
                 <table>
                     <thead>
-                        <tr><th>구분</th><th>좌석번호</th></tr>
+                        <tr><th>구분</th><th>좌석번호</th><th>이름</th></tr>
                     </thead>
                     <tbody>
             """
-            for seat_type, seat_number in rows:
-                html_table += f"<tr><td>{seat_type}</td><td>{seat_number}</td></tr>"
+            for seat_type, seat_number, name in rows:
+                html_table += f"<tr><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td></tr>"
             html_table += """
                     </tbody>
                 </table>
