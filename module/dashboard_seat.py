@@ -124,14 +124,19 @@ def check_seat_status(driver):
                 try:
                     cols = row.find_elements(By.TAG_NAME, "td")
 
-                    if len(cols) < 3:
+                    if len(cols) < 7:
                         continue
+
                     seat_type = cols[1].text.strip()
-                    seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
-                    identifier = cols[4].text.strip()  # 이름 추출
+                    seat_number_text = cols[2].text.strip().replace("개", "").replace("번", "").strip()
+                    identifier = cols[4].text.strip()  # 이름
+                    product = cols[5].text.strip()
+                    start_time = cols[6].text.strip()
+
                     if not identifier:
-                        continue  # 이름 비어 있으면 무시
-                    all_rows_data.append((seat_type, seat_number_text, identifier))
+                        continue
+
+                    all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
                 except Exception:
                     continue
             try:
@@ -153,7 +158,7 @@ def check_seat_status(driver):
                     print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
                 break
 
-        # 추가 대기: td 수가 3 미만인 행만 있는 경우 (not strictly needed with all_rows_data, but can reload if needed)
+        # 추가 대기: td 수가 7 미만인 행만 있는 경우 (not strictly needed with all_rows_data, but can reload if needed)
         attempts = 0
         while attempts < 3 and all(len(row) < 2 or not row[1] for row in all_rows_data):
             time.sleep(1.5)
@@ -163,27 +168,26 @@ def check_seat_status(driver):
             for row in page_rows:
                 try:
                     cols = row.find_elements(By.TAG_NAME, "td")
-                    if len(cols) < 3:
+                    if len(cols) < 7:
                         continue
                     seat_type = cols[1].text.strip()
-                    seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
-                    identifier = cols[3].text.strip() if len(cols) > 3 else ""
+                    seat_number_text = cols[2].text.strip().replace("개", "").replace("번", "").strip()
+                    identifier = cols[4].text.strip()
+                    product = cols[5].text.strip()
+                    start_time = cols[6].text.strip()
                     if not identifier:
                         continue
-                    all_rows_data.append((seat_type, seat_number_text, identifier))
+                    all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
                 except Exception:
                     continue
             attempts += 1
 
         seat_debug_log = []
-        for seat_type, seat_number_text, _ in all_rows_data:
+        for seat_type, seat_number_text, *_ in all_rows_data:
             try:
                 seat_number = int(seat_number_text)
             except Exception:
                 continue
-
-            # if DEBUG:
-                # print(f"[DEBUG] 좌석 유형 원본: '{seat_type}'")
 
             # Only log 자유석 (non-fixed, non-laptop) for all_seat_numbers
             if "개인석" in seat_type:
@@ -197,8 +201,6 @@ def check_seat_status(driver):
                         print(f"[DEBUG] 노트북석 사용됨: {seat_number}")
                 else:
                     used_free_seats += 1
-                    # if DEBUG:
-                    #     print(f"[DEBUG] 자유석 사용됨: {seat_number}")
                     all_seat_numbers.append(seat_number)  # Only 자유석 tracked here
 
         if DEBUG:
@@ -614,17 +616,16 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         laptop_rows = []
         free_rows = []
 
-        for seat_type, seat_number, name in raw_rows:
+        for seat_type, seat_number, name, product, start_time in raw_rows:
             try:
                 seat_number_int = int(seat_number)
             except ValueError:
                 continue
 
             if seat_number_int not in FIXED_SEAT_NUMBERS:
-                free_rows.append((seat_type, seat_number, name))
-
+                free_rows.append((seat_type, seat_number, name, product, start_time))
             elif seat_number_int in LAPTOP_SEAT_NUMBERS:
-                laptop_rows.append((seat_type, seat_number, name))
+                laptop_rows.append((seat_type, seat_number, name, product, start_time))
 
         def render_table(title, rows):
             html_table = f"""
@@ -632,12 +633,12 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 <h2>{title}</h2>
                 <table>
                     <thead>
-                        <tr><th>구분</th><th>좌석번호</th><th>이름</th></tr>
+                        <tr><th>구분</th><th>좌석번호</th><th>이름</th><th>상품</th><th>시작시간</th></tr>
                     </thead>
                     <tbody>
             """
-            for seat_type, seat_number, name in rows:
-                html_table += f"<tr><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td></tr>"
+            for seat_type, seat_number, name, product, start_time in rows:
+                html_table += f"<tr><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td>{start_time}</td></tr>"
             html_table += """
                     </tbody>
                 </table>
