@@ -123,14 +123,20 @@ def check_seat_status(driver):
             for row in page_rows:
                 try:
                     cols = row.find_elements(By.TAG_NAME, "td")
-                    if len(cols) < 3:
+
+                    if len(cols) < 7:
                         continue
+
                     seat_type = cols[1].text.strip()
-                    seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
-                    identifier = cols[3].text.strip()
+                    seat_number_text = cols[2].text.strip().replace("개", "").replace("번", "").strip()
+                    identifier = cols[4].text.strip()  # 이름
+                    product = cols[5].text.strip()
+                    start_time = cols[6].text.strip()
+
                     if not identifier:
-                        continue  # 이름/휴대폰 비어 있으면 무시
-                    all_rows_data.append((seat_type, seat_number_text))
+                        continue
+
+                    all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
                 except Exception:
                     continue
             try:
@@ -152,7 +158,7 @@ def check_seat_status(driver):
                     print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
                 break
 
-        # 추가 대기: td 수가 3 미만인 행만 있는 경우 (not strictly needed with all_rows_data, but can reload if needed)
+        # 추가 대기: td 수가 7 미만인 행만 있는 경우 (not strictly needed with all_rows_data, but can reload if needed)
         attempts = 0
         while attempts < 3 and all(len(row) < 2 or not row[1] for row in all_rows_data):
             time.sleep(1.5)
@@ -162,46 +168,51 @@ def check_seat_status(driver):
             for row in page_rows:
                 try:
                     cols = row.find_elements(By.TAG_NAME, "td")
-                    if len(cols) < 3:
+                    if len(cols) < 7:
                         continue
                     seat_type = cols[1].text.strip()
-                    seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
-                    all_rows_data.append((seat_type, seat_number_text))
+                    seat_number_text = cols[2].text.strip().replace("개", "").replace("번", "").strip()
+                    identifier = cols[4].text.strip()
+                    product = cols[5].text.strip()
+                    start_time = cols[6].text.strip()
+                    if not identifier:
+                        continue
+                    all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
                 except Exception:
                     continue
             attempts += 1
 
-        seat_debug_log = []
-        for seat_type, seat_number_text in all_rows_data:
+
+        # Insert the grouped and styled seat table before closing .box
+        if all_rows_data:
+            laptop_rows = []
+            free_rows = []
+
+            for seat_type, seat_number, name, product, start_time in all_rows_data:
+                try:
+                    seat_number_int = int(seat_number)
+                except ValueError:
+                    continue
+
+                if seat_number_int in LAPTOP_SEAT_NUMBERS:
+                    seat_type = "노트북석"
+                    laptop_rows.append((seat_type, seat_number, name, product, start_time))
+                elif seat_number_int not in FIXED_SEAT_NUMBERS:
+                    free_rows.append((seat_type, seat_number, name, product, start_time))
+
+
+        # --- Sort rows by 시작시간 (start_time) ---
+        import datetime as dt
+        def sort_by_start_time(row):
             try:
-                seat_number = int(seat_number_text)
-            except Exception:
-                continue
+                return dt.datetime.strptime(row[4], '%Y.%m.%d %H:%M')
+            except:
+                return dt.datetime.min
+        free_rows.sort(key=sort_by_start_time, reverse=True)
+        laptop_rows.sort(key=sort_by_start_time, reverse=True)
 
-            # if DEBUG:
-                # print(f"[DEBUG] 좌석 유형 원본: '{seat_type}'")
-
-            # Only log 자유석 (non-fixed, non-laptop) for all_seat_numbers
-            if "개인석" in seat_type:
-                if seat_number in fixed_set:
-                    used_fixed_seats += 1
-                    if DEBUG:
-                        print(f"[DEBUG] 고정석 사용됨: {seat_number}")
-                elif seat_number in laptop_set:
-                    used_labtop_seats += 1
-                    if DEBUG:
-                        print(f"[DEBUG] 노트북석 사용됨: {seat_number}")
-                else:
-                    used_free_seats += 1
-                    # if DEBUG:
-                    #     print(f"[DEBUG] 자유석 사용됨: {seat_number}")
-                    all_seat_numbers.append(seat_number)  # Only 자유석 tracked here
-
-        if DEBUG:
-            print(f"[DEBUG] 전체 좌석번호(자유석): {all_seat_numbers}")
-            print(f"[DEBUG] 고정석 번호(set): {sorted(fixed_set)}")
-            print(f"[DEBUG] 노트북석 번호(set): {sorted(laptop_set)}")
-            print(f"[DEBUG] 제외된 좌석(set): {sorted(excluded_seats)}")
+        used_labtop_seats = len(laptop_rows)
+        used_free_seats = len(free_rows)
 
         total_used = used_free_seats + used_labtop_seats + used_fixed_seats
         if total_used > 0 or retry_count == max_retries:
@@ -224,7 +235,8 @@ def check_seat_status(driver):
     # The above pagination and seat parsing logic has already processed all rows,
     # so we do not need to process again here.
 
-    total_assigned_free_seats = TOTAL_SEATS - len(fixed_set) - len(laptop_set)
+    total_assigned_free_seats = TOTAL_SEATS - len(fixed_set.union(laptop_set))
+    
     used_total_seats = used_free_seats + used_labtop_seats + used_fixed_seats
     # remaining_seats is simply the difference between total seats and used seats
     TOTAL_FREE_SEATS = total_assigned_free_seats
@@ -271,7 +283,8 @@ def check_seat_status(driver):
         used_laptop=used_labtop_seats,
         total_laptop=len(laptop_seat_numbers),
         remaining=remaining_seats,
-        status_emoji=status_emoji
+        free_rows=free_rows,
+        laptop_rows=laptop_rows
     )
 
 
@@ -282,7 +295,28 @@ def check_seat_status(driver):
         send_broadcast_and_update(f"[주의] ⚠️ 자유석 {WARNING_THRESHOLD}석 이하 - 이용 주의 필요", broadcast=True, category="seat")
 
     # === 최종 CSV 로그
-    return msg
+    return free_rows, laptop_rows, msg
+
+
+def render_table(title, rows):
+    html_table = f"""
+    <div class="table-box">
+        <h2>{title}</h2>
+        <table class="sortable" data-sortable>
+            <thead>
+                <tr><th>#</th><th>구분</th><th>좌석번호</th><th>이름</th><th>상품</th><th>시작시간</th></tr>
+            </thead>
+            <tbody>
+    """
+    for idx, (seat_type, seat_number, name, product, start_time) in enumerate(rows, 1):
+        html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td class='time'>{start_time.replace('.', '-')}</td></tr>"
+    html_table += """
+            </tbody>
+        </table>
+    </div>
+    """
+    return html_table
+
 
 # === 메인 실행 ===
 def main_check_seat():
@@ -311,7 +345,7 @@ def main_check_seat():
                 with open(cum_users_path, "a", encoding="utf-8") as f:
                     f.write(f"{now_str},{today_user_count}\n")
                             
-            seat_status_msg = check_seat_status(driver)
+            free_rows, laptop_rows, seat_status_msg  = check_seat_status(driver)
             # Use the same now_str for the monitoring message
             loop_msg = (
                 f"\n\n🪑 좌석 모니터링 정상 동작 중\n"
@@ -335,8 +369,7 @@ def main_check_seat():
         driver.quit()
 
 
-
-def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
+def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, free_rows=None, laptop_rows=None):
     history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
     cum_users_path = os.path.join(DASHBOARD_PATH, "cum_users_history.csv")
 
@@ -548,7 +581,51 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 font-size: 0.8rem;
                 color: #888;
                 margin-top: 1rem;
+            }}
+            .tables {{
+                display: flex;
+                justify-content: space-around;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }}
+            .table-box {{
+                flex: 1;
+                min-width: 280px;
+                max-height: 230px;
+                overflow-y: auto;
+                display: block;
+            }}
+            .table-box h2 {{
+                font-size: 1rem;
+                margin: 0.5rem 0;
+            }}
+            table {{
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.7rem;
+            }}
+            th, td {{
+                border: 1px solid #dee2e6;
+                padding: 0.2rem;
+            }}
+            th {{
+                background-color: #6c757d;
+                color: white;
             }}          
+            .time {{
+                font-size: 0.7rem;
+                padding: 0.4rem;
+                word-break: break-word;
+                white-space: normal; 
+                min-width: 50px; 
+                max-width: 60px;
+            }}            
+            tr:nth-child(even) {{
+                background-color: #f8f9fa;
+            }}
+            table.sortable th {{
+                cursor: pointer;
+            }}
             @media (max-width: 480px) {{
                 body {{
                     /* max-height: 50vh; */
@@ -560,6 +637,8 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 }}
             }}                
         </style>
+        <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/sorttable/2.1.2/sorttable.min.js"></script>
     </head>
     <body>
         <div class="box">
@@ -572,7 +651,25 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                  <canvas id="seatChart"  height="200"></canvas>
                 {chart_script}
             </div>
-        </div>
+"""
+
+    html += """
+    <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+    """
+    html += render_table("자유석", free_rows)
+    html += render_table("노트북석", laptop_rows)
+    html += """
+    </div>
+    """
+    html += """
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('table.sortable').forEach(function(table) {
+          table.classList.add('sortable');
+        });
+      });
+    </script>
     </body>
     </html>
     """
