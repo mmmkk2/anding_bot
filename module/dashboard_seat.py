@@ -191,14 +191,16 @@ def check_seat_status(driver):
 
             # Only log 자유석 (non-fixed, non-laptop) for all_seat_numbers
             if "개인석" in seat_type:
-                if seat_number in fixed_set:
-                    used_fixed_seats += 1
-                    if DEBUG:
-                        print(f"[DEBUG] 고정석 사용됨: {seat_number}")
-                elif seat_number in laptop_set:
+                if seat_number in laptop_set:
                     used_labtop_seats += 1
                     if DEBUG:
                         print(f"[DEBUG] 노트북석 사용됨: {seat_number}")
+
+                elif seat_number in fixed_set:
+                    used_fixed_seats += 1
+                    if DEBUG:
+                        print(f"[DEBUG] 고정석 사용됨: {seat_number}")
+
                 else:
                     used_free_seats += 1
                     all_seat_numbers.append(seat_number)  # Only 자유석 tracked here
@@ -628,10 +630,12 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             except ValueError:
                 continue
 
-            if seat_number_int not in FIXED_SEAT_NUMBERS:
-                free_rows.append((seat_type, seat_number, name, product, start_time))
-            elif seat_number_int in LAPTOP_SEAT_NUMBERS:
+            if seat_number_int in LAPTOP_SEAT_NUMBERS:
                 laptop_rows.append((seat_type, seat_number, name, product, start_time))
+            
+            elif seat_number_int not in FIXED_SEAT_NUMBERS:
+                free_rows.append((seat_type, seat_number, name, product, start_time))
+
 
         # --- Sort rows by 시작시간 (start_time) ---
         import datetime as dt
