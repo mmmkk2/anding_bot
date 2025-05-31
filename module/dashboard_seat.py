@@ -641,7 +641,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             html_table = f"""
             <div class="table-box">
                 <h2>{title}</h2>
-                <table>
+                <table class="sortable">
                     <thead>
                         <tr><th>구분</th><th>좌석번호</th><th>이름</th><th>상품</th><th>시작시간</th></tr>
                     </thead>
@@ -666,6 +666,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         """
     html += """
         </div>
+    <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
     </body>
     </html>
     """
