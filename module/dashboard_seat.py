@@ -309,7 +309,7 @@ def render_table(title, rows):
             <tbody>
     """
     for idx, (seat_type, seat_number, name, product, start_time) in enumerate(rows, 1):
-        html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td>{start_time.replace('.', '-')}</td></tr>"
+        html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td class='time'><td>{start_time.replace('.', '-')}</td></tr>"
     html_table += """
             </tbody>
         </table>
@@ -603,10 +603,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 width: 100%;
                 border-collapse: collapse;
                 font-size: 0.7rem;
-                margin-top: 1rem;
-                padding: 0.4rem;
-                word-break: break-word;
-                white-space: normal; 
             }}
             th, td {{
                 border: 1px solid #dee2e6;
@@ -616,6 +612,14 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 background-color: #6c757d;
                 color: white;
             }}          
+            .time {{
+                font-size: 0.7rem;
+                padding: 0.4rem;
+                word-break: break-word;
+                white-space: normal; 
+                min-width: 50px;               
+                max-width: 90px; /*
+            }}            
             tr:nth-child(even) {{
                 background-color: #f8f9fa;
             }}
