@@ -593,11 +593,27 @@ def get_today_user_count(driver):
             lambda d: d.find_element(By.ID, "today_use_cnt").text.strip().isdigit()
         )
         user_count_text = driver.find_element(By.ID, "today_use_cnt").text.strip()
+        today_count = int(user_count_text)
 
         if DEBUG:
-            print(f"[DEBUG] 추출된 사용자 수 텍스트: '{user_count_text}'")
+            print(f"[DEBUG] 추출된 사용자 수 텍스트 (오늘): '{today_count}'")
 
-        return int(user_count_text)
+        now_kst = datetime.now(kst)
+        if now_kst.hour < 5:
+            # 어제 날짜로 대시보드 조회
+            yesterday = (now_kst - timedelta(days=1)).strftime("%Y.%m.%d")
+            driver.get(f"{BASE_URL}/dashboard?date={yesterday}")
+            time.sleep(1)
+            WebDriverWait(driver, 10).until(
+                lambda d: d.find_element(By.ID, "today_use_cnt").text.strip().isdigit()
+            )
+            y_text = driver.find_element(By.ID, "today_use_cnt").text.strip()
+            yesterday_count = int(y_text)
+            if DEBUG:
+                print(f"[DEBUG] 어제 사용자 수 텍스트: '{yesterday_count}'")
+            return today_count + yesterday_count
+
+        return today_count
 
     except Exception as e:
         if DEBUG:
