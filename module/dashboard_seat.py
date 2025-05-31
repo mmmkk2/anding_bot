@@ -575,7 +575,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
 """
 
     html += """
-    <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+    <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
     """
     html += render_table("자유석", free_rows)
     html += render_table("노트북석", laptop_rows)
