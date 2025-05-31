@@ -230,7 +230,8 @@ def check_seat_status(driver):
     # The above pagination and seat parsing logic has already processed all rows,
     # so we do not need to process again here.
 
-    total_assigned_free_seats = TOTAL_SEATS - len(fixed_set) - len(laptop_set)
+    total_assigned_free_seats = TOTAL_SEATS - len(fixed_set.union(laptop_set))
+    
     used_total_seats = used_free_seats + used_labtop_seats + used_fixed_seats
     # remaining_seats is simply the difference between total seats and used seats
     TOTAL_FREE_SEATS = total_assigned_free_seats
