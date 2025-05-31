@@ -127,6 +127,9 @@ def check_seat_status(driver):
                         continue
                     seat_type = cols[1].text.strip()
                     seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
+                    identifier = cols[3].text.strip()
+                    if not identifier:
+                        continue  # 이름/휴대폰 비어 있으면 무시
                     all_rows_data.append((seat_type, seat_number_text))
                 except Exception:
                     continue
@@ -175,8 +178,8 @@ def check_seat_status(driver):
             except Exception:
                 continue
 
-            if DEBUG:
-                print(f"[DEBUG] 좌석 유형 원본: '{seat_type}'")
+            # if DEBUG:
+                # print(f"[DEBUG] 좌석 유형 원본: '{seat_type}'")
 
             # Only log 자유석 (non-fixed, non-laptop) for all_seat_numbers
             if "개인석" in seat_type:
@@ -190,8 +193,8 @@ def check_seat_status(driver):
                         print(f"[DEBUG] 노트북석 사용됨: {seat_number}")
                 else:
                     used_free_seats += 1
-                    if DEBUG:
-                        print(f"[DEBUG] 자유석 사용됨: {seat_number}")
+                    # if DEBUG:
+                    #     print(f"[DEBUG] 자유석 사용됨: {seat_number}")
                     all_seat_numbers.append(seat_number)  # Only 자유석 tracked here
 
         if DEBUG:
@@ -237,13 +240,14 @@ def check_seat_status(driver):
 
     if remaining_seats <= DANGER_THRESHOLD:
         status_emoji = "🔴"
-        line_color = 'rgba(255, 99, 132, 1)'  # red
     elif remaining_seats <= WARNING_THRESHOLD:
         status_emoji = "🟡"
-        line_color = 'rgba(255, 206, 86, 1)'  # yellow
     else:
         status_emoji = "🟢"
-        line_color = 'rgba(75, 192, 192, 1)'  # green
+
+    # line_color = 'rgba(75, 192, 192, 1)'  # green
+    # line_color = 'rgba(255, 99, 132, 1)'  # red
+    # line_color = 'rgba(255, 206, 86, 1)'  # yellow
 
 
     # === 메시지 작성
@@ -293,17 +297,25 @@ def main_check_seat():
 
     driver = create_driver()
 
+    now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
     try:
         if login(driver):
-
+    
             today_user_count = get_today_user_count(driver)
             print(f"[DEBUG] 추출된 누적 사용자 수 텍스트: '{today_user_count}'")
-            
+
+            # ✅ 누적 이용자 수 저장
+            if today_user_count is not None:
+                cum_users_path = os.path.join(DASHBOARD_PATH, "cum_users_history.csv")
+                os.makedirs(os.path.dirname(cum_users_path), exist_ok=True)
+                with open(cum_users_path, "a", encoding="utf-8") as f:
+                    f.write(f"{now_str},{today_user_count}\n")
+                            
             seat_status_msg = check_seat_status(driver)
-            now_full_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
+            # Use the same now_str for the monitoring message
             loop_msg = (
                 f"\n\n🪑 좌석 모니터링 정상 동작 중\n"
-                f"⏰ 날짜 + 실행 시각: {now_full_str}"
+                f"⏰ 날짜 + 실행 시각: {now_str}"
             )
             full_msg = loop_msg + "\n\n" + seat_status_msg
             send_broadcast_and_update(full_msg, broadcast=False, category="seat")
@@ -326,8 +338,8 @@ def main_check_seat():
 
 def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
     history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
+    cum_users_path = os.path.join(DASHBOARD_PATH, "cum_users_history.csv")
 
-    history_rows = []
     # --- Daytime window calculation (KST 5:00 to next 5:00) ---
     now_kst = datetime.now(kst)
     if now_kst.hour < 5:
@@ -339,20 +351,17 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     min_ts = start_time.isoformat()
     max_ts = end_time.isoformat()
 
-    #cutoff_time = datetime.now(kst) - timedelta(hours=chart_timedelta)
-    cutoff_time = start_time
-
+    # --- 자유석 이력 ---
+    history_rows = []
     with open(history_path, "r", encoding="utf-8") as f:
         for line in reversed(f.readlines()):
             parts = line.strip().split(",")
             if len(parts) >= 2:
                 timestamp_obj = kst.localize(datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S"))
-                #if timestamp_obj >= cutoff_time:
                 if start_time <= timestamp_obj < end_time:
                     history_rows.insert(0, line)
                 else:
                     break
-                
     timestamps = []
     used_frees = []
     for line in history_rows:
@@ -363,17 +372,52 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             used_frees.append(int(parts[1]))
     point_colors = []
     for y in used_frees:
-        if total_free - y <= 5:
+        if total_free - y <= DANGER_THRESHOLD:
             point_colors.append('rgba(255, 99, 132, 1)')  # Red
-        elif total_free - y <= 7:
+        elif total_free - y <= WARNING_THRESHOLD:
             point_colors.append('rgba(255, 206, 86, 1)')  # Yellow
         else:
             point_colors.append('rgba(75, 192, 192, 0.1)')  # Light gray transparent for normal usage
 
-    lineColor = 'rgba(75, 192, 192, 1)'  # default green
     
     data_points = [{"x": t, "y": y} for t, y in zip(timestamps, used_frees)]
 
+    # --- 누적 이용자 수 이력 ---
+    cum_users_rows = []
+    cum_users_points = []
+    try:
+        with open(cum_users_path, "r", encoding="utf-8") as f:
+            for line in reversed(f.readlines()):
+                parts = line.strip().split(",")
+                if len(parts) >= 2:
+                    timestamp_obj = kst.localize(datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S"))
+                    if start_time <= timestamp_obj < end_time:
+                        cum_users_rows.insert(0, line)
+                    else:
+                        break
+        cum_timestamps = []
+        cum_user_counts = []
+        for line in cum_users_rows:
+            parts = line.strip().split(",")
+            if len(parts) >= 2:
+                timestamp_obj = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
+                cum_timestamps.append(timestamp_obj.strftime("%Y-%m-%dT%H:%M:%S"))
+                cum_user_counts.append(int(parts[1]))
+        cum_users_points = [{"x": t, "y": y} for t, y in zip(cum_timestamps, cum_user_counts)]
+    except Exception:
+        cum_users_points = []
+
+    # y1 axis min/max for 누적 이용자 수
+    if cum_users_points:
+        y_values = [pt["y"] for pt in cum_users_points]
+        y1_suggested_min = 0
+        y1_suggested_max = max(70, max(y_values) + 1)
+    
+
+    # --- 차트 스크립트 ---
+    lineColor = 'rgba(75, 192, 192, 1)'  # default green
+    cum_lineColor = 'rgba(153, 102, 255, 1)'
+    cum_point_color='rgba(153, 102, 255, 0.11)'
     chart_script = f"""
     <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns'></script>
@@ -382,14 +426,27 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         new Chart(ctx, {{
             type: 'line',
             data: {{
-                datasets: [{{
-                    label: '자유석 사용 수',
-                    data: {json.dumps(data_points)},
-                    borderColor: '{lineColor}',
-                    pointBackgroundColor: {json.dumps(point_colors)},
-                    pointRadius: window.innerWidth > 768 ? 2 : 4,
-                    tension: 0.1
-                }}]
+                datasets: [
+                    {{
+                        label: '자유석 이용자 수',
+                        data: {json.dumps(data_points)},
+                        borderColor: '{lineColor}',
+                        pointBackgroundColor: {json.dumps(point_colors)},
+                        pointRadius: window.innerWidth > 768 ? 2 : 4,
+                        borderWidth: 1,
+                        tension: 0.1,
+                        yAxisID: 'y'
+                    }},
+                    {{
+                        label: '누적 이용자 수',
+                        data: {json.dumps(cum_users_points)},
+                        borderColor: '{cum_lineColor}',
+                        pointBackgroundColor: '{cum_point_color}',
+                        borderWidth: 1,
+                        tension: 0.1,
+                        yAxisID: 'y1'
+                    }}
+                ]
             }},
             options: {{
                 responsive: true,
@@ -416,7 +473,22 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     }},
                     y: {{
                         beginAtZero: true,
-                        max: {total_free}
+                        max: {total_free},
+                        title: {{
+                            display: true,
+                            text: '자유석 이용자 수'
+                        }},                        
+                    }},
+                    y1: {{
+                        position: 'right',
+                        grid: {{ drawOnChartArea: false }},
+                        title: {{
+                            display: true,
+                            text: '누적 이용자 수'
+                        }},
+                        beginAtZero: true,
+                        suggestedMin: {y1_suggested_min},
+                        suggestedMax: {y1_suggested_max}
                     }}
                 }}
             }}
@@ -480,11 +552,11 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             @media (max-width: 480px) {{
                 body {{
                     /* max-height: 50vh; */
-                    min-height: 200px;
-                    max-height: 230px;
+                    min-height: 100px;
+                    max-height: 100px;
                 }}            
                 .box {{
-                    max-height: 110vh;  /* 화면 높이의 90%까지 확장 */
+                    max-height: 200vh;  /*  */
                 }}
             }}                
         </style>
