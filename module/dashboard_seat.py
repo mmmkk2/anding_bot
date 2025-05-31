@@ -573,7 +573,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             table {{
                 width: 100%;
                 border-collapse: collapse;
-                font-size: 0.8rem;
+                font-size: 0.7rem;
                 margin-top: 1rem;
             }}
             th, td {{
