@@ -350,7 +350,8 @@ def main_check_seat():
                 if 5 <= now_kst.hour < 6:
                     daily_count_path = os.path.join(DASHBOARD_PATH, "daily_count_history.csv")
                     os.makedirs(os.path.dirname(daily_count_path), exist_ok=True)
-                    today_date = now_kst.strftime("%Y-%m-%d")
+                    # 날짜가 오전 0시~5시 사이 실행 시 전날 날짜로 기록
+                    today_date = (now_kst - timedelta(days=1)).strftime("%Y-%m-%d") if now_kst.hour < 5 else now_kst.strftime("%Y-%m-%d")
                     already_written = False
                     if os.path.exists(daily_count_path):
                         with open(daily_count_path, "r", encoding="utf-8") as f:
