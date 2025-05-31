@@ -271,7 +271,8 @@ def check_seat_status(driver):
         used_laptop=used_labtop_seats,
         total_laptop=len(laptop_seat_numbers),
         remaining=remaining_seats,
-        status_emoji=status_emoji
+        status_emoji=status_emoji,
+        raw_rows=all_rows_data
     )
 
 
@@ -336,7 +337,7 @@ def main_check_seat():
 
 
 
-def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji):
+def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji, raw_rows=None):
     history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
     cum_users_path = os.path.join(DASHBOARD_PATH, "cum_users_history.csv")
 
@@ -498,22 +499,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
 
     now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
 
-    # --- (Optional) Table of recent seat data (example, showing last N rows) ---
-    raw_rows = ""
-    try:
-        with open(history_path, "r", encoding="utf-8") as f:
-            lines = f.readlines()
-        if lines:
-            recent = lines[-10:]
-            raw_rows = "<table style='margin:0.5rem auto;font-size:0.85rem;border-collapse:collapse;'><tr><th>시각</th><th>자유석</th></tr>"
-            for line in recent:
-                parts = line.strip().split(",")
-                if len(parts) >= 2:
-                    raw_rows += f"<tr><td>{parts[0]}</td><td>{parts[1]}</td></tr>"
-            raw_rows += "</table>"
-    except Exception:
-        raw_rows = ""
-
     html = f"""
     <!DOCTYPE html>
     <html lang="ko">
@@ -589,9 +574,23 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 {chart_script}
             </div>
 """
-    # Insert the table after the chart container
+    # Insert the raw_rows table before closing .box
     if raw_rows:
-        html += f"\n            {raw_rows}\n"
+        html += """
+    <div style="margin-top: 1rem;">
+        <table border="1" cellspacing="0" cellpadding="4" style="margin: 0 auto; font-size: 0.8rem; border-collapse: collapse;">
+            <thead>
+                <tr><th>구분</th><th>좌석번호</th></tr>
+            </thead>
+            <tbody>
+    """
+        for seat_type, seat_number_text in raw_rows:
+            html += f"<tr><td>{seat_type}</td><td>{seat_number_text}</td></tr>"
+        html += """
+            </tbody>
+        </table>
+    </div>
+    """
     html += """
         </div>
     </body>
