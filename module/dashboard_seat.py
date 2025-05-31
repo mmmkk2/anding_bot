@@ -618,6 +618,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 word-break: break-word;
                 white-space: normal; 
                 min-width: 50px; 
+                max-width: 60px;
             }}            
             tr:nth-child(even) {{
                 background-color: #f8f9fa;
