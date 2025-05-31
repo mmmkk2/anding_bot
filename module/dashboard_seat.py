@@ -620,10 +620,11 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             except ValueError:
                 continue
 
-            if seat_number_int in LAPTOP_SEAT_NUMBERS:
-                laptop_rows.append((seat_type, seat_number, name))
-            elif seat_number_int not in FIXED_SEAT_NUMBERS:
+            if seat_number_int not in FIXED_SEAT_NUMBERS:
                 free_rows.append((seat_type, seat_number, name))
+
+            elif seat_number_int in LAPTOP_SEAT_NUMBERS:
+                laptop_rows.append((seat_type, seat_number, name))
 
         def render_table(title, rows):
             html_table = f"""
