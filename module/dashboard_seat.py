@@ -603,6 +603,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             }}                
         </style>
         <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/sorttable/2.1.2/sorttable.min.js"></script>
     </head>
     <body>
         <div class="box">
@@ -646,7 +647,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             html_table = f"""
             <div class="table-box">
                 <h2>{title}</h2>
-                <table class="sortable">
+                <table class="sortable" data-sortable>
                     <thead>
                         <tr><th>구분</th><th>좌석번호</th><th>이름</th><th>상품</th><th>시작시간</th></tr>
                     </thead>
@@ -671,6 +672,13 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         """
     html += """
         </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('table.sortable').forEach(function(table) {
+          table.classList.add('sortable');
+        });
+      });
+    </script>
     </body>
     </html>
     """
