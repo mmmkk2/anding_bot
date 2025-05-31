@@ -284,7 +284,7 @@ def update_dashboard(category, msg, append=False):
         f.write(msg + "\n\n")
 
 def send_broadcast_and_update(msg, broadcast=True, category="seat"):
-    send_telegram_and_log(msg, broadcast=True)
+    send_telegram_and_log(msg, broadcast=broadcast)
     update_dashboard(category, msg)
 
 
