@@ -654,7 +654,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     <tbody>
             """
             for idx, (seat_type, seat_number, name, product, start_time) in enumerate((rows), 1):
-                html_table += f"<tr><td>{idx}</td><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td>{start_time.replace('.', '-')}</td></tr>"
+                html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td>{start_time.replace('.', '-')}</td></tr>"
             html_table += """
                     </tbody>
                 </table>
