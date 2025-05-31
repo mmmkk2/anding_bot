@@ -614,8 +614,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     if raw_rows:
         # Group by seat type, ensuring seats marked as both 노트북석 and 고정석 are grouped under 노트북석 only.
         laptop_rows = [row for row in raw_rows if '노트북석' in row[0]]
-        fixed_rows = [row for row in raw_rows if '고정석' in row[0] and row not in laptop_rows]
-        free_rows = [row for row in raw_rows if row not in fixed_rows and row not in laptop_rows]
+        free_rows = [row for row in raw_rows if row not in laptop_rows]
 
         def render_table(title, rows):
             html_table = f"""
@@ -637,11 +636,10 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             return html_table
 
         html += """
-        <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+        <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
         """
         html += render_table("자유석", free_rows)
         html += render_table("노트북석", laptop_rows)
-        html += render_table("고정석", fixed_rows)
         html += """
         </div>
         """
