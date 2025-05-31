@@ -591,7 +591,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             .table-box {{
                 flex: 1;
                 min-width: 280px;
-                max-height: 180px;
+                max-height: 230px;
                 overflow-y: auto;
                 display: block;
             }}
