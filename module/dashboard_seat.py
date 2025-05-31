@@ -587,6 +587,9 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             tr:nth-child(even) {{
                 background-color: #f8f9fa;
             }}
+            table.sortable th {{
+                cursor: pointer;
+            }}
             @media (max-width: 480px) {{
                 body {{
                     /* max-height: 50vh; */
