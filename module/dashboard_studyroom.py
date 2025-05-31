@@ -175,14 +175,28 @@ def check_studyroom(driver):
 
     reservations_2.sort(key=lambda x: x['time'].split('~')[0].strip())
     reservations_4.sort(key=lambda x: x['time'].split('~')[0].strip())
-    
+
+    # --- 추가: 현재 사용중 여부 계산 ---
+    def is_currently_in_use(reservations):
+        now = datetime.now(kst)
+        for r in reservations:
+            try:
+                start_str, end_str = r['time'].split("~")
+                start_dt = datetime.strptime(start_str.strip(), "%Y.%m.%d %H:%M")
+                end_dt = datetime.strptime(end_str.strip(), "%Y.%m.%d %H:%M")
+                if start_dt <= now <= end_dt:
+                    return True
+            except:
+                continue
+        return False
+
+    using_2 = is_currently_in_use(reservations_2)
+    using_4 = is_currently_in_use(reservations_4)
 
     html_rows_2 = "\n".join(
         f"<tr><td>{r['time']}</td><td>{r['name']}</td></tr>"
         for r in reservations_2
     )
-    # Sort 4인실 예약 by start time before generating HTML rows
-    
     html_rows_4 = "\n".join(
         f"<tr><td>{r['time']}</td><td>{r['name']}</td></tr>"
         for r in reservations_4
@@ -204,8 +218,8 @@ def check_studyroom(driver):
         <div class="box">
             <div class="updated">📅 기준 날짜: <b>{today_str}</b></div>
             <div class="summary">
-                2인실 예약: {count_2}건<br>
-                4인실 예약: {count_4}건
+                [2인실] 예약: {count_2}건 {'🟢 사용중' if using_2 else '⚪ 비어있음'}<br>
+                [4인실] 예약: {count_4}건 {'🟢 사용중' if using_4 else '⚪ 비어있음'}
             </div>
             <div class="updated">업데이트 시각: {now_str}</div>
             <div class="tables">
