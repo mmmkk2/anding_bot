@@ -613,7 +613,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     # Insert the grouped and styled seat table before closing .box
     if raw_rows:
         # Group by seat type, ensuring seats marked as both 노트북석 and 고정석 are grouped under 노트북석 only.
-        laptop_rows = [row for row in raw_rows if '노트북석' in row[0]]
+        laptop_rows = [row for row in raw_rows if '노트북석' in row[0] or ('고정석' in row[0] and '노트북석' in row[0])]
         free_rows = [row for row in raw_rows if row not in laptop_rows]
 
         def render_table(title, rows):
