@@ -75,10 +75,10 @@ th {
 }
 .time {
     font-size: 0.7rem;
-    padding: 0.2rem;
+    padding: 0.rem;
     word-break: break-word;
     white-space: normal; 
-    min-width: 550px; 
+    min-width: 60px; 
     max-width: 70px;
 }            
 tr:nth-child(even) {
