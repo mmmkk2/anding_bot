@@ -284,29 +284,7 @@ def update_dashboard(category, msg, append=False):
         f.write(msg + "\n\n")
 
 def send_broadcast_and_update(msg, broadcast=True, category="seat"):
-    if broadcast:
-        send_telegram_and_log(msg, broadcast=True)
-    else:
-        print(msg)
+    send_telegram_and_log(msg, broadcast=True)
     update_dashboard(category, msg)
-
-
-# import os
-# import pickle
-
-# FLAGS_FILE = "log/broadcast_flags.pkl"
-
-# def load_flags():
-#     if os.path.exists(FLAGS_FILE):
-#         with open(FLAGS_FILE, "rb") as f:
-#             data = pickle.load(f)
-#     else:
-#         data = {"date": "", "warn_6": False, "warn_4": False, "recovery": False, "fixed_missing": False}
-#     return data
-
-# def save_flags(flags):
-#     os.makedirs("log", exist_ok=True)
-#     with open(FLAGS_FILE, "wb") as f:
-#         pickle.dump(flags, f)
 
 
