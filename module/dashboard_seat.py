@@ -182,34 +182,37 @@ def check_seat_status(driver):
                     continue
             attempts += 1
 
-        seat_debug_log = []
-        for seat_type, seat_number_text, *_ in all_rows_data:
+
+        # Insert the grouped and styled seat table before closing .box
+        if all_rows_data:
+            laptop_rows = []
+            free_rows = []
+
+            for seat_type, seat_number, name, product, start_time in all_rows_data:
+                try:
+                    seat_number_int = int(seat_number)
+                except ValueError:
+                    continue
+
+                if seat_number_int in LAPTOP_SEAT_NUMBERS:
+                    seat_type = "노트북석"
+                    laptop_rows.append((seat_type, seat_number, name, product, start_time))
+                elif seat_number_int not in FIXED_SEAT_NUMBERS:
+                    free_rows.append((seat_type, seat_number, name, product, start_time))
+
+
+        # --- Sort rows by 시작시간 (start_time) ---
+        import datetime as dt
+        def sort_by_start_time(row):
             try:
-                seat_number = int(seat_number_text)
-            except Exception:
-                continue
+                return dt.datetime.strptime(row[4], '%Y.%m.%d %H:%M')
+            except:
+                return dt.datetime.min
+        free_rows.sort(key=sort_by_start_time, reverse=True)
+        laptop_rows.sort(key=sort_by_start_time, reverse=True)
 
-            # Only log 자유석 (non-fixed, non-laptop) for all_seat_numbers
-            if "개인석" in seat_type:
-                if seat_number in laptop_set:
-                    used_labtop_seats += 1
-                    if DEBUG:
-                        print(f"[DEBUG] 노트북석 사용됨: {seat_number}")
-
-                elif seat_number in fixed_set:
-                    used_fixed_seats += 1
-                    if DEBUG:
-                        print(f"[DEBUG] 고정석 사용됨: {seat_number}")
-
-                else:
-                    used_free_seats += 1
-                    all_seat_numbers.append(seat_number)  # Only 자유석 tracked here
-
-        if DEBUG:
-            print(f"[DEBUG] 전체 좌석번호(자유석): {all_seat_numbers}")
-            print(f"[DEBUG] 고정석 번호(set): {sorted(fixed_set)}")
-            print(f"[DEBUG] 노트북석 번호(set): {sorted(laptop_set)}")
-            print(f"[DEBUG] 제외된 좌석(set): {sorted(excluded_seats)}")
+        used_labtop_seats = len(laptop_rows)
+        used_free_seats = len(free_rows)
 
         total_used = used_free_seats + used_labtop_seats + used_fixed_seats
         if total_used > 0 or retry_count == max_retries:
@@ -280,8 +283,8 @@ def check_seat_status(driver):
         used_laptop=used_labtop_seats,
         total_laptop=len(laptop_seat_numbers),
         remaining=remaining_seats,
-        status_emoji=status_emoji,
-        raw_rows=all_rows_data
+        free_rows=free_rows,
+        laptop_rows=laptop_rows
     )
 
 
@@ -292,7 +295,28 @@ def check_seat_status(driver):
         send_broadcast_and_update(f"[주의] ⚠️ 자유석 {WARNING_THRESHOLD}석 이하 - 이용 주의 필요", broadcast=True, category="seat")
 
     # === 최종 CSV 로그
-    return msg
+    return free_rows, laptop_rows, msg
+
+
+def render_table(title, rows):
+    html_table = f"""
+    <div class="table-box">
+        <h2>{title}</h2>
+        <table class="sortable" data-sortable>
+            <thead>
+                <tr><th>#</th><th>구분</th><th>좌석번호</th><th>이름</th><th>상품</th><th>시작시간</th></tr>
+            </thead>
+            <tbody>
+    """
+    for idx, (seat_type, seat_number, name, product, start_time) in enumerate((rows), 1):
+        html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td>{start_time.replace('.', '-')}</td></tr>"
+    html_table += """
+            </tbody>
+        </table>
+    </div>
+    """
+    return html_table
+
 
 # === 메인 실행 ===
 def main_check_seat():
@@ -321,7 +345,7 @@ def main_check_seat():
                 with open(cum_users_path, "a", encoding="utf-8") as f:
                     f.write(f"{now_str},{today_user_count}\n")
                             
-            seat_status_msg = check_seat_status(driver)
+            free_rows, laptop_rows, seat_status_msg  = check_seat_status(driver)
             # Use the same now_str for the monitoring message
             loop_msg = (
                 f"\n\n🪑 좌석 모니터링 정상 동작 중\n"
@@ -345,8 +369,7 @@ def main_check_seat():
         driver.quit()
 
 
-
-def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, status_emoji, raw_rows=None):
+def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, free_rows=None, laptop_rows=None):
     history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
     cum_users_path = os.path.join(DASHBOARD_PATH, "cum_users_history.csv")
 
@@ -619,63 +642,17 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 {chart_script}
             </div>
 """
-    # Insert the grouped and styled seat table before closing .box
-    if raw_rows:
-        laptop_rows = []
-        free_rows = []
 
-        for seat_type, seat_number, name, product, start_time in raw_rows:
-            try:
-                seat_number_int = int(seat_number)
-            except ValueError:
-                continue
-
-            if seat_number_int in LAPTOP_SEAT_NUMBERS:
-                seat_type = "노트북석"
-                laptop_rows.append((seat_type, seat_number, name, product, start_time))
-            elif seat_number_int not in FIXED_SEAT_NUMBERS:
-                free_rows.append((seat_type, seat_number, name, product, start_time))
-
-
-        # --- Sort rows by 시작시간 (start_time) ---
-        import datetime as dt
-        def sort_by_start_time(row):
-            try:
-                return dt.datetime.strptime(row[4], '%Y.%m.%d %H:%M')
-            except:
-                return dt.datetime.min
-        free_rows.sort(key=sort_by_start_time, reverse=True)
-        laptop_rows.sort(key=sort_by_start_time, reverse=True)
-
-        def render_table(title, rows):
-            html_table = f"""
-            <div class="table-box">
-                <h2>{title}</h2>
-                <table class="sortable" data-sortable>
-                    <thead>
-                        <tr><th>#</th><th>구분</th><th>좌석번호</th><th>이름</th><th>상품</th><th>시작시간</th></tr>
-                    </thead>
-                    <tbody>
-            """
-            for idx, (seat_type, seat_number, name, product, start_time) in enumerate((rows), 1):
-                html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td>{start_time.replace('.', '-')}</td></tr>"
-            html_table += """
-                    </tbody>
-                </table>
-            </div>
-            """
-            return html_table
-
-        html += """
-      <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
-        """
-        html += render_table("자유석", free_rows)
-        html += render_table("노트북석", laptop_rows)
-        html += """
-        </div>
-        """
     html += """
-        </div>
+    <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+    """
+    html += render_table("자유석", free_rows)
+    html += render_table("노트북석", laptop_rows)
+    html += """
+    </div>
+    """
+    html += """
+    </div>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('table.sortable').forEach(function(table) {
