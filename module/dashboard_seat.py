@@ -549,7 +549,38 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 font-size: 0.8rem;
                 color: #888;
                 margin-top: 1rem;
-            }}          
+            }}
+            .tables {{
+                display: flex;
+                justify-content: space-around;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }}
+            .table-box {{
+                flex: 1;
+                min-width: 280px;
+            }}
+            .table-box h2 {{
+                font-size: 1rem;
+                margin: 0.5rem 0;
+            }}
+            table {{
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.8rem;
+                margin-top: 1rem;
+            }}
+            th, td {{
+                border: 1px solid #dee2e6;
+                padding: 0.2rem;
+            }}
+            th {{
+                background-color: #6c757d;
+                color: white;
+            }}
+            tr:nth-child(even) {{
+                background-color: #f8f9fa;
+            }}
             @media (max-width: 480px) {{
                 body {{
                     /* max-height: 50vh; */
@@ -574,23 +605,41 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 {chart_script}
             </div>
 """
-    # Insert the raw_rows table before closing .box
+    # Insert the grouped and styled seat table before closing .box
     if raw_rows:
+        # Group by seat type
+        fixed_rows = [row for row in raw_rows if '고정석' in row[0]]
+        laptop_rows = [row for row in raw_rows if '노트북석' in row[0]]
+        free_rows = [row for row in raw_rows if row[0] not in ['고정석', '노트북석']]
+
+        def render_table(title, rows):
+            html_table = f"""
+            <div class="table-box">
+                <h2>{title}</h2>
+                <table>
+                    <thead>
+                        <tr><th>구분</th><th>좌석번호</th></tr>
+                    </thead>
+                    <tbody>
+            """
+            for seat_type, seat_number in rows:
+                html_table += f"<tr><td>{seat_type}</td><td>{seat_number}</td></tr>"
+            html_table += """
+                    </tbody>
+                </table>
+            </div>
+            """
+            return html_table
+
         html += """
-    <div style="margin-top: 1rem;">
-        <table border="1" cellspacing="0" cellpadding="4" style="margin: 0 auto; font-size: 0.8rem; border-collapse: collapse;">
-            <thead>
-                <tr><th>구분</th><th>좌석번호</th></tr>
-            </thead>
-            <tbody>
-    """
-        for seat_type, seat_number_text in raw_rows:
-            html += f"<tr><td>{seat_type}</td><td>{seat_number_text}</td></tr>"
+        <div class="tables" style="margin-top: 1rem;">
+        """
+        html += render_table("자유석", free_rows)
+        html += render_table("노트북석", laptop_rows)
+        html += render_table("고정석", fixed_rows)
         html += """
-            </tbody>
-        </table>
-    </div>
-    """
+        </div>
+        """
     html += """
         </div>
     </body>
