@@ -78,7 +78,7 @@ th {
     padding: 0.2rem;
     word-break: break-word;
     white-space: normal; 
-    min-width: 50px; 
+    min-width: 550px; 
     max-width: 70px;
 }            
 tr:nth-child(even) {
