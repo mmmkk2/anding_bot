@@ -628,12 +628,12 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 laptop_rows.append((seat_type, seat_number, name, product, start_time))
 
         # --- Sort rows by 시작시간 (start_time) ---
-        from datetime import datetime
+        import datetime as dt
         def sort_by_start_time(row):
             try:
-                return datetime.strptime(row[4], '%Y.%m.%d %H:%M')
+                return dt.datetime.strptime(row[4], '%Y.%m.%d %H:%M')
             except:
-                return datetime.min
+                return dt.datetime.min
         free_rows.sort(key=sort_by_start_time)
         laptop_rows.sort(key=sort_by_start_time)
 
