@@ -64,12 +64,15 @@ table {
 }
 th, td {
     border: 1px solid #dee2e6;
-    padding: 0.2rem;
+    padding: 0.4rem;
+    text-align: center;
+    background-color: white;
 }
 th {
     background-color: #6c757d;
     color: white;
-}          
+    font-weight: bold;
+}
 .time {
     font-size: 0.7rem;
     padding: 0.4rem;
