@@ -627,6 +627,16 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             elif seat_number_int in LAPTOP_SEAT_NUMBERS:
                 laptop_rows.append((seat_type, seat_number, name, product, start_time))
 
+        # --- Sort rows by 시작시간 (start_time) ---
+        from datetime import datetime
+        def sort_by_start_time(row):
+            try:
+                return datetime.strptime(row[4], '%Y.%m.%d %H:%M')
+            except:
+                return datetime.min
+        free_rows.sort(key=sort_by_start_time)
+        laptop_rows.sort(key=sort_by_start_time)
+
         def render_table(title, rows):
             html_table = f"""
             <div class="table-box">
