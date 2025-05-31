@@ -123,13 +123,15 @@ def check_seat_status(driver):
             for row in page_rows:
                 try:
                     cols = row.find_elements(By.TAG_NAME, "td")
+
+                    print(cols)
                     if len(cols) < 3:
                         continue
                     seat_type = cols[1].text.strip()
                     seat_number_text = cols[2].text.strip().replace("\uac1c", "").replace("\ubc88", "").strip()
-                    identifier = cols[3].text.strip()
+                    identifier = cols[4].text.strip()  # 이름 추출
                     if not identifier:
-                        continue  # 이름/휴대폰 비어 있으면 무시
+                        continue  # 이름 비어 있으면 무시
                     all_rows_data.append((seat_type, seat_number_text, identifier))
                 except Exception:
                     continue
@@ -635,7 +637,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             return html_table
 
         html += """
-        <div class="tables" style="margin-top: 1rem;">
+        <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
         """
         html += render_table("자유석", free_rows)
         html += render_table("노트북석", laptop_rows)
