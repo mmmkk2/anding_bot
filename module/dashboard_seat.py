@@ -601,6 +601,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 }}
             }}                
         </style>
+        <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
     </head>
     <body>
         <div class="box">
@@ -651,11 +652,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     <tbody>
             """
             for seat_type, seat_number, name, product, start_time in rows:
-                try:
-                    sort_key = dt.datetime.strptime(start_time, "%Y.%m.%d %H:%M").isoformat()
-                except:
-                    sort_key = "0000-00-00T00:00"
-                html_table += f"<tr><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td data-sort='{sort_key}'>{start_time}</td></tr>"
+                html_table += f"<tr><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td>{start_time.replace('.', '-')}</td></tr>"
             html_table += """
                     </tbody>
                 </table>
@@ -673,7 +670,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         """
     html += """
         </div>
-    <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
     </body>
     </html>
     """
