@@ -631,8 +631,8 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 continue
 
             if seat_number_int in LAPTOP_SEAT_NUMBERS:
+                seat_type = "노트북석"
                 laptop_rows.append((seat_type, seat_number, name, product, start_time))
-            
             elif seat_number_int not in FIXED_SEAT_NUMBERS:
                 free_rows.append((seat_type, seat_number, name, product, start_time))
 
