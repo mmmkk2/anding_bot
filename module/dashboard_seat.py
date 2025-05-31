@@ -308,7 +308,7 @@ def render_table(title, rows):
             </thead>
             <tbody>
     """
-    for idx, (seat_type, seat_number, name, product, start_time) in enumerate((rows), 1):
+    for idx, (seat_type, seat_number, name, product, start_time) in enumerate(rows, 1):
         html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td>{start_time.replace('.', '-')}</td></tr>"
     html_table += """
             </tbody>
@@ -591,6 +591,9 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             .table-box {{
                 flex: 1;
                 min-width: 280px;
+                max-height: 180px;
+                overflow-y: auto;
+                display: block;
             }}
             .table-box h2 {{
                 font-size: 1rem;
