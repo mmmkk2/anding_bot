@@ -75,9 +75,9 @@ th {
 }
 .time {
     font-size: 0.7rem;
-    padding: 0.rem;
-    word-break: break-word;
-    white-space: normal; 
+    /* padding: 0.4rem; */
+    /* word-break: break-word;
+    white-space: normal;  */
     min-width: 70px; 
     max-width: 70px;
 }            
