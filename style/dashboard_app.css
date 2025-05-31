@@ -1,0 +1,71 @@
+
+body {
+    font-family: 'Apple SD Gothic Neo', Arial, sans-serif;
+    background: #f1f3f5;
+    padding: 2rem;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+.box {
+    max-width: 650px;
+    width: 100%;
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.toggle-section {
+    margin-bottom: 2rem;
+}
+.summary-header {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    text-align: left;
+}
+.status {
+    font-size: 1.2rem;
+    margin-left: 0.3rem;
+}
+.updated {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 0.2rem;
+}
+.toggle-button {
+    display: block;
+    width: 100%;
+    padding: 0.6rem;
+    background: #adb5bd;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-align: left;
+    margin-top: 0.5rem;
+}
+.content {
+    display: none;
+    margin-top: 1rem;
+}
+iframe {
+    width: 100%;
+    min-height: 600px;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+@media (max-width: 480px) {
+    iframe {
+    min-height: 420px;  /* 또는 필요시 더 작게 */
+    }
+    body {
+    padding: 1rem;
+    }
+    .box {
+    padding: 1rem;
+    }
+}
+
+

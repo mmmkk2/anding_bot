@@ -212,7 +212,7 @@ def check_studyroom(driver):
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>스터디룸 예약 현황</title>
         <meta http-equiv="refresh" content="60">
-        <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_studyroom_style.css">
+        <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_studyroom.css">
     </head>
     <body>
         <div class="box">

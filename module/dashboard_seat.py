@@ -557,7 +557,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <title>좌석 현황</title>
         <meta http-equiv="refresh" content="60">
-        <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_seat_style.css">
+        <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_seat.css">
         <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/sorttable/2.1.2/sorttable.min.js"></script>
     </head>
