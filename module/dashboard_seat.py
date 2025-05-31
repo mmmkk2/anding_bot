@@ -304,12 +304,12 @@ def render_table(title, rows):
         <h2>{title}</h2>
         <table class="sortable" data-sortable>
             <thead>
-                <tr><th>#</th><th>구분</th><th>좌석번호</th><th>이름</th><th>상품</th><th>시작시간</th></tr>
+                <tr><th>#</th><th>좌석번호</th><th>이름</th><th>상품</th><th>시작시간</th></tr>
             </thead>
             <tbody>
     """
     for idx, (seat_type, seat_number, name, product, start_time) in enumerate(rows, 1):
-        html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td class='time'>{start_time.replace('.', '-')}</td></tr>"
+        html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td class='time'>{start_time.replace('.', '-')}</td></tr>"
     html_table += """
             </tbody>
         </table>
