@@ -640,8 +640,8 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 return dt.datetime.strptime(row[4], '%Y.%m.%d %H:%M')
             except:
                 return dt.datetime.min
-        free_rows.sort(key=sort_by_start_time)
-        laptop_rows.sort(key=sort_by_start_time)
+        free_rows.sort(key=sort_by_start_time, reverse=True)
+        laptop_rows.sort(key=sort_by_start_time, reverse=True)
 
         def render_table(title, rows):
             html_table = f"""
@@ -653,8 +653,8 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     </thead>
                     <tbody>
             """
-            for idx, (seat_type, seat_number, name, product, start_time) in enumerate(rows, 1):
-                html_table += f"<tr><td>{idx}</td><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td>{start_time.replace('.', '-')}</td></tr>"
+            for idx, (seat_type, seat_number, name, product, start_time) in enumerate(reversed(rows), 1):
+                html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td>{start_time.replace('.', '-')}</td></tr>"
             html_table += """
                     </tbody>
                 </table>
