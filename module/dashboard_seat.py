@@ -344,6 +344,23 @@ def main_check_seat():
                 os.makedirs(os.path.dirname(cum_users_path), exist_ok=True)
                 with open(cum_users_path, "a", encoding="utf-8") as f:
                     f.write(f"{now_str},{today_user_count}\n")
+
+                # ✅ 일일 누적 이용자 수 저장 (05시대에만, 하루 1회만 저장)
+                now_kst = datetime.now(kst)
+                if 5 <= now_kst.hour < 6:
+                    daily_count_path = os.path.join(DASHBOARD_PATH, "daily_count_history.csv")
+                    os.makedirs(os.path.dirname(daily_count_path), exist_ok=True)
+                    today_date = now_kst.strftime("%Y-%m-%d")
+                    already_written = False
+                    if os.path.exists(daily_count_path):
+                        with open(daily_count_path, "r", encoding="utf-8") as f:
+                            for line in f:
+                                if line.startswith(today_date):
+                                    already_written = True
+                                    break
+                    if not already_written:
+                        with open(daily_count_path, "a", encoding="utf-8") as f:
+                            f.write(f"{today_date},{today_user_count}\n")
                             
             free_rows, laptop_rows, seat_status_msg  = check_seat_status(driver)
             # Use the same now_str for the monitoring message
