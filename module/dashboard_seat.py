@@ -304,7 +304,7 @@ def render_table(title, rows):
         <h2>{title}</h2>
         <table class="sortable" data-sortable>
             <thead>
-                <tr><th>#</th><th>좌석<br>번호</th><th>이름</th><th>상품</th><th>시작시간</th></tr>
+                <tr><th>#</th><th>Seat#</th><th>이름</th><th>상품</th><th>시작시간</th></tr>
             </thead>
             <tbody>
     """
