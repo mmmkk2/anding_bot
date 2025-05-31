@@ -124,7 +124,6 @@ def check_seat_status(driver):
                 try:
                     cols = row.find_elements(By.TAG_NAME, "td")
 
-                    print(cols)
                     if len(cols) < 3:
                         continue
                     seat_type = cols[1].text.strip()
@@ -612,9 +611,19 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
 """
     # Insert the grouped and styled seat table before closing .box
     if raw_rows:
-        # Group by seat type, ensuring seats marked as both 노트북석 and 고정석 are grouped under 노트북석 only.
-        laptop_rows = [row for row in raw_rows if '노트북석' in row[0] or ('고정석' in row[0] and '노트북석' in row[0])]
-        free_rows = [row for row in raw_rows if row not in laptop_rows]
+        laptop_rows = []
+        free_rows = []
+
+        for seat_type, seat_number, name in raw_rows:
+            try:
+                seat_number_int = int(seat_number)
+            except ValueError:
+                continue
+
+            if seat_number_int in LAPTOP_SEAT_NUMBERS:
+                laptop_rows.append((seat_type, seat_number, name))
+            elif seat_number_int not in FIXED_SEAT_NUMBERS:
+                free_rows.append((seat_type, seat_number, name))
 
         def render_table(title, rows):
             html_table = f"""
