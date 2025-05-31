@@ -604,6 +604,9 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 border-collapse: collapse;
                 font-size: 0.7rem;
                 margin-top: 1rem;
+                padding: 0.4rem;
+                word-break: break-word;
+                white-space: normal; 
             }}
             th, td {{
                 border: 1px solid #dee2e6;
@@ -612,7 +615,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             th {{
                 background-color: #6c757d;
                 color: white;
-            }}
+            }}          
             tr:nth-child(even) {{
                 background-color: #f8f9fa;
             }}
