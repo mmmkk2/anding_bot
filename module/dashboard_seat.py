@@ -209,16 +209,16 @@ def check_seat_status(driver):
             except ValueError:
                 continue
 
+            # Priority: 노트북석 > 고정석 > 자유석
             if seat_number_int in LAPTOP_SEAT_NUMBERS:
                 seat_type = "노트북석"
                 laptop_rows.append((seat_type, seat_number, name, product, start_time))
-
-            elif seat_number_int not in FIXED_SEAT_NUMBERS:
-                free_rows.append((seat_type, seat_number, name, product, start_time))
-
+            elif seat_number_int in FIXED_SEAT_NUMBERS:
+                seat_type = "고정석"
+                fixed_rows.append((seat_type, seat_number, name, product, start_time))
             else:
-                # Fetch actual entrance time for fixed seat
-                fixed_rows_data.append((seat_type, seat_number, name, product, start_time))
+                seat_type = "자유석"
+                free_rows.append((seat_type, seat_number, name, product, start_time))
 
 
     # --- Sort rows by 시작시간 (start_time) ---
