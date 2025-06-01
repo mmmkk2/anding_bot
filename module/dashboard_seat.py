@@ -69,6 +69,8 @@ kst = pytz.timezone("Asia/Seoul")
 # URL
 BASE_URL = os.getenv("BASE_URL")
 SEAT_URL = f"{BASE_URL}/use/seatUse"
+FIXED_URL =  f"{BASE_URL}/use/seatAccess"
+
 
 # TOTAL 
 TOTAL_SEATS = int(os.getenv("TOTAL_SEATS", 5))
@@ -184,6 +186,54 @@ def check_seat_status(driver):
             free_rows = []
             fixed_rows = []
 
+            def get_fixed_seat_start_time(name):
+                """
+                Fetch the actual entrance time for a fixed seat user by scraping the seat access page.
+                Returns the time string in the same format as the original start_time, or None if not found.
+                """
+                from selenium.webdriver.common.by import By
+                from selenium.webdriver.support.ui import WebDriverWait
+                from selenium.webdriver.support import expected_conditions as EC
+                import time
+                # Use the same driver (assumed logged in)
+                try:
+                    # Navigate to the fixed seat access page
+                    driver.get(FIXED_URL)
+                    # Wait for table to load
+                    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
+                    time.sleep(0.8)
+                    # The table may be paginated; search all rows on all pages
+                    while True:
+                        rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
+                        for row in rows:
+                            try:
+                                tds = row.find_elements(By.TAG_NAME, "td")
+                                if len(tds) < 6:
+                                    continue
+                                row_name = tds[2].text.strip()
+                                if row_name == name:
+                                    # Entrance time is typically in the 5th or 6th column (check and adjust if needed)
+                                    # Let's try 5th (index 4) first, fallback to 6th (index 5)
+                                    real_time = tds[4].text.strip() or tds[5].text.strip()
+                                    return real_time
+                            except Exception:
+                                continue
+                        # Check for next page
+                        try:
+                            next_li = driver.find_element(By.CSS_SELECTOR, '.paginate_button.next')
+                            next_class = next_li.get_attribute("class")
+                            if "disabled" in next_class:
+                                break
+                            next_btn = next_li.find_element(By.TAG_NAME, "a")
+                            next_btn.click()
+                            time.sleep(1.0)
+                        except Exception:
+                            break
+                except Exception as e:
+                    if DEBUG:
+                        print(f"[DEBUG] get_fixed_seat_start_time error for '{name}': {e}")
+                return None
+
             for seat_type, seat_number, name, product, start_time in all_rows_data:
                 try:
                     seat_number_int = int(seat_number)
@@ -191,13 +241,15 @@ def check_seat_status(driver):
                     continue
 
                 if seat_number_int in LAPTOP_SEAT_NUMBERS:
-                    seat_type = "노트북석"
+                    # seat_type = "노트북석"
                     laptop_rows.append((seat_type, seat_number, name, product, start_time))
                 elif seat_number_int not in FIXED_SEAT_NUMBERS:
                     free_rows.append((seat_type, seat_number, name, product, start_time))
                 else:
-                    fixed_rows.append((seat_type, seat_number, name, product, start_time))
-
+                    # Fetch actual entrance time for fixed seat
+                    real_start_time = get_fixed_seat_start_time(name) or start_time
+                    fixed_rows.append((seat_type, seat_number, name, product, real_start_time))
+    
 
         # --- Sort rows by 시작시간 (start_time) ---
         import datetime as dt
