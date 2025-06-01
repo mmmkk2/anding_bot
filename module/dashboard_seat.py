@@ -77,16 +77,15 @@ TOTAL_SEATS = int(os.getenv("TOTAL_SEATS", 5))
 
 
 # === 좌석 상태 체크 ===
-def check_seat_status(driver):
+def extract_seat_data(driver, SEAT_URL, seat_type_filter):
+    """
+    Extracts all seat data from the seat table with pagination and returns a list of tuples:
+    (seat_type, seat_number_text, identifier, product, start_time)
+    """
     retry_count = 0
     max_retries = 2
-
+    all_rows_data = []
     while retry_count <= max_retries:
-        used_free_seats = 0
-        used_labtop_seats = 0
-        used_fixed_seats = 0
-        all_seat_numbers = []
-
         # Cast to sets for faster lookup and deduplication
         fixed_set = set(FIXED_SEAT_NUMBERS)
         laptop_set = set(LAPTOP_SEAT_NUMBERS)
@@ -120,20 +119,21 @@ def check_seat_status(driver):
             for row in page_rows:
                 try:
                     cols = row.find_elements(By.TAG_NAME, "td")
+                    # bool 타입 요소 제거
+                    cols = [col for col in cols if not isinstance(col, bool)]
 
                     if len(cols) < 7:
                         continue
-
-                    seat_type = cols[1].text.strip()
-                    seat_number_text = cols[2].text.strip().replace("개", "").replace("번", "").strip()
-                    identifier = cols[4].text.strip()  # 이름
-                    product = cols[5].text.strip()
-                    start_time = cols[6].text.strip()
+                    seat_type = cols[0].text.strip()
+                    seat_number_text = cols[1].text.strip().replace("개", "").replace("번", "").strip()
+                    identifier = cols[3].text.strip()  # 이름
+                    product = cols[4].text.strip()
+                    start_time = cols[5].text.strip()
 
                     if not identifier:
                         continue
-
-                    all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
+                    if seat_type in seat_type_filter:
+                        all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
                 except Exception:
                     continue
             try:
@@ -178,100 +178,66 @@ def check_seat_status(driver):
                 except Exception:
                     continue
             attempts += 1
-
-
-        # Insert the grouped and styled seat table before closing .box
-        if all_rows_data:
-            laptop_rows = []
-            free_rows = []
-            fixed_rows = []
-
-            def get_fixed_seat_start_time(name):
-                """
-                Fetch the actual entrance time for a fixed seat user by scraping the seat access page.
-                Returns the time string in the same format as the original start_time, or None if not found.
-                """
-                from selenium.webdriver.common.by import By
-                from selenium.webdriver.support.ui import WebDriverWait
-                from selenium.webdriver.support import expected_conditions as EC
-                import time
-                # Use the same driver (assumed logged in)
-                try:
-                    # Navigate to the fixed seat access page
-                    driver.get(FIXED_URL)
-                    # Wait for table to load
-                    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
-                    time.sleep(0.8)
-                    # The table may be paginated; search all rows on all pages
-                    while True:
-                        rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
-                        for row in rows:
-                            try:
-                                tds = row.find_elements(By.TAG_NAME, "td")
-                                if len(tds) < 6:
-                                    continue
-                                row_name = tds[2].text.strip()
-                                if row_name == name:
-                                    # Entrance time is typically in the 5th or 6th column (check and adjust if needed)
-                                    # Let's try 5th (index 4) first, fallback to 6th (index 5)
-                                    real_time = tds[4].text.strip() or tds[5].text.strip()
-                                    return real_time
-                            except Exception:
-                                continue
-                        # Check for next page
-                        try:
-                            next_li = driver.find_element(By.CSS_SELECTOR, '.paginate_button.next')
-                            next_class = next_li.get_attribute("class")
-                            if "disabled" in next_class:
-                                break
-                            next_btn = next_li.find_element(By.TAG_NAME, "a")
-                            next_btn.click()
-                            time.sleep(1.0)
-                        except Exception:
-                            break
-                except Exception as e:
-                    if DEBUG:
-                        print(f"[DEBUG] get_fixed_seat_start_time error for '{name}': {e}")
-                return None
-
-            for seat_type, seat_number, name, product, start_time in all_rows_data:
-                try:
-                    seat_number_int = int(seat_number)
-                except ValueError:
-                    continue
-
-                if seat_number_int in LAPTOP_SEAT_NUMBERS:
-                    # seat_type = "노트북석"
-                    laptop_rows.append((seat_type, seat_number, name, product, start_time))
-                elif seat_number_int not in FIXED_SEAT_NUMBERS:
-                    free_rows.append((seat_type, seat_number, name, product, start_time))
-                else:
-                    # Fetch actual entrance time for fixed seat
-                    real_start_time = get_fixed_seat_start_time(name) or start_time
-                    fixed_rows.append((seat_type, seat_number, name, product, real_start_time))
-    
-
-        # --- Sort rows by 시작시간 (start_time) ---
-        import datetime as dt
-        def sort_by_start_time(row):
-            try:
-                return dt.datetime.strptime(row[4], '%Y.%m.%d %H:%M')
-            except:
-                return dt.datetime.min
-        free_rows.sort(key=sort_by_start_time, reverse=True)
-        laptop_rows.sort(key=sort_by_start_time, reverse=True)
-        fixed_rows.sort(key=sort_by_start_time, reverse=True)
-
-
-        used_labtop_seats = len(laptop_rows)
-        used_free_seats = len(free_rows)
-        used_fixed_seats = len(fixed_rows)        
-
-        total_used = used_free_seats + used_labtop_seats + used_fixed_seats
-        if total_used > 0 or retry_count == max_retries:
+        # If we have data or we've reached the last retry, break
+        if all_rows_data or retry_count == max_retries:
             break
         retry_count += 1
         time.sleep(3)
+
+    return all_rows_data
+
+
+def check_seat_status(driver):
+    fixed_set = set(FIXED_SEAT_NUMBERS)
+    laptop_set = set(LAPTOP_SEAT_NUMBERS)
+    excluded_seats = fixed_set.union(laptop_set)
+
+    free_rows_data = extract_seat_data(driver, SEAT_URL, seat_type_filter=["개인석"])
+    fixed_rows_data = extract_seat_data(driver, FIXED_URL, seat_type_filter=["고정석"])
+
+    all_rows_data = free_rows_data + fixed_rows_data
+
+    # Insert the grouped and styled seat table before closing .box
+    if all_rows_data:
+        laptop_rows = []
+        free_rows = []
+        fixed_rows = []
+
+        for seat_type, seat_number, name, product, start_time in all_rows_data:
+            try:
+                seat_number_int = int(seat_number)
+            except ValueError:
+                continue
+
+            if seat_number_int in LAPTOP_SEAT_NUMBERS:
+                seat_type = "노트북석"
+                laptop_rows.append((seat_type, seat_number, name, product, start_time))
+
+            elif seat_number_int not in FIXED_SEAT_NUMBERS:
+                free_rows.append((seat_type, seat_number, name, product, start_time))
+
+            else:
+                # Fetch actual entrance time for fixed seat
+                free_rows.append((seat_type, seat_number, name, product, start_time))
+
+
+    # --- Sort rows by 시작시간 (start_time) ---
+    import datetime as dt
+    def sort_by_start_time(row):
+        try:
+            return dt.datetime.strptime(row[4], '%Y.%m.%d %H:%M')
+        except:
+            return dt.datetime.min
+    free_rows.sort(key=sort_by_start_time, reverse=True)
+    laptop_rows.sort(key=sort_by_start_time, reverse=True)
+    fixed_rows.sort(key=sort_by_start_time, reverse=True)
+
+
+    used_labtop_seats = len(laptop_rows)
+    used_free_seats = len(free_rows)
+    used_fixed_seats = len(fixed_rows)        
+
+    total_used = used_free_seats + used_labtop_seats + used_fixed_seats
 
     if DEBUG and total_used == 0:
         debug_file = os.path.join(DEBUG_PATH, f"debug_seat_zero_{datetime.now(kst).strftime('%Y%m%d_%H%M%S')}.html")
