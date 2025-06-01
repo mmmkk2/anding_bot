@@ -74,11 +74,6 @@ SEAT_URL = f"{BASE_URL}/use/seatUse"
 TOTAL_SEATS = int(os.getenv("TOTAL_SEATS", 5))
 
 
-fixed_seat_numbers = FIXED_SEAT_NUMBERS
-laptop_seat_numbers = LAPTOP_SEAT_NUMBERS
-
-
-
 # === 좌석 상태 체크 ===
 def check_seat_status(driver):
     retry_count = 0
@@ -91,8 +86,8 @@ def check_seat_status(driver):
         all_seat_numbers = []
 
         # Cast to sets for faster lookup and deduplication
-        fixed_set = set(fixed_seat_numbers)
-        laptop_set = set(laptop_seat_numbers)
+        fixed_set = set(FIXED_SEAT_NUMBERS)
+        laptop_set = set(LAPTOP_SEAT_NUMBERS)
         excluded_seats = fixed_set.union(laptop_set)
 
         driver.get(SEAT_URL)
@@ -187,6 +182,7 @@ def check_seat_status(driver):
         if all_rows_data:
             laptop_rows = []
             free_rows = []
+            fixed_rows = []
 
             for seat_type, seat_number, name, product, start_time in all_rows_data:
                 try:
@@ -199,6 +195,8 @@ def check_seat_status(driver):
                     laptop_rows.append((seat_type, seat_number, name, product, start_time))
                 elif seat_number_int not in FIXED_SEAT_NUMBERS:
                     free_rows.append((seat_type, seat_number, name, product, start_time))
+                else:
+                    fixed_rows.append((seat_type, seat_number, name, product, start_time))
 
 
         # --- Sort rows by 시작시간 (start_time) ---
@@ -210,9 +208,12 @@ def check_seat_status(driver):
                 return dt.datetime.min
         free_rows.sort(key=sort_by_start_time, reverse=True)
         laptop_rows.sort(key=sort_by_start_time, reverse=True)
+        fixed_rows.sort(key=sort_by_start_time, reverse=True)
+
 
         used_labtop_seats = len(laptop_rows)
         used_free_seats = len(free_rows)
+        used_fixed_seats = len(fixed_rows)        
 
         total_used = used_free_seats + used_labtop_seats + used_fixed_seats
         if total_used > 0 or retry_count == max_retries:
@@ -266,7 +267,7 @@ def check_seat_status(driver):
     msg = (
         f"[좌석 알림] {status_emoji}\n"
         f"자유석 현재 입실: {used_free_seats}/{TOTAL_FREE_SEATS}\n"
-        f"노트북석 현재 입실: {used_labtop_seats}/{len(laptop_seat_numbers)}\n"
+        f"노트북석 현재 입실: {used_labtop_seats}/{len(LAPTOP_SEAT_NUMBERS)}\n"
         f"남은 자유석: {remaining_seats}석"
     )
 
@@ -277,14 +278,16 @@ def check_seat_status(driver):
         now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
         f.write(f"{now_str},{used_free_seats}\n")
 
+
+    rows_dict = {"자유석": free_rows, "노트북석": laptop_rows, "고정석" : fixed_rows}
+
     save_seat_dashboard_html(
         used_free=used_free_seats,
         total_free=TOTAL_FREE_SEATS,
         used_laptop=used_labtop_seats,
-        total_laptop=len(laptop_seat_numbers),
+        total_laptop=len(LAPTOP_SEAT_NUMBERS),
         remaining=remaining_seats,
-        free_rows=free_rows,
-        laptop_rows=laptop_rows
+        rows_dict=rows_dict
     )
 
 
@@ -387,7 +390,7 @@ def main_check_seat():
         driver.quit()
 
 
-def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, free_rows=None, laptop_rows=None):
+def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, rows_dict):
     history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
     cum_users_path = os.path.join(DASHBOARD_PATH, "cum_users_history.csv")
 
@@ -577,8 +580,9 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     html += """
     <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
     """
-    html += render_table("자유석", free_rows)
-    html += render_table("노트북석", laptop_rows)
+    for title, rows in rows_dict.items():
+        html += render_table(title, rows)
+    
     html += """
     </div>
     """
