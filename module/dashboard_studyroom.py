@@ -182,8 +182,9 @@ def check_studyroom(driver):
         for r in reservations:
             try:
                 start_str, end_str = r['time'].split("~")
-                start_dt = datetime.strptime(start_str.strip(), "%Y.%m.%d %H:%M")
-                end_dt = datetime.strptime(end_str.strip(), "%Y.%m.%d %H:%M")
+                start_dt = kst.localize(datetime.strptime(start_str.strip(), "%Y.%m.%d %H:%M"))
+                end_dt = kst.localize(datetime.strptime(end_str.strip(), "%Y.%m.%d %H:%M"))
+
                 if start_dt <= now <= end_dt:
                     return True
             except:
