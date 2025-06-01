@@ -119,10 +119,11 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
                     if len(cols) < 7:
                         continue
                     # Determine offset based on whether cols[0].text is a boolean string (like 'True'/'False')
+                    print(cols[0].text.strip().lower())
                     offset = 1 if cols[0].text.strip().lower() in ["true", "false"] else 0
                     try:
                         seat_type = cols[offset].text.strip()
-                        seat_number_text = cols[offset + 1].text.strip().replace("개", "").replace("번", "").strip()
+                        seat_number_text = cols[offset + 1].text.strip().replace("번", "").strip()
                         identifier = cols[offset + 3].text.strip()
                         product = cols[offset + 4].text.strip()
                         start_time = cols[offset + 5].text.strip()
