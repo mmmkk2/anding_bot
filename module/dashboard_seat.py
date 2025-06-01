@@ -128,12 +128,9 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
 
                     if not identifier:
                         continue
-                    if seat_type_filter:
+
+                    if seat_type_filter is None or any(f in seat_type for f in seat_type_filter):
                         all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
-                    else:
-                        if seat_type in seat_type_filter:
-                            all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
-                        continue
                     
                 except Exception:
                     continue
