@@ -102,18 +102,13 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
             # driver.execute_script(f"document.querySelector('input[name=\"s_start_date_start\"]').value = '{today_date_str}';")
             start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name$='_date_start']")))
             driver.execute_script(f"document.querySelector('input[name$=\"_date_start\"]').value = '{today_date_str}';")
-            print(2)
             end_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name$='_date_end']")))
             driver.execute_script(f"document.querySelector('input[name$=\"_date_end\"]').value = '{today_date_str}';")
             # driver.execute_script(f"document.querySelector('input[name=\"s_start_date_end\"]').value = '{today_date_str}';")
-            print(3)
             time.sleep(0.5)
             # 검색 버튼 클릭
-            print(4)
             search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
-            print(5)
             search_button.click()
-            print(6)
             time.sleep(1.5)  # 검색 결과 로딩 대기
 
         except Exception as e:
