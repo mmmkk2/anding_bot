@@ -97,11 +97,15 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
         try:
             # 날짜 필터 설정
             print(1)
-            start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_start_date_start']")))
-            driver.execute_script(f"document.querySelector('input[name=\"s_start_date_start\"]').value = '{today_date_str}';")
+            # start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_start_date_start']")))
+            # start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_enter_date_start']")))
+            # driver.execute_script(f"document.querySelector('input[name=\"s_start_date_start\"]').value = '{today_date_str}';")
+            start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name$='_date_start']")))
+            driver.execute_script(f"document.querySelector('input[name$=\"_date_start\"]').value = '{today_date_str}';")
             print(2)
-            end_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_start_date_end']")))
-            driver.execute_script(f"document.querySelector('input[name=\"s_start_date_end\"]').value = '{today_date_str}';")
+            end_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name$='_date_end']")))
+            driver.execute_script(f"document.querySelector('input[name$=\"_date_end\"]').value = '{today_date_str}';")
+            # driver.execute_script(f"document.querySelector('input[name=\"s_start_date_end\"]').value = '{today_date_str}';")
             print(3)
             time.sleep(0.5)
             # 검색 버튼 클릭
