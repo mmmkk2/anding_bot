@@ -116,23 +116,23 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
             for row in page_rows:
                 try:
                     cols = row.find_elements(By.TAG_NAME, "td")
-                    cols = [col for col in cols if not isinstance(col, bool)]
                     if len(cols) < 7:
                         continue
-
-                    seat_type = cols[0].text.strip()
-                    seat_number_text = cols[1].text.strip().replace("개", "").replace("번", "").strip()
-                    identifier = cols[3].text.strip()
-                    product = cols[4].text.strip()
-                    start_time = cols[5].text.strip()
-
+                    # Determine offset based on whether cols[0].text is a boolean string (like 'True'/'False')
+                    offset = 1 if cols[0].text.strip().lower() in ["true", "false"] else 0
+                    try:
+                        seat_type = cols[offset].text.strip()
+                        seat_number_text = cols[offset + 1].text.strip().replace("개", "").replace("번", "").strip()
+                        identifier = cols[offset + 3].text.strip()
+                        product = cols[offset + 4].text.strip()
+                        start_time = cols[offset + 5].text.strip()
+                    except IndexError:
+                        continue
                     if not identifier:
                         continue
-                    
                     print(cols)
                     print(seat_type)
                     print(seat_type in seat_type_filter)
-                    
                     if (seat_type_filter is None) or (seat_type in seat_type_filter):
                         all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
                 except Exception:
