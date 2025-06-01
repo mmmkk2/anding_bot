@@ -77,7 +77,8 @@ TOTAL_SEATS = int(os.getenv("TOTAL_SEATS", 5))
 
 
 # === 좌석 상태 체크 ===
-def extract_seat_data(driver, SEAT_URL, seat_type_filter):
+
+def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
     """
     Extracts all seat data from the seat table with pagination and returns a list of tuples:
     (seat_type, seat_number_text, identifier, product, start_time)
@@ -92,93 +93,56 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter):
         excluded_seats = fixed_set.union(laptop_set)
 
         driver.get(SEAT_URL)
-        # === 날짜 필터 추가 ===
         today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
         try:
-            # 시작일 입력
+            # 날짜 필터 설정
             start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_start_date_start']")))
             driver.execute_script(f"document.querySelector('input[name=\"s_start_date_start\"]').value = '{today_date_str}';")
-            # 종료일 입력
             end_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_start_date_end']")))
             driver.execute_script(f"document.querySelector('input[name=\"s_start_date_end\"]').value = '{today_date_str}';")
-            time.sleep(0.5)  # 안정화 대기
-            # 검색 버튼 클릭
-            search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
-            search_button.click()
-            time.sleep(1.5)  # 검색 결과 로딩 대기
+            time.sleep(0.5)
+            driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)").click()
+            time.sleep(1.5)
         except Exception as e:
             if DEBUG:
                 print(f"[DEBUG] 날짜 필터 및 검색 실패: {e}")
 
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
         time.sleep(1)
-        # --- Pagination logic (safe seat data extraction) ---
+
         all_rows_data = []
         while True:
             page_rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
             for row in page_rows:
                 try:
                     cols = row.find_elements(By.TAG_NAME, "td")
-                    # bool 타입 요소 제거
                     cols = [col for col in cols if not isinstance(col, bool)]
-
                     if len(cols) < 7:
                         continue
+
                     seat_type = cols[0].text.strip()
                     seat_number_text = cols[1].text.strip().replace("개", "").replace("번", "").strip()
-                    identifier = cols[3].text.strip()  # 이름
+                    identifier = cols[3].text.strip()
                     product = cols[4].text.strip()
                     start_time = cols[5].text.strip()
 
                     if not identifier:
                         continue
-                    if seat_type in seat_type_filter:
-                        all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
-                except Exception:
-                    continue
-            try:
-                next_li = driver.find_element(By.CSS_SELECTOR, '.paginate_button.next')
-                next_class = next_li.get_attribute("class")
-                if DEBUG:
-                    print(f"[DEBUG] 다음 버튼 class 속성: {next_class}")
-                if "disabled" in next_class:
-                    if DEBUG:
-                        print("[DEBUG] 다음 페이지 없음 → 루프 종료")
-                    break
-                next_btn = next_li.find_element(By.TAG_NAME, "a")
-                next_btn.click()
-                if DEBUG:
-                    print("[DEBUG] 다음 페이지 클릭")
-                time.sleep(1.5)  # 다음 페이지 로딩 시간 확보
-            except NoSuchElementException:
-                if DEBUG:
-                    print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
-                break
-
-        # 추가 대기: td 수가 7 미만인 행만 있는 경우 (not strictly needed with all_rows_data, but can reload if needed)
-        attempts = 0
-        while attempts < 3 and all(len(row) < 2 or not row[1] for row in all_rows_data):
-            time.sleep(1.5)
-            # reload all_rows_data (repeat first page)
-            all_rows_data = []
-            page_rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
-            for row in page_rows:
-                try:
-                    cols = row.find_elements(By.TAG_NAME, "td")
-                    if len(cols) < 7:
-                        continue
-                    seat_type = cols[1].text.strip()
-                    seat_number_text = cols[2].text.strip().replace("개", "").replace("번", "").strip()
-                    identifier = cols[4].text.strip()
-                    product = cols[5].text.strip()
-                    start_time = cols[6].text.strip()
-                    if not identifier:
+                    if seat_type_filter and seat_type not in seat_type_filter:
                         continue
                     all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
                 except Exception:
                     continue
-            attempts += 1
-        # If we have data or we've reached the last retry, break
+
+            try:
+                next_li = driver.find_element(By.CSS_SELECTOR, '.paginate_button.next')
+                if "disabled" in next_li.get_attribute("class"):
+                    break
+                next_li.find_element(By.TAG_NAME, "a").click()
+                time.sleep(1.5)
+            except NoSuchElementException:
+                break
+
         if all_rows_data or retry_count == max_retries:
             break
         retry_count += 1
