@@ -218,7 +218,7 @@ def check_seat_status(driver):
 
             else:
                 # Fetch actual entrance time for fixed seat
-                free_rows.append((seat_type, seat_number, name, product, start_time))
+                fixed_rows_data.append((seat_type, seat_number, name, product, start_time))
 
 
     # --- Sort rows by 시작시간 (start_time) ---
