@@ -128,20 +128,29 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
 
                     if not identifier:
                         continue
-
-                    if seat_type_filter is None or any(f in seat_type for f in seat_type_filter):
-                        all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
                     
+                    print(all_rows_data)
+                    if seat_type_filter is None or (seat_type in seat_type_filter):
+                        all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
                 except Exception:
                     continue
-
             try:
                 next_li = driver.find_element(By.CSS_SELECTOR, '.paginate_button.next')
-                if "disabled" in next_li.get_attribute("class"):
+                next_class = next_li.get_attribute("class")
+                if DEBUG:
+                    print(f"[DEBUG] 다음 버튼 class 속성: {next_class}")
+                if "disabled" in next_class:
+                    if DEBUG:
+                        print("[DEBUG] 다음 페이지 없음 → 루프 종료")
                     break
-                next_li.find_element(By.TAG_NAME, "a").click()
+                next_btn = next_li.find_element(By.TAG_NAME, "a")
+                next_btn.click()
+                if DEBUG:
+                    print("[DEBUG] 다음 페이지 클릭")
                 time.sleep(1.5)
             except NoSuchElementException:
+                if DEBUG:
+                    print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
                 break
 
         if all_rows_data or retry_count == max_retries:
