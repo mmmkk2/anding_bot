@@ -15,11 +15,14 @@ body {
     background: white;
     border-radius: 1rem;
     padding: 1rem;
-    max-width: 650px;
+    /* max-width: 650px; */
     width: 100%;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     text-align: center;
     margin: 0 auto;
+    /* padding: 1.2rem; */
+    max-width: 95vw;
+    min-height: 90vh;  /* 화면 높이의 90%까지 확장 */
 }
 @media (max-width: 480px) {
     .box {
