@@ -119,7 +119,6 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
                     if len(cols) < 7:
                         continue
                     # Determine offset based on whether cols[0].text is a boolean string (like 'True'/'False')
-                    print(cols[0].text.strip().lower())
                     offset = 1 if cols[0].text.strip()=="" else 0
                     try:
                         seat_type = cols[offset].text.strip()
@@ -132,10 +131,6 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
                     if not identifier:
                         continue
                     
-                    print(seat_type)
-                    
-                    print(seat_number_text)
-                    print(seat_type in seat_type_filter)
                     if (seat_type_filter is None) or (seat_type in seat_type_filter):
                         all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
                 except Exception:
