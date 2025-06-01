@@ -193,7 +193,9 @@ def check_seat_status(driver):
     excluded_seats = fixed_set.union(laptop_set)
 
     free_rows_data = extract_seat_data(driver, SEAT_URL, seat_type_filter=["개인석"])
+    print(free_rows_data)
     fixed_rows_data = extract_seat_data(driver, FIXED_URL, seat_type_filter=["고정석"])
+    print(fixed_rows_data)
 
     all_rows_data = free_rows_data + fixed_rows_data
 
