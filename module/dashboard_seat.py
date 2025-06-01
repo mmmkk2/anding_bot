@@ -130,7 +130,7 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
                         continue
                     if not identifier:
                         continue
-                    print(cols)
+                    
                     print(seat_type)
                     print(seat_type in seat_type_filter)
                     if (seat_type_filter is None) or (seat_type in seat_type_filter):
