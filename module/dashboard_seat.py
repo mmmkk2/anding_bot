@@ -299,7 +299,7 @@ def check_seat_status(driver):
     if remaining_seats <= DANGER_THRESHOLD:
         send_broadcast_and_update(f"[경고] 🚨 잔여 자유석 {remaining_seats}석 - 일일권 제한 강화 필요", broadcast=True, category="seat")
     elif remaining_seats <= WARNING_THRESHOLD:
-        send_broadcast_and_update(f"[주의] ⚠️ 잔여 자유석 {remaining_seats}석 이하 - 이용 주의 필요", broadcast=True, category="seat")
+        send_broadcast_and_update(f"[주의] ⚠️ 잔여 자유석 {remaining_seats}석 - 이용 주의 필요", broadcast=True, category="seat")
 
     # === 최종 CSV 로그
     return free_rows, laptop_rows, msg
