@@ -443,7 +443,8 @@ def fetch_monthly_sales_from_calendar(driver):
         df_prev = df[df["month"] == prev_month].sort_values("date").drop(columns=["month"])
         df_prev["cumsum"] = df_prev["amount"].cumsum()
 
-        dates = df_prev["date"].dt.strftime("%d").tolist()
+        # Ensure date labels are always two digits (e.g., '01', '02', ..., '31')
+        dates = df_prev["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}").tolist()
         cumsums = df_prev["cumsum"].tolist()
 
         # Prepare current month sales for comparison
@@ -457,12 +458,19 @@ def fetch_monthly_sales_from_calendar(driver):
         df_current["cumsum"] = df_current["amount"].cumsum()
 
         # Align current month cumulative sales to dates (labels)
-        # If a date in 'dates' (previous month) is not present in current month, fill with None or 0
-        # But per instruction, use 'dates' as labels for both datasets
-        dates_current = df_current["date"].dt.strftime("%d").tolist()
+        # Use two-digit day for label consistency
+        dates_current = df_current["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}").tolist()
         cumsum_map_current = dict(zip(dates_current, df_current["cumsum"].tolist()))
-        # For each date in previous month, get corresponding cumsum of current month or 0
-        cumsums_current = [cumsum_map_current.get(d, 0) for d in dates]
+        # For each date in previous month, get corresponding cumsum of current month or None for future dates
+        today_day = now.strftime("%d")
+        cumsums_current = []
+        for d in dates:
+            if d < today_day:
+                cumsums_current.append(cumsum_map_current.get(d, 0))
+            elif d == today_day:
+                cumsums_current.append(cumsum_map_current.get(d, 0))  # Include today
+            else:
+                cumsums_current.append(None)  # Leave future dates as blank
 
         chart_html = f"""
         <!DOCTYPE html>
