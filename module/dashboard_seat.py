@@ -442,7 +442,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
 
     # --- 누적 이용자 수 이력 ---
     cum_users_rows = []
-    cum_users_points = []
+    cum_user_counts = []
     try:
         with open(cum_users_path, "r", encoding="utf-8") as f:
             for line in reversed(f.readlines()):
@@ -453,29 +453,16 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         cum_users_rows.insert(0, line)
                     else:
                         break
-        cum_timestamps = []
-        cum_user_counts = []
         for line in cum_users_rows:
             parts = line.strip().split(",")
             if len(parts) >= 2:
-                timestamp_obj = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
-                cum_timestamps.append(timestamp_obj.strftime("%Y-%m-%dT%H:%M:%S"))
                 cum_user_counts.append(int(parts[1]))
-        cum_users_points = [{"x": t, "y": y} for t, y in zip(cum_timestamps, cum_user_counts)]
     except Exception:
-        cum_users_points = []
-
-    # y1 axis min/max for 누적 이용자 수
-    if cum_users_points:
-        y_values = [pt["y"] for pt in cum_users_points]
-        y1_suggested_min = 0
-        y1_suggested_max = max(70, max(y_values) + 1)
+        cum_user_counts = []
     
 
     # --- 차트 스크립트 ---
     lineColor = 'rgba(75, 192, 192, 1)'  # default green
-    cum_lineColor = 'rgba(153, 102, 255, 1)'
-    cum_point_color='rgba(153, 102, 255, 0.11)'
     chart_script = f"""
     <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns'></script>
@@ -494,15 +481,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         borderWidth: 1,
                         tension: 0.1,
                         yAxisID: 'y'
-                    }},
-                    {{
-                        label: '누적 이용자 수',
-                        data: {json.dumps(cum_users_points)},
-                        borderColor: '{cum_lineColor}',
-                        pointBackgroundColor: '{cum_point_color}',
-                        borderWidth: 1,
-                        tension: 0.1,
-                        yAxisID: 'y1'
                     }}
                 ]
             }},
@@ -536,17 +514,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                             display: true,
                             text: '자유석 이용자 수'
                         }},                        
-                    }},
-                    y1: {{
-                        position: 'right',
-                        grid: {{ drawOnChartArea: false }},
-                        title: {{
-                            display: true,
-                            text: '누적 이용자 수'
-                        }},
-                        beginAtZero: true,
-                        suggestedMin: {y1_suggested_min},
-                        suggestedMax: {y1_suggested_max}
                     }}
                 }}
             }}
@@ -575,6 +542,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             <div class="stat">노트북석: {used_laptop}/{total_laptop}</div>
             <div class="stat">남은 자유석: {remaining}석</div>            
             <div class="updated">업데이트 시각: {now_str}</div>
+            <div class="stat">누적 이용자 수: {cum_user_counts[-1] if cum_user_counts else "정보 없음"}명</div>
             <div style="margin-top:0.5rem;">            
                 <canvas id="seatChart"  style="max-width: 100%; height: auto;"></canvas>
                 {chart_script}
