@@ -220,7 +220,7 @@ def fetch_monthly_sales_from_calendar(driver):
                     총 결제: {prev_month}월 {summary_amount_prev:,}원 / {curr_month}월 {summary_amount_curr:,}원<br>
                 </div>
                 <div class="updated">업데이트 시각: {now_str}</div>
-                <canvas id="monthlyChart"  height="200"></canvas>
+                <canvas id="monthlyChart" style="max-width: 100%; height: auto;"></canvas>
             </div>
             <script>
                 // Prepare data for Chart.js: set first point to null, and pointRadius 0 for first.
