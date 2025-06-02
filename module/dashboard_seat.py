@@ -480,8 +480,10 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     borderWidth: 2,
                     tension: 0.1,
                     pointRadius: function(context) {{
-                        return context.dataIndex === 0 ? 0 : 2;
+                        const color = context.dataset.pointBackgroundColor[context.dataIndex];
+                        return (color === 'rgba(75, 192, 192, 0.1)') ? 0 : 3;
                     }},
+                    pointBackgroundColor: {json.dumps(point_colors)},
                     spanGaps: false
                 }}]
             }},
