@@ -386,6 +386,53 @@ def fetch_monthly_sales_from_calendar(driver):
                     if DEBUG:
                         print(f"[DEBUG] 매출 파싱 실패: {text} ({e})")
 
+    # === 현재달 매출 수집 ===
+    try:
+        next_btn = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.fc-next-button"))
+        )
+        if DEBUG:
+            print("[DEBUG] '다음달' 버튼 클릭 시도")
+        next_btn.click()
+        time.sleep(1.2)
+    except Exception as e:
+        if DEBUG:
+            print(f"[DEBUG] '다음달' 버튼 클릭 실패: {e}")
+        raise
+
+    try:
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div.fc-event-title"))
+        )
+        if DEBUG:
+            print("[DEBUG] 현재달 캘린더 이벤트 로딩 완료")
+    except TimeoutException:
+        if DEBUG:
+            print("[DEBUG] 현재달 이벤트 로딩 실패 (Timeout)")
+        return sales
+
+    # 현재달 매출 수집
+    current_sales = []
+    day_cells = driver.find_elements(By.CSS_SELECTOR, "td.fc-daygrid-day[data-date]")
+    for cell in day_cells:
+        date_str = cell.get_attribute("data-date")  # e.g., "2025-06-01"
+        event_titles = cell.find_elements(By.CSS_SELECTOR, "div.fc-event-title")
+        for event in event_titles:
+            text = event.text.strip()
+            if "원" in text:
+                try:
+                    amount = int(text.replace(",", "").replace("원", "").strip())
+                    formatted_date = datetime.strptime(date_str, "%Y-%m-%d").strftime("%Y.%m.%d")
+                    current_sales.append({"date": formatted_date, "amount": amount})
+                    if DEBUG:
+                        print(f"[DEBUG] 현재달 매출 파싱: {formatted_date} / {amount}")
+                except Exception as e:
+                    if DEBUG:
+                        print(f"[DEBUG] 현재달 매출 파싱 실패: {text} ({e})")
+
+    # 병합
+    sales += current_sales
+
     if sales:
         import pandas as pd
         df = pd.DataFrame(sales)
@@ -422,7 +469,7 @@ def fetch_monthly_sales_from_calendar(driver):
         <html lang="ko">
         <head>
             <meta charset="UTF-8" />
-            <title>이전달 매출</title>
+            <title>{now.year}년 {prev_month}월 매출 vs {now.year}년 {now.month}월 매출</title>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <style>
                 body {{
@@ -447,7 +494,7 @@ def fetch_monthly_sales_from_calendar(driver):
         </head>
         <body>
             <div class="box">
-                <h2>📊 이전달 일별 매출</h2>
+                <h2>📊 {now.year}년 {prev_month}월 vs {now.month}월 누적 매출 비교</h2>
                 <canvas id="monthlyChart"></canvas>
             </div>
             <script>
