@@ -367,27 +367,24 @@ def fetch_monthly_sales_from_calendar(driver):
             print("[DEBUG] 캘린더 이벤트 로딩 실패 (Timeout)")
         return []
 
-    # 모든 매출 이벤트 텍스트 추출
-    event_elems = driver.find_elements(By.CSS_SELECTOR, "div.fc-event-title")
-    if DEBUG:
-        print(f"[DEBUG] 추출된 매출 이벤트 개수: {len(event_elems)}")
+    # 각 날짜 셀(td[data-date])에서 매출 이벤트 수집
     sales = []
-    for elem in event_elems:
-        text = elem.text.strip()
-        # 예: "2025.05.01 / 150,000원"
-        if DEBUG:
-            print(f"[DEBUG] 이벤트 텍스트: {text}")
-        if " / " in text and "원" in text:
-            try:
-                date_part, amount_part = text.split(" / ")
-                amount = int(amount_part.replace(",", "").replace("원", "").strip())
-                sales.append({"date": date_part.strip(), "amount": amount})
-            except Exception as e:
-                if DEBUG:
-                    print(f"[DEBUG] 파싱 실패: {text} ({e})")
-                continue
-    if DEBUG:
-        print(f"[DEBUG] 파싱된 매출 이벤트 수: {len(sales)}")
+    day_cells = driver.find_elements(By.CSS_SELECTOR, "td.fc-daygrid-day[data-date]")
+    for cell in day_cells:
+        date_str = cell.get_attribute("data-date")  # e.g., "2025-05-01"
+        event_titles = cell.find_elements(By.CSS_SELECTOR, "div.fc-event-title")
+        for event in event_titles:
+            text = event.text.strip()
+            if "원" in text:
+                try:
+                    amount = int(text.replace(",", "").replace("원", "").strip())
+                    formatted_date = datetime.strptime(date_str, "%Y-%m-%d").strftime("%Y.%m.%d")
+                    sales.append({"date": formatted_date, "amount": amount})
+                    if DEBUG:
+                        print(f"[DEBUG] 캘린더 매출 파싱: {formatted_date} / {amount}")
+                except Exception as e:
+                    if DEBUG:
+                        print(f"[DEBUG] 매출 파싱 실패: {text} ({e})")
     return sales
 
 def main_monthly_payment():
@@ -411,12 +408,3 @@ def main_monthly_payment():
         pass
     finally:
         driver.quit()
-
-
-if __name__ == "__main__":
-
-    # # 인증 리스너를 백그라운드에서 실행
-    # listener_thread = threading.Thread(target=start_telegram_listener, daemon=True)
-    # listener_thread.start()
-
-    main_monthly_payment()
