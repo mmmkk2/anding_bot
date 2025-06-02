@@ -192,6 +192,8 @@ def fetch_monthly_sales_from_calendar(driver):
         # For each date in previous month, get corresponding cumsum of current month or None for future dates
         today_day = now.strftime("%d")
         now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+        if DEBUG:
+            print(f"[DEBUG] now_str: {now_str}")
         cumsums_current = []
         for d in dates:
             if d < today_day:
