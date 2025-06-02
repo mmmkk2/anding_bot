@@ -69,74 +69,79 @@ kst = pytz.timezone("Asia/Seoul")
 # URL
 BASE_URL = os.getenv("BASE_URL")
 SEAT_URL = f"{BASE_URL}/use/seatUse"
+FIXED_URL =  f"{BASE_URL}/use/seatAccess"
+
 
 # TOTAL 
 TOTAL_SEATS = int(os.getenv("TOTAL_SEATS", 5))
 
 
-fixed_seat_numbers = FIXED_SEAT_NUMBERS
-laptop_seat_numbers = LAPTOP_SEAT_NUMBERS
-
-
-
 # === 좌석 상태 체크 ===
-def check_seat_status(driver):
+
+def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
+    """
+    Extracts all seat data from the seat table with pagination and returns a list of tuples:
+    (seat_type, seat_number_text, identifier, product, start_time)
+    """
     retry_count = 0
     max_retries = 2
-
+    all_rows_data = []
     while retry_count <= max_retries:
-        used_free_seats = 0
-        used_labtop_seats = 0
-        used_fixed_seats = 0
-        all_seat_numbers = []
-
         # Cast to sets for faster lookup and deduplication
-        fixed_set = set(fixed_seat_numbers)
-        laptop_set = set(laptop_seat_numbers)
+        fixed_set = set(FIXED_SEAT_NUMBERS)
+        laptop_set = set(LAPTOP_SEAT_NUMBERS)
         excluded_seats = fixed_set.union(laptop_set)
 
         driver.get(SEAT_URL)
-        # === 날짜 필터 추가 ===
         today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
+        yesterday_date_str = (datetime.now(kst) - timedelta(days=1)).strftime("%Y.%m.%d")
         try:
-            # 시작일 입력
-            start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_start_date_start']")))
-            driver.execute_script(f"document.querySelector('input[name=\"s_start_date_start\"]').value = '{today_date_str}';")
-            # 종료일 입력
-            end_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_start_date_end']")))
-            driver.execute_script(f"document.querySelector('input[name=\"s_start_date_end\"]').value = '{today_date_str}';")
-            time.sleep(0.5)  # 안정화 대기
+            # 날짜 필터 설정
+            print(1)
+            # start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_start_date_start']")))
+            # start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_enter_date_start']")))
+            # driver.execute_script(f"document.querySelector('input[name=\"s_start_date_start\"]').value = '{today_date_str}';")
+            start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name$='_date_start']")))
+            driver.execute_script(f"document.querySelector('input[name$=\"_date_start\"]').value = '{yesterday_date_str}';")
+            end_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name$='_date_end']")))
+            driver.execute_script(f"document.querySelector('input[name$=\"_date_end\"]').value = '{today_date_str}';")
+            # driver.execute_script(f"document.querySelector('input[name=\"s_start_date_end\"]').value = '{today_date_str}';")
+            time.sleep(0.5)
             # 검색 버튼 클릭
             search_button = driver.find_element(By.CSS_SELECTOR, "button:has(i.fas.fa-search)")
             search_button.click()
             time.sleep(1.5)  # 검색 결과 로딩 대기
+
         except Exception as e:
             if DEBUG:
                 print(f"[DEBUG] 날짜 필터 및 검색 실패: {e}")
 
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr")))
         time.sleep(1)
-        # --- Pagination logic (safe seat data extraction) ---
+
         all_rows_data = []
         while True:
             page_rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
             for row in page_rows:
                 try:
                     cols = row.find_elements(By.TAG_NAME, "td")
-
                     if len(cols) < 7:
                         continue
-
-                    seat_type = cols[1].text.strip()
-                    seat_number_text = cols[2].text.strip().replace("개", "").replace("번", "").strip()
-                    identifier = cols[4].text.strip()  # 이름
-                    product = cols[5].text.strip()
-                    start_time = cols[6].text.strip()
-
+                    # Determine offset based on whether cols[0].text is a boolean string (like 'True'/'False')
+                    offset = 1 if cols[0].text.strip()=="" else 0
+                    try:
+                        seat_type = cols[offset].text.strip()
+                        seat_number_text = cols[offset + 1].text.strip().replace("번", "").strip()
+                        identifier = cols[offset + 3].text.strip()
+                        product = cols[offset + 4].text.strip()
+                        start_time = cols[offset + 5].text.strip()
+                    except IndexError:
+                        continue
                     if not identifier:
                         continue
-
-                    all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
+                    
+                    if (seat_type_filter is None) or (seat_type in seat_type_filter):
+                        all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
                 except Exception:
                     continue
             try:
@@ -152,73 +157,73 @@ def check_seat_status(driver):
                 next_btn.click()
                 if DEBUG:
                     print("[DEBUG] 다음 페이지 클릭")
-                time.sleep(1.5)  # 다음 페이지 로딩 시간 확보
+                time.sleep(1.5)
             except NoSuchElementException:
                 if DEBUG:
                     print("[DEBUG] 페이지네이션 요소 없음 → 루프 종료")
                 break
 
-        # 추가 대기: td 수가 7 미만인 행만 있는 경우 (not strictly needed with all_rows_data, but can reload if needed)
-        attempts = 0
-        while attempts < 3 and all(len(row) < 2 or not row[1] for row in all_rows_data):
-            time.sleep(1.5)
-            # reload all_rows_data (repeat first page)
-            all_rows_data = []
-            page_rows = driver.find_elements(By.CSS_SELECTOR, "table tbody tr")
-            for row in page_rows:
-                try:
-                    cols = row.find_elements(By.TAG_NAME, "td")
-                    if len(cols) < 7:
-                        continue
-                    seat_type = cols[1].text.strip()
-                    seat_number_text = cols[2].text.strip().replace("개", "").replace("번", "").strip()
-                    identifier = cols[4].text.strip()
-                    product = cols[5].text.strip()
-                    start_time = cols[6].text.strip()
-                    if not identifier:
-                        continue
-                    all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
-                except Exception:
-                    continue
-            attempts += 1
-
-
-        # Insert the grouped and styled seat table before closing .box
-        if all_rows_data:
-            laptop_rows = []
-            free_rows = []
-
-            for seat_type, seat_number, name, product, start_time in all_rows_data:
-                try:
-                    seat_number_int = int(seat_number)
-                except ValueError:
-                    continue
-
-                if seat_number_int in LAPTOP_SEAT_NUMBERS:
-                    seat_type = "노트북석"
-                    laptop_rows.append((seat_type, seat_number, name, product, start_time))
-                elif seat_number_int not in FIXED_SEAT_NUMBERS:
-                    free_rows.append((seat_type, seat_number, name, product, start_time))
-
-
-        # --- Sort rows by 시작시간 (start_time) ---
-        import datetime as dt
-        def sort_by_start_time(row):
-            try:
-                return dt.datetime.strptime(row[4], '%Y.%m.%d %H:%M')
-            except:
-                return dt.datetime.min
-        free_rows.sort(key=sort_by_start_time, reverse=True)
-        laptop_rows.sort(key=sort_by_start_time, reverse=True)
-
-        used_labtop_seats = len(laptop_rows)
-        used_free_seats = len(free_rows)
-
-        total_used = used_free_seats + used_labtop_seats + used_fixed_seats
-        if total_used > 0 or retry_count == max_retries:
+        if all_rows_data or retry_count == max_retries:
             break
         retry_count += 1
         time.sleep(3)
+
+    return all_rows_data
+
+
+def check_seat_status(driver):
+    fixed_set = set(FIXED_SEAT_NUMBERS)
+    laptop_set = set(LAPTOP_SEAT_NUMBERS)
+    excluded_seats = fixed_set.union(laptop_set)
+
+    free_rows_data = extract_seat_data(driver, SEAT_URL, seat_type_filter=["개인석"])
+    print(free_rows_data)
+    fixed_rows_data = extract_seat_data(driver, FIXED_URL, seat_type_filter=["고정석"])
+    print(fixed_rows_data)
+
+    all_rows_data = free_rows_data + fixed_rows_data
+
+    # Insert the grouped and styled seat table before closing .box
+    if all_rows_data:
+        laptop_rows = []
+        free_rows = []
+        fixed_rows = []
+
+        for seat_type, seat_number, name, product, start_time in all_rows_data:
+            try:
+                seat_number_int = int(seat_number)
+            except ValueError:
+                continue
+
+            # Priority: 노트북석 > 고정석 > 자유석
+            if seat_number_int in LAPTOP_SEAT_NUMBERS:
+                seat_type = "노트북석"
+                laptop_rows.append((seat_type, seat_number, name, product, start_time))
+            elif seat_number_int in FIXED_SEAT_NUMBERS:
+                seat_type = "고정석"
+                fixed_rows.append((seat_type, seat_number, name, product, start_time))
+            else:
+                seat_type = "자유석"
+                free_rows.append((seat_type, seat_number, name, product, start_time))
+
+
+    # --- Sort rows by 시작시간 (start_time) ---
+    import datetime as dt
+    def sort_by_start_time(row):
+        try:
+            return dt.datetime.strptime(row[4], '%Y.%m.%d %H:%M')
+        except:
+            return dt.datetime.min
+    free_rows.sort(key=sort_by_start_time, reverse=True)
+    laptop_rows.sort(key=sort_by_start_time, reverse=True)
+    fixed_rows.sort(key=sort_by_start_time, reverse=True)
+
+
+    used_labtop_seats = len(laptop_rows)
+    used_free_seats = len(free_rows)
+    used_fixed_seats = len(fixed_rows)        
+
+    total_used = used_free_seats + used_labtop_seats + used_fixed_seats
 
     if DEBUG and total_used == 0:
         debug_file = os.path.join(DEBUG_PATH, f"debug_seat_zero_{datetime.now(kst).strftime('%Y%m%d_%H%M%S')}.html")
@@ -266,7 +271,7 @@ def check_seat_status(driver):
     msg = (
         f"[좌석 알림] {status_emoji}\n"
         f"자유석 현재 입실: {used_free_seats}/{TOTAL_FREE_SEATS}\n"
-        f"노트북석 현재 입실: {used_labtop_seats}/{len(laptop_seat_numbers)}\n"
+        f"노트북석 현재 입실: {used_labtop_seats}/{len(LAPTOP_SEAT_NUMBERS)}\n"
         f"남은 자유석: {remaining_seats}석"
     )
 
@@ -277,14 +282,16 @@ def check_seat_status(driver):
         now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
         f.write(f"{now_str},{used_free_seats}\n")
 
+
+    rows_dict = {"자유석": free_rows, "노트북석": laptop_rows, "고정석" : fixed_rows}
+
     save_seat_dashboard_html(
         used_free=used_free_seats,
         total_free=TOTAL_FREE_SEATS,
         used_laptop=used_labtop_seats,
-        total_laptop=len(laptop_seat_numbers),
+        total_laptop=len(LAPTOP_SEAT_NUMBERS),
         remaining=remaining_seats,
-        free_rows=free_rows,
-        laptop_rows=laptop_rows
+        rows_dict=rows_dict
     )
 
 
@@ -304,12 +311,12 @@ def render_table(title, rows):
         <h2>{title}</h2>
         <table class="sortable" data-sortable>
             <thead>
-                <tr><th>#</th><th>구분</th><th>좌석번호</th><th>이름</th><th>상품</th><th>시작시간</th></tr>
+                <tr><th>#</th><th>Seat#</th><th>이름</th><th>상품</th><th>시작시간</th></tr>
             </thead>
             <tbody>
     """
     for idx, (seat_type, seat_number, name, product, start_time) in enumerate(rows, 1):
-        html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_type}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td class='time'>{start_time.replace('.', '-')}</td></tr>"
+        html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td class='time'>{start_time.replace('.', '-')}</td></tr>"
     html_table += """
             </tbody>
         </table>
@@ -344,6 +351,24 @@ def main_check_seat():
                 os.makedirs(os.path.dirname(cum_users_path), exist_ok=True)
                 with open(cum_users_path, "a", encoding="utf-8") as f:
                     f.write(f"{now_str},{today_user_count}\n")
+
+                # ✅ 일일 누적 이용자 수 저장 (05시대에만, 하루 1회만 저장)
+                now_kst = datetime.now(kst)
+                if 5 <= now_kst.hour < 6:
+                    daily_count_path = os.path.join(DASHBOARD_PATH, "daily_count_history.csv")
+                    os.makedirs(os.path.dirname(daily_count_path), exist_ok=True)
+                    # 날짜가 오전 0시~5시 사이 실행 시 전날 날짜로 기록
+                    today_date = (now_kst - timedelta(days=1)).strftime("%Y-%m-%d") if now_kst.hour < 5 else now_kst.strftime("%Y-%m-%d")
+                    already_written = False
+                    if os.path.exists(daily_count_path):
+                        with open(daily_count_path, "r", encoding="utf-8") as f:
+                            for line in f:
+                                if line.startswith(today_date):
+                                    already_written = True
+                                    break
+                    if not already_written:
+                        with open(daily_count_path, "a", encoding="utf-8") as f:
+                            f.write(f"{today_date},{today_user_count}\n")
                             
             free_rows, laptop_rows, seat_status_msg  = check_seat_status(driver)
             # Use the same now_str for the monitoring message
@@ -369,7 +394,7 @@ def main_check_seat():
         driver.quit()
 
 
-def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, free_rows=None, laptop_rows=None):
+def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, rows_dict):
     history_path = os.path.join(DASHBOARD_PATH, "seat_history.csv")
     cum_users_path = os.path.join(DASHBOARD_PATH, "cum_users_history.csv")
 
@@ -506,7 +531,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                     }},
                     y: {{
                         beginAtZero: true,
-                        max: {total_free},
+                        max: 30,
                         title: {{
                             display: true,
                             text: '자유석 이용자 수'
@@ -539,104 +564,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <title>좌석 현황</title>
         <meta http-equiv="refresh" content="60">
-        <style>
-            body {{
-                font-family: 'Apple SD Gothic Neo', 'Arial', sans-serif;
-                background: #f1f3f5;
-                padding: 0.5rem;
-                margin: 0;
-                display: flex;
-                align-items: flex-start;
-                min-height: 180px; /* max-height: 25vh; */
-                max-height: 180px; /*   max-width: 100vw; */ 
-                box-sizing: border-box;
-                justify-content: center;
-                text-align: center;  /* 텍스트 정렬 보정 */               
-            }}
-            .box {{
-                background: white;
-                border-radius: 1rem;
-                padding: 1rem;
-                max-width: 650px;         /* max-width: 600px */
-                width: 100%;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                text-align: center;
-                overflow-y: auto;
-                margin: 0 auto;
-            }}       
-            h1 {{
-                font-size: 1.1rem;
-                margin-bottom: 1rem;
-                color: #333;
-            }}
-            .emoji {{
-                font-size: 1.0rem;
-                margin-bottom: 1rem;
-            }}
-            .stat {{
-                font-size: 0.9rem;
-                margin: 0.3rem 0;
-            }}
-            .updated {{
-                font-size: 0.8rem;
-                color: #888;
-                margin-top: 1rem;
-            }}
-            .tables {{
-                display: flex;
-                justify-content: space-around;
-                gap: 1rem;
-                flex-wrap: wrap;
-            }}
-            .table-box {{
-                flex: 1;
-                min-width: 280px;
-                max-height: 230px;
-                overflow-y: auto;
-                display: block;
-            }}
-            .table-box h2 {{
-                font-size: 1rem;
-                margin: 0.5rem 0;
-            }}
-            table {{
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 0.7rem;
-            }}
-            th, td {{
-                border: 1px solid #dee2e6;
-                padding: 0.2rem;
-            }}
-            th {{
-                background-color: #6c757d;
-                color: white;
-            }}          
-            .time {{
-                font-size: 0.7rem;
-                padding: 0.4rem;
-                word-break: break-word;
-                white-space: normal; 
-                min-width: 50px; 
-                max-width: 60px;
-            }}            
-            tr:nth-child(even) {{
-                background-color: #f8f9fa;
-            }}
-            table.sortable th {{
-                cursor: pointer;
-            }}
-            @media (max-width: 480px) {{
-                body {{
-                    /* max-height: 50vh; */
-                    min-height: 100px;
-                    max-height: 100px;
-                }}            
-                .box {{
-                    max-height: 200vh;  /*  */
-                }}
-            }}                
-        </style>
+        <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_seat.css">
         <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/sorttable/2.1.2/sorttable.min.js"></script>
     </head>
@@ -656,8 +584,9 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     html += """
     <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
     """
-    html += render_table("자유석", free_rows)
-    html += render_table("노트북석", laptop_rows)
+    for title, rows in rows_dict.items():
+        html += render_table(title, rows)
+    
     html += """
     </div>
     """
@@ -690,11 +619,27 @@ def get_today_user_count(driver):
             lambda d: d.find_element(By.ID, "today_use_cnt").text.strip().isdigit()
         )
         user_count_text = driver.find_element(By.ID, "today_use_cnt").text.strip()
+        today_count = int(user_count_text)
 
         if DEBUG:
-            print(f"[DEBUG] 추출된 사용자 수 텍스트: '{user_count_text}'")
+            print(f"[DEBUG] 추출된 사용자 수 텍스트 (오늘): '{today_count}'")
 
-        return int(user_count_text)
+        now_kst = datetime.now(kst)
+        if now_kst.hour < 5:
+            # 어제 날짜로 대시보드 조회
+            yesterday = (now_kst - timedelta(days=1)).strftime("%Y.%m.%d")
+            driver.get(f"{BASE_URL}/dashboard?date={yesterday}")
+            time.sleep(1)
+            WebDriverWait(driver, 10).until(
+                lambda d: d.find_element(By.ID, "today_use_cnt").text.strip().isdigit()
+            )
+            y_text = driver.find_element(By.ID, "today_use_cnt").text.strip()
+            yesterday_count = int(y_text)
+            if DEBUG:
+                print(f"[DEBUG] 어제 사용자 수 텍스트: '{yesterday_count}'")
+            return today_count + yesterday_count
+
+        return today_count
 
     except Exception as e:
         if DEBUG:

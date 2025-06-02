@@ -223,6 +223,31 @@ def check_payment_status(driver):
         with open(PAYMENT_CACHE_FILE, "wb") as f:
             pickle.dump(today_only[0]["id"], f)
 
+    # 누적 결제 금액 계산 (승인된 결제만)
+    summary_amount = sum(
+        int(p['amount'].replace(',', '').replace('원', ''))
+        for p in today_only
+        if p['amount'] and '승인' in p['status']
+    )
+
+    # Broadcast on 100,000 KRW thresholds
+    try:
+        threshold_unit = 100_000
+        broadcast_file = os.path.join(DEBUG_PATH, "payment_threshold.pkl")
+        last_threshold = 0
+        if os.path.exists(broadcast_file):
+            with open(broadcast_file, "rb") as f:
+                last_threshold = pickle.load(f)
+
+        current_threshold = (summary_amount // threshold_unit) * threshold_unit
+        if current_threshold > last_threshold:
+            send_broadcast_and_update(f"✅ 오늘 누적 결제액 {summary_amount:,}원 돌파!", broadcast=True, category="payment")
+            with open(broadcast_file, "wb") as f:
+                pickle.dump(current_threshold, f)
+    except Exception as e:
+        if DEBUG:
+            print(f"[DEBUG] 누적 금액 알림 실패: {e}")
+
     # 대시보드 HTML 저장 함수 호출 (항상 호출, today_only가 비어도)
     save_payment_dashboard_html(today_only)
     if DEBUG:
@@ -267,100 +292,7 @@ def save_payment_dashboard_html(payments):
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>오늘 결제 현황</title>
         <meta http-equiv="refresh" content="60">
-        <style>
-            body {{
-                font-family: 'Apple SD Gothic Neo', Arial, sans-serif;
-                background: #f1f3f5;
-                padding: 0.5rem;
-                margin: 0;
-                display: flex;
-                align-items: flex-start;
-                justify-content: center;
-                text-align: center;
-                max-width: 100vw;
-                height: auto;
-                min-height: 0;
-                box-sizing: border-box;
-            }}
-            .box {{
-                background: white;
-                border-radius: 1rem;
-                padding: 1rem;
-                max-width: 650px;         /* 데스크탑 기준 최대 폭 */
-                width: 100%;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                text-align: center;
-                margin: 0 auto;
-            }}
-            @media (max-width: 480px) {{
-                .box {{
-                max-width: 95vw;
-                /* padding: 1.2rem; */
-                min-height: 90vh;  /* 화면 높이의 90%까지 확장 */
-                }}
-            }} 
-            h1 {{
-                font-size: 1.1rem;
-                margin-bottom: 1rem;
-                color: #333;
-            }}
-            .summary {{
-                font-size: 1rem;
-                margin-bottom: 1rem;
-                color: #555;
-            }}
-            .updated {{
-                font-size: 0.8rem;
-                color: #888;
-                margin-top: 1rem;
-                text-align: center;
-            }}
-            table {{
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 0.8rem;
-                margin-top: 1rem;
-            }}
-            th, td {{
-                border: 1px solid #dee2e6;
-                padding: 0.2rem;
-            }}
-            th {{
-                background-color: #6c757d;
-                color: white;
-            }}
-            tr:nth-child(even) {{
-                background-color: #f8f9fa;
-            }}
-            .number {{
-                font-size: 0.7rem;
-                min-width: 20px;
-                padding: 0.4rem;
-            }}            
-            .user {{
-                min-width: 40px;
-            }}
-            .amount {{            
-                font-size: 0.7rem;
-                min-width: 50px;
-            }}
-            .seat {{
-                font-size: 0.7rem;
-                padding: 0.1rem;  
-                word-break: break-word;
-                white-space: normal; 
-                min-width: 58px;
-                max-width: 90px; /*
-            }}            
-            .time {{
-                font-size: 0.7rem;
-                padding: 0.4rem;
-                word-break: break-word;
-                white-space: normal; 
-                min-width: 50px;               
-                max-width: 90px; /*
-            }}
-        </style>
+        <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_payment.css">
     </head>
     <body>
         <div class="box">
