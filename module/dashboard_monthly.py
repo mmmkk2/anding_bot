@@ -390,11 +390,32 @@ def fetch_monthly_sales_from_calendar(driver):
         import pandas as pd
         df = pd.DataFrame(sales)
         df["date"] = pd.to_datetime(df["date"], format="%Y.%m.%d")
-        df = df.sort_values("date")
-        df["cumsum"] = df["amount"].cumsum()
+        # Filter only previous month
+        prev_month = (now.replace(day=1) - pd.Timedelta(days=1)).month
+        df["month"] = df["date"].dt.month
+        df_prev = df[df["month"] == prev_month].sort_values("date").drop(columns=["month"])
+        df_prev["cumsum"] = df_prev["amount"].cumsum()
 
-        dates = df["date"].dt.strftime("%Y-%m-%d").tolist()
-        cumsums = df["cumsum"].tolist()
+        dates = df_prev["date"].dt.strftime("%Y-%m-%d").tolist()
+        cumsums = df_prev["cumsum"].tolist()
+
+        # Prepare current month sales for comparison
+        current_month = now.month
+        df_current = pd.DataFrame(sales)
+        df_current["date"] = pd.to_datetime(df_current["date"], format="%Y.%m.%d")
+        df_current["month"] = df_current["date"].dt.month
+        df_current = df_current[df_current["month"] == current_month]
+        df_current = df_current.sort_values("date")
+        df_current = df_current.drop(columns=["month"])
+        df_current["cumsum"] = df_current["amount"].cumsum()
+
+        # Align current month cumulative sales to dates (labels)
+        # If a date in 'dates' (previous month) is not present in current month, fill with None or 0
+        # But per instruction, use 'dates' as labels for both datasets
+        dates_current = df_current["date"].dt.strftime("%Y-%m-%d").tolist()
+        cumsum_map_current = dict(zip(dates_current, df_current["cumsum"].tolist()))
+        # For each date in previous month, get corresponding cumsum of current month or 0
+        cumsums_current = [cumsum_map_current.get(d, 0) for d in dates]
 
         chart_html = f"""
         <!DOCTYPE html>
@@ -435,15 +456,26 @@ def fetch_monthly_sales_from_calendar(driver):
                     type: 'line',
                     data: {{
                         labels: {dates},
-                        datasets: [{{
-                            label: '누적 매출 (원)',
-                            data: {cumsums},
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            fill: true,
-                            tension: 0.1,
-                            pointRadius: 2
-                        }}]
+                        datasets: [
+                            {{
+                                label: '이전달 누적 매출 (원)',
+                                data: {cumsums},
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                fill: true,
+                                tension: 0.1,
+                                pointRadius: 2
+                            }},
+                            {{
+                                label: '이번달 누적 매출 (원)',
+                                data: {cumsums_current},
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                fill: true,
+                                tension: 0.1,
+                                pointRadius: 2
+                            }}
+                        ]
                     }},
                     options: {{
                         responsive: true,
