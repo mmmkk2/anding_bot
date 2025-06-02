@@ -426,8 +426,6 @@ def fetch_monthly_sales_from_calendar(driver):
                 <div class="summary">
                     총 결제: {prev_month}월 {summary_amount_prev:,}원 / {curr_month}월 {summary_amount_curr:,}원<br>
                 </div>
-            </div>        
-            <div class="box">                
                 <canvas id="monthlyChart"></canvas>
             </div>
             <script>
