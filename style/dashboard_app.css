@@ -8,12 +8,13 @@
     max-width: 720px;
     margin: 2rem auto;
     font-family: monospace;
+    position: relative;
 }
 
 .log-title {
     font-size: 1.2rem;
     font-weight: bold;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
     color: #333;
 }
 
@@ -28,15 +29,12 @@ pre.log-output {
 }
 
 .back-link {
-    display: inline-block;
-    margin-top: 1rem;
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
     font-size: 0.85rem;
     color: #007bff;
     text-decoration: none;
-}
-
-.back-link:hover {
-    text-decoration: underline;
 }
 
 body {
@@ -62,6 +60,7 @@ body {
     font-size: 0.95rem;
     margin-bottom: 0.5rem;
     text-align: left;
+    margin-right: 0.5rem;
 }
 .status {
     font-size: 1.2rem;
@@ -141,7 +140,8 @@ iframe {
 /* Compact button spacing for summary-header-row forms and buttons */
 .summary-header-row form {
     display: inline-block;
-    margin-left: 0.15rem;
+    margin-left: 0.05rem;
+    margin-right: 0.05rem;
     margin-top: 0.25rem;
     margin-bottom: 0;
 }
