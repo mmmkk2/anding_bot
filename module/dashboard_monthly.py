@@ -415,13 +415,13 @@ def fetch_monthly_sales_from_calendar(driver):
         <html lang="ko">
         <head>
             <meta charset="UTF-8" />
-            <title>{now.year}년 {prev_month}월 매출 vs {now.year}년 {now.month}월 매출</title>
+            <title>{now.year}년 {now.month}월 매출</title>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_monthly.css">
         </head>
         <body>
             <div class="box">
-            <h1>📊 {now.year}년 {prev_month}월 vs {now.month}월 누적 매출 비교</h1>
+            <h1>📊 당월 vs 전월 누적 매출 비교</h1>
                 <div class="updated">📅 기준 날짜: <b>{today_str}</b></div>
                 <div class="summary">
                     총 결제: {prev_month}월 {summary_amount_prev:,}원 / {curr_month}월 {summary_amount_curr:,}원<br>
