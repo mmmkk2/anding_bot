@@ -24,7 +24,8 @@ body {
 }
 canvas {
     width: 100%;
-    min-height: 60vh;
+    min-height: 40vh;
+    min-height: 40vh;
     height: auto;
 }
 .updated {
@@ -41,5 +42,6 @@ h1 {
 @media (max-width: 480px) {
   canvas {
     min-height: 40vh;
+    max-height: 40vh;
   }
 }
