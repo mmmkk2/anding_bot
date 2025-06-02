@@ -512,6 +512,9 @@ def fetch_monthly_sales_from_calendar(driver):
                 <canvas id="monthlyChart"></canvas>
             </div>
             <script>
+                // Prepare data for Chart.js: set first point to null, and pointRadius 0 for first.
+                const cumsumsPrev = [null, ...{json.dumps(cumsums[1:])}];
+                const cumsumsCur = [null, ...{json.dumps(cumsums_current[1:])}];
                 const ctx = document.getElementById('monthlyChart').getContext('2d');
                 new Chart(ctx, {{
                     type: 'line',
@@ -520,21 +523,27 @@ def fetch_monthly_sales_from_calendar(driver):
                         datasets: [
                             {{
                                 label: '이전달 매출 (원)',
-                                data: {json.dumps(cumsums)},
+                                data: cumsumsPrev,
                                 borderColor: 'rgba(75, 192, 192, 1)',
                                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                                 fill: true,
                                 tension: 0.1,
-                                pointRadius: 2
+                                pointRadius: function(context) {{
+                                    return context.dataIndex === 0 ? 0 : 2;
+                                }},
+                                spanGaps: false
                             }},
                             {{
                                 label: '이번달 매출 (원)',
-                                data: {json.dumps(cumsums_current)},
+                                data: cumsumsCur,
                                 borderColor: 'rgba(255, 99, 132, 1)',
                                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                                 fill: true,
                                 tension: 0.1,
-                                pointRadius: 2
+                                pointRadius: function(context) {{
+                                    return context.dataIndex === 0 ? 0 : 2;
+                                }},
+                                spanGaps: false
                             }}
                         ]
                     }},
