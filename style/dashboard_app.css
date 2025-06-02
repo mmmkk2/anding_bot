@@ -157,3 +157,11 @@ iframe {
 }
 
 
+.summary-buttons {
+  display: flex;
+  gap: 0.2rem; /* 버튼 사이 최소 간격 */
+  margin-top: 0.25rem;
+}
+.summary-buttons form {
+  margin: 0; /* form 자체 여백 제거 */
+}
