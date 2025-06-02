@@ -461,8 +461,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         cum_user_counts = []
     
 
-    # --- 차트 스크립트 ---
-    lineColor = 'rgba(75, 192, 192, 1)'  # default green
+    # --- 차트 스크립트 (dashboard_monthly.py 스타일) ---
     chart_script = f"""
     <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns'></script>
@@ -471,22 +470,37 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         new Chart(ctx, {{
             type: 'line',
             data: {{
-                datasets: [
-                    {{
-                        label: '자유석 이용자 수',
-                        data: {json.dumps(data_points)},
-                        borderColor: '{lineColor}',
-                        pointBackgroundColor: {json.dumps(point_colors)},
-                        pointRadius: window.innerWidth > 768 ? 2 : 4,
-                        borderWidth: 1,
-                        tension: 0.1,
-                        yAxisID: 'y'
-                    }}
-                ]
+                labels: {json.dumps(timestamps)},
+                datasets: [{{
+                    label: '자유석 이용자 수',
+                    data: {json.dumps(used_frees)},
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                    borderWidth: 2,
+                    tension: 0.1,
+                    pointRadius: function(context) {{
+                        return context.dataIndex === 0 ? 0 : 2;
+                    }},
+                    spanGaps: false
+                }}]
             }},
             options: {{
                 responsive: true,
                 scales: {{
+                    y: {{
+                        beginAtZero: true,
+                        max: 30,
+                        title: {{
+                            display: true,
+                            text: '자유석 이용자 수'
+                        }},
+                        ticks: {{
+                            callback: function(value) {{
+                                return value + '명';
+                            }}
+                        }}
+                    }},
                     x: {{
                         type: 'time',
                         time: {{
@@ -506,14 +520,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         title: {{
                             display: false
                         }}
-                    }},
-                    y: {{
-                        beginAtZero: true,
-                        max: 30,
-                        title: {{
-                            display: true,
-                            text: '자유석 이용자 수'
-                        }},                        
                     }}
                 }}
             }}
