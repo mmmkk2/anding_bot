@@ -1,5 +1,6 @@
 import requests
 import socket
+import contextlib
 from module.dashboard_studyroom import main_check_studyroom
 from module.dashboard_payment import main_check_payment
 from module.dashboard_seat import main_check_seat
@@ -11,13 +12,18 @@ if __name__ == "__main__":
     print(f"현재 외부 IP 주소: {ip}")
     print(f"📡 Running on hostname: {socket.gethostname()}")
 
-    # # 인증 리스너를 백그라운드에서 실행
-    # listener_thread = threading.Thread(target=start_telegram_listener, daemon=True)
-    # listener_thread.start()
+    with open("logs/run_s.log", "w") as f:
+        with contextlib.redirect_stdout(f), contextlib.redirect_stderr(f):
+            main_check_seat()
 
-    main_check_seat()
-    main_check_payment()
-    main_monthly_payment()
-    main_check_studyroom()
-    
-    
+    with open("logs/run_p.log", "w") as f:
+        with contextlib.redirect_stdout(f), contextlib.redirect_stderr(f):
+            main_check_payment()
+
+    with open("logs/run_m.log", "w") as f:
+        with contextlib.redirect_stdout(f), contextlib.redirect_stderr(f):
+            main_monthly_payment()
+
+    with open("logs/run_r.log", "w") as f:
+        with contextlib.redirect_stdout(f), contextlib.redirect_stderr(f):
+            main_check_studyroom()
