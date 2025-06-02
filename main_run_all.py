@@ -12,18 +12,18 @@ if __name__ == "__main__":
     print(f"현재 외부 IP 주소: {ip}")
     print(f"📡 Running on hostname: {socket.gethostname()}")
 
-    with open("logs/run_s.log", "w") as f:
+    with open("/home/mmkkshim/anding_bot/logs/run_s.log", "w") as f:
         with contextlib.redirect_stdout(f), contextlib.redirect_stderr(f):
             main_check_seat()
 
-    with open("logs/run_p.log", "w") as f:
+    with open("/home/mmkkshim/anding_bot/logs/run_p.log", "w") as f:
         with contextlib.redirect_stdout(f), contextlib.redirect_stderr(f):
             main_check_payment()
 
-    with open("logs/run_m.log", "w") as f:
+    with open("/home/mmkkshim/anding_bot/logs/run_m.log", "w") as f:
         with contextlib.redirect_stdout(f), contextlib.redirect_stderr(f):
             main_monthly_payment()
 
-    with open("logs/run_r.log", "w") as f:
+    with open("/home/mmkkshim/anding_bot/logs/run_r.log", "w") as f:
         with contextlib.redirect_stdout(f), contextlib.redirect_stderr(f):
             main_check_studyroom()
