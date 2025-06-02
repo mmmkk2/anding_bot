@@ -435,6 +435,7 @@ def fetch_monthly_sales_from_calendar(driver):
 
     if sales:
         import pandas as pd
+        import json
         df = pd.DataFrame(sales)
         df["date"] = pd.to_datetime(df["date"], format="%Y.%m.%d")
         # Filter only previous month
@@ -515,11 +516,11 @@ def fetch_monthly_sales_from_calendar(driver):
                 new Chart(ctx, {{
                     type: 'line',
                     data: {{
-                        labels: {dates},
+                        labels: {json.dumps(dates)},
                         datasets: [
                             {{
                                 label: '이전달 매출 (원)',
-                                data: {cumsums},
+                                data: {json.dumps(cumsums)},
                                 borderColor: 'rgba(75, 192, 192, 1)',
                                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                                 fill: true,
@@ -528,7 +529,7 @@ def fetch_monthly_sales_from_calendar(driver):
                             }},
                             {{
                                 label: '이번달 매출 (원)',
-                                data: {cumsums_current},
+                                data: {json.dumps(cumsums_current)},
                                 borderColor: 'rgba(255, 99, 132, 1)',
                                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                                 fill: true,
