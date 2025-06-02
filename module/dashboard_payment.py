@@ -296,7 +296,6 @@ def save_payment_dashboard_html(payments):
     </head>
     <body>
         <div class="box">
-            <div class="updated">📅 기준 날짜: <b>{today_str}</b></div>
             <div class="summary">
                 총 결제: {summary_count}건 / {summary_amount:,}원<br>
             </div>
