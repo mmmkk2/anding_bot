@@ -3,7 +3,7 @@ import socket
 from module.dashboard_studyroom import main_check_studyroom
 from module.dashboard_payment import main_check_payment
 from module.dashboard_seat import main_check_seat
-
+from module.dashboard_monthly import main_monthly_payment
 
 
 if __name__ == "__main__":
@@ -19,6 +19,4 @@ if __name__ == "__main__":
     main_check_payment()
     main_check_seat()
     main_check_studyroom()
-        
-    # if should_run_studyroom():
-    #     main_check_studyroom()
+    main_monthly_payment()
