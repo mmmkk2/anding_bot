@@ -443,9 +443,12 @@ def fetch_monthly_sales_from_calendar(driver):
         df_prev = df[df["month"] == prev_month].sort_values("date").drop(columns=["month"])
         df_prev["cumsum"] = df_prev["amount"].cumsum()
 
-        # Ensure date labels are always two digits (e.g., '01', '02', ..., '31')
+        # Ensure date labels are always two digits (e.g., '01', '02d', ..., '31')
         dates = df_prev["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}").tolist()
         cumsums = df_prev["cumsum"].tolist()
+        # Insert "00" and 0 at the start of both lists
+        dates.insert(0, "00")
+        cumsums.insert(0, 0)
 
         # Prepare current month sales for comparison
         current_month = now.month
@@ -471,6 +474,8 @@ def fetch_monthly_sales_from_calendar(driver):
                 cumsums_current.append(cumsum_map_current.get(d, 0))  # Include today
             else:
                 cumsums_current.append(None)  # Leave future dates as blank
+        # Insert a zero at the start of cumsums_current
+        cumsums_current.insert(0, 0)
 
         chart_html = f"""
         <!DOCTYPE html>
@@ -552,8 +557,12 @@ def fetch_monthly_sales_from_calendar(driver):
         """
 
         graph_path = os.path.join(DASHBOARD_PATH, "calendar_dashboard.html")
+        # Ensure the dashboard path exists
+        os.makedirs(DASHBOARD_PATH, exist_ok=True)
         with open(graph_path, "w", encoding="utf-8") as f:
             f.write(chart_html)
+        if DEBUG:
+            print(f"[DEBUG] 캘린더 대시보드 HTML 저장 완료: {graph_path}")
 
     return sales
 
