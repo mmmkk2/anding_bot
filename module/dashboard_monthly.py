@@ -254,80 +254,6 @@ def check_payment_status(driver):
         print("[DEBUG] 대시보드 HTML 저장 완료 요청됨.")
 
 
-def save_payment_dashboard_html(payments):
-    today = now.strftime("%Y.%m.%d")
-    summary_time = now.strftime("%H:%M")
-    summary_count = len(payments)
-    # summary_amount = sum(int(p['amount'].replace(',', '').replace('원', '')) for p in payments if p['amount'])
-    summary_amount = sum(
-        int(p['amount'].replace(',', '').replace('원', ''))
-        for p in payments
-        if p['amount'] and '승인' in p['status']
-    )
-    if DEBUG:
-        print(f"[DEBUG] save_payment_dashboard_html: 전달된 결제 내역 개수: {len(payments)}")
-        if not payments:
-            print("[DEBUG] save_payment_dashboard_html: 결제 내역이 비어 있음. HTML은 그래도 생성됨.")
-    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
-    if not payments:
-        html_rows = "<tr><td colspan='5'>오늘 결제 내역이 없습니다.</td></tr>"
-    else:
-        html_rows = ""
-        for row in payments:
-            html_rows += f"""
-                <tr>
-                    <td class="number">{row['id']}</td>
-                    <td class="user">{row['user']}</td>
-                    <td class="amount">{row['amount']}</td>
-                    <td class="seat">{row['seat_type']}</td>
-                    <td class="time">{row['date'][:10]} {row['date'][11:19]}</td>
-                </tr>
-            """
-
-    html = f"""
-    <!DOCTYPE html>
-    <html lang="ko">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>오늘 결제 현황</title>
-        <meta http-equiv="refresh" content="60">
-        <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_payment.css">
-    </head>
-    <body>
-        <div class="box">
-            <div class="updated">📅 기준 날짜: <b>{today_str}</b></div>
-            <div class="summary">
-                총 결제: {summary_count}건 / {summary_amount:,}원<br>
-            </div>
-            <div class="updated">업데이트 시각: {now_str}</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>번호</th>
-                        <th>이름</th>
-                        <th>금액</th>
-                        <th>상품</th>
-                        <th>결제일시</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {html_rows}
-                </tbody>
-            </table>
-        </div>
-    </body>
-    </html>
-    """
-
-    output_path = os.path.join(DASHBOARD_PATH, "payment_dashboard.html")
-    try:
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(html)
-        if DEBUG:
-            print(f"[완료] 결제 대시보드 HTML 저장됨: {output_path}")
-    except Exception as e:
-        print(f"[오류] 결제 대시보드 HTML 저장 실패: {e}")
 
 # === 월별 매출 캘린더 파싱 함수 ===
 def fetch_monthly_sales_from_calendar(driver):
@@ -461,6 +387,12 @@ def fetch_monthly_sales_from_calendar(driver):
         df_current = df_current.drop(columns=["month"])
         df_current["cumsum"] = df_current["amount"].cumsum()
 
+        # Inserted: calculate prev_month, curr_month, summary_amount_prev, summary_amount_curr
+        prev_month = df_prev["date"].dt.month.iloc[0] if not df_prev.empty else now.month - 1
+        curr_month = df_current["date"].dt.month.iloc[0] if not df_current.empty else now.month
+        summary_amount_prev = df_prev["amount"].sum()
+        summary_amount_curr = df_current["amount"].sum()
+
         # Align current month cumulative sales to dates (labels)
         # Use two-digit day for label consistency
         dates_current = df_current["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}").tolist()
@@ -485,30 +417,17 @@ def fetch_monthly_sales_from_calendar(driver):
             <meta charset="UTF-8" />
             <title>{now.year}년 {prev_month}월 매출 vs {now.year}년 {now.month}월 매출</title>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <style>
-                body {{
-                    font-family: Arial, sans-serif;
-                    text-align: center;
-                    padding: 2rem;
-                    background-color: #f1f3f5;
-                }}
-                .box {{
-                    background: white;
-                    border-radius: 1rem;
-                    padding: 1.5rem;
-                    max-width: 900px;
-                    margin: auto;
-                    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-                }}
-                canvas {{
-                    width: 100%;
-                    height: 400px;
-                }}
-            </style>
+            <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_monthly.css">
         </head>
         <body>
             <div class="box">
-                <h2>📊 {now.year}년 {prev_month}월 vs {now.month}월 누적 매출 비교</h2>
+            <h1>📊 {now.year}년 {prev_month}월 vs {now.month}월 누적 매출 비교</h1>
+                <div class="updated">📅 기준 날짜: <b>{today_str}</b></div>
+                <div class="summary">
+                    총 결제: {prev_month}월 {summary_amount_prev:,}원 / {curr_month}월 {summary_amount_curr:,}원<br>
+                </div>
+            </div>        
+            <div class="box">                
                 <canvas id="monthlyChart"></canvas>
             </div>
             <script>
