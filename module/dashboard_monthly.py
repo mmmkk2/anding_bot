@@ -385,6 +385,89 @@ def fetch_monthly_sales_from_calendar(driver):
                 except Exception as e:
                     if DEBUG:
                         print(f"[DEBUG] 매출 파싱 실패: {text} ({e})")
+
+    if sales:
+        import pandas as pd
+        df = pd.DataFrame(sales)
+        df["date"] = pd.to_datetime(df["date"], format="%Y.%m.%d")
+        df = df.sort_values("date")
+        df["cumsum"] = df["amount"].cumsum()
+
+        dates = df["date"].dt.strftime("%Y-%m-%d").tolist()
+        cumsums = df["cumsum"].tolist()
+
+        chart_html = f"""
+        <!DOCTYPE html>
+        <html lang="ko">
+        <head>
+            <meta charset="UTF-8" />
+            <title>이전달 누적 매출</title>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    text-align: center;
+                    padding: 2rem;
+                    background-color: #f1f3f5;
+                }}
+                .box {{
+                    background: white;
+                    border-radius: 1rem;
+                    padding: 1.5rem;
+                    max-width: 900px;
+                    margin: auto;
+                    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                }}
+                canvas {{
+                    width: 100%;
+                    height: 400px;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="box">
+                <h2>📊 이전달 일별 누적 매출</h2>
+                <canvas id="monthlyChart"></canvas>
+            </div>
+            <script>
+                const ctx = document.getElementById('monthlyChart').getContext('2d');
+                new Chart(ctx, {{
+                    type: 'line',
+                    data: {{
+                        labels: {dates},
+                        datasets: [{{
+                            label: '누적 매출 (원)',
+                            data: {cumsums},
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            fill: true,
+                            tension: 0.1,
+                            pointRadius: 2
+                        }}]
+                    }},
+                    options: {{
+                        responsive: true,
+                        scales: {{
+                            y: {{
+                                beginAtZero: false,
+                                ticks: {{
+                                    callback: function(value) {{
+                                        return value.toLocaleString() + '원';
+                                    }}
+                                }}
+                            }}
+                        }}
+                    }}
+                }});
+            </script>
+        </body>
+        </html>
+        """
+
+        graph_path = os.path.join(DASHBOARD_PATH, "calendar_dashboard.html")
+        with open(graph_path, "w", encoding="utf-8") as f:
+            f.write(chart_html)
+
     return sales
 
 def main_monthly_payment():
