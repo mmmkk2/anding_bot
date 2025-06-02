@@ -396,7 +396,7 @@ def fetch_monthly_sales_from_calendar(driver):
         df_prev = df[df["month"] == prev_month].sort_values("date").drop(columns=["month"])
         df_prev["cumsum"] = df_prev["amount"].cumsum()
 
-        dates = df_prev["date"].dt.strftime("%Y-%m-%d").tolist()
+        dates = df_prev["date"].dt.strftime("%d").tolist()
         cumsums = df_prev["cumsum"].tolist()
 
         # Prepare current month sales for comparison
@@ -412,7 +412,7 @@ def fetch_monthly_sales_from_calendar(driver):
         # Align current month cumulative sales to dates (labels)
         # If a date in 'dates' (previous month) is not present in current month, fill with None or 0
         # But per instruction, use 'dates' as labels for both datasets
-        dates_current = df_current["date"].dt.strftime("%Y-%m-%d").tolist()
+        dates_current = df_current["date"].dt.strftime("%d").tolist()
         cumsum_map_current = dict(zip(dates_current, df_current["cumsum"].tolist()))
         # For each date in previous month, get corresponding cumsum of current month or 0
         cumsums_current = [cumsum_map_current.get(d, 0) for d in dates]
@@ -422,7 +422,7 @@ def fetch_monthly_sales_from_calendar(driver):
         <html lang="ko">
         <head>
             <meta charset="UTF-8" />
-            <title>이전달 누적 매출</title>
+            <title>이전달 매출</title>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <style>
                 body {{
@@ -447,7 +447,7 @@ def fetch_monthly_sales_from_calendar(driver):
         </head>
         <body>
             <div class="box">
-                <h2>📊 이전달 일별 누적 매출</h2>
+                <h2>📊 이전달 일별 매출</h2>
                 <canvas id="monthlyChart"></canvas>
             </div>
             <script>
@@ -458,7 +458,7 @@ def fetch_monthly_sales_from_calendar(driver):
                         labels: {dates},
                         datasets: [
                             {{
-                                label: '이전달 누적 매출 (원)',
+                                label: '이전달 매출 (원)',
                                 data: {cumsums},
                                 borderColor: 'rgba(75, 192, 192, 1)',
                                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -467,7 +467,7 @@ def fetch_monthly_sales_from_calendar(driver):
                                 pointRadius: 2
                             }},
                             {{
-                                label: '이번달 누적 매출 (원)',
+                                label: '이번달 매출 (원)',
                                 data: {cumsums_current},
                                 borderColor: 'rgba(255, 99, 132, 1)',
                                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
