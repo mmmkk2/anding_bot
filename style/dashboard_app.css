@@ -126,6 +126,7 @@ iframe {
 }
 
 
+
 @media (max-width: 480px) {
     .updated-box {
         flex-direction: column;
@@ -135,6 +136,19 @@ iframe {
         font-size: 0.85rem;
         padding: 0.3rem 0.8rem;
     }
+}
+
+/* Compact button spacing for summary-header-row forms and buttons */
+.summary-header-row form {
+    display: inline-block;
+    margin-left: 0.3rem;
+}
+.summary-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.3rem;
 }
 
 
