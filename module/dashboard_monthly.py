@@ -237,6 +237,7 @@ def fetch_monthly_sales_from_calendar(driver):
                                 borderColor: 'rgba(75, 192, 192, 1)',
                                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                                 fill: true,
+                                borderWidth: 2,
                                 tension: 0.1,
                                 pointRadius: function(context) {{
                                     return context.dataIndex === 0 ? 0 : 2;
@@ -249,6 +250,7 @@ def fetch_monthly_sales_from_calendar(driver):
                                 borderColor: 'rgba(255, 99, 132, 1)',
                                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                                 fill: true,
+                                borderWidth: 2,
                                 tension: 0.1,
                                 pointRadius: function(context) {{
                                     return context.dataIndex === 0 ? 0 : 2;
