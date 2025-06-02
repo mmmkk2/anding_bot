@@ -390,7 +390,7 @@ def fetch_monthly_sales_from_calendar(driver):
         print(f"[DEBUG] 파싱된 매출 이벤트 수: {len(sales)}")
     return sales
 
-def main_check_payment():
+def main_monthly_payment():
 
     # ✅ 인증번호 파일 초기화
     if os.path.exists("auth_code.txt"):
@@ -411,3 +411,12 @@ def main_check_payment():
         pass
     finally:
         driver.quit()
+
+
+if __name__ == "__main__":
+
+    # # 인증 리스너를 백그라운드에서 실행
+    # listener_thread = threading.Thread(target=start_telegram_listener, daemon=True)
+    # listener_thread.start()
+
+    main_monthly_payment()
