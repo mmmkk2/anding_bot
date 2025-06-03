@@ -26,17 +26,16 @@ try:
 except:
     pass
 
-# Dashboard path for logs and HTML
-DEBUG_PATH = os.getenv("DEBUG_PATH")
-DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
-
-
 # Add manual mode switch after loading .env
 # Default: DEBUG is True unless --manual is passed
 parser = argparse.ArgumentParser()
 parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 비활성화)")
 args = parser.parse_args()
 DEBUG = not args.manual and os.getenv("DEBUG", "true").lower() == "true"
+
+# Dashboard path for logs and HTML
+DEBUG_PATH = os.getenv("DEBUG_PATH")
+DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
 
 PAYMENT_CACHE_FILE = os.getenv("COOKIE_FILE")
 
