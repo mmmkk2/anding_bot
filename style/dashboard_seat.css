@@ -39,6 +39,7 @@ h1 {
     font-size: 0.8rem;
     color: #888;
     margin-top: 1rem;
+    margin-right: 0.1rem;
     width: 100%;
     text-align: right !important;
     padding-right: 1rem;
@@ -103,16 +104,6 @@ table.sortable th {
     }
 }                
 
-.updated {
-    font-size: 0.8rem;
-    color: #888;
-    margin-top: 1rem;
-    margin-right: 0.1rem;
-    width: 100%;
-    text-align: right !important;
-    display: block;
-    box-sizing: border-box;
-}
 .pill {
     background-color: #dfe6de;
     color: #333;
@@ -136,7 +127,6 @@ table.sortable th {
     }
 }
 
-
 .summary-box {
     display: block;
     text-align: right;
@@ -148,3 +138,77 @@ table.sortable th {
 .summary-text {
     line-height: 1.3;
 }  
+
+/* Additional styles merged from dashboard_payment.css */
+
+.payment-container {
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    max-width: 650px;
+    margin: 0 auto;
+    overflow-y: auto;
+}
+
+.payment-header {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #444;
+}
+
+.payment-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+}
+
+.payment-table th, .payment-table td {
+    border: 1px solid #dee2e6;
+    padding: 0.3rem;
+    text-align: center;
+    background-color: white;
+}
+
+.payment-table th {
+    background-color: #495057;
+    color: white;
+    font-weight: bold;
+}
+
+.payment-table tr:nth-child(even) {
+    background-color: #f1f3f5;
+}
+
+.payment-status {
+    font-weight: 600;
+    color: #2f855a; /* green for success */
+}
+
+.payment-status.failed {
+    color: #e53e3e; /* red for failed */
+}
+
+.payment-summary {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #666;
+    text-align: right;
+}
+
+@media (max-width: 480px) {
+    .payment-container {
+        max-height: 200vh;
+        padding: 0.5rem;
+    }
+    .payment-header {
+        font-size: 1rem;
+    }
+    .payment-table {
+        font-size: 0.65rem;
+    }
+    .payment-summary {
+        font-size: 0.8rem;
+    }
+}
