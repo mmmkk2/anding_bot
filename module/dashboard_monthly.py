@@ -178,7 +178,13 @@ def fetch_monthly_sales_from_calendar(driver):
         df_current = df_current[df_current["month"] == current_month]
         df_current = df_current.sort_values("date")
         df_current = df_current.drop(columns=["month"])
-        df_current["cumsum"] = df_current["amount"].cumsum()
+        # Inserted: handle empty df_current before calculating cumsum
+        # df_current["cumsum"] = df_current["amount"].cumsum()
+        if df_current.empty:
+            df_current = pd.DataFrame([{"date": now, "amount": 0}])
+            df_current["cumsum"] = df_current["amount"].cumsum()
+        else:
+            df_current["cumsum"] = df_current["amount"].cumsum()
 
         # Inserted: calculate prev_month, curr_month, summary_amount_prev, summary_amount_curr
         prev_month = df_prev["date"].dt.month.iloc[0] if not df_prev.empty else now.month - 1
