@@ -233,6 +233,7 @@ def check_studyroom(driver):
             </div>
             <div class="updated">Updated {now_str}</div>
         </div>
+    </div>
     </body>
     </html>
     """

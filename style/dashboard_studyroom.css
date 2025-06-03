@@ -19,16 +19,17 @@ body {
     width: 100%;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     text-align: center;
-    margin: 0 auto;
+    margin: 0 auto 1rem auto;
     max-width: 95vw;
+    display: block;
 }
 
 .summary-box {
     border-radius: 1rem;
-    padding: 1rem;
+    padding: 1rem 1.5rem;
     width: 100%;
-    text-align: center;
-    margin: 1.5rem auto 1rem;
+    text-align: right;
+    margin: 0 auto;
     max-width: 95vw;
     background-color: transparent;
     display: block;
