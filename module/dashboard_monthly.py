@@ -216,10 +216,6 @@ def fetch_monthly_sales_from_calendar(driver):
         </head>
         <body>
             <div class="box">
-                <div class="summary">
-                    총 결제: {prev_month}월 {summary_amount_prev:,}원 / {curr_month}월 {summary_amount_curr:,}원<br>
-                </div>
-                <div class="updated">Updated {now_str}</div>
                 <canvas id="monthlyChart" style="max-width: 100%; height: auto;"></canvas>
             </div>
             <script>
@@ -275,6 +271,10 @@ def fetch_monthly_sales_from_calendar(driver):
                     }}
                 }});
             </script>
+            <div class="summary-box">
+                <div> 총 결제: {prev_month}월 {summary_amount_prev:,}원 / {curr_month}월 {summary_amount_curr:,}원<br> </div>
+                <div class="updated">Updated {now_str}</div>
+            </div>
         </body>
         </html>
         """
