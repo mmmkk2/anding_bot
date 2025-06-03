@@ -312,8 +312,8 @@ def save_payment_dashboard_html(payments):
             </table>
             <div class="summary">
                 총 결제: {summary_count}건 / {summary_amount:,}원<br>
+                <div class="updated">Updated {now_str}</div>
             </div>
-            <div class="updated">Updated {now_str}</div>            
         </div>
     </body>
     </html>
