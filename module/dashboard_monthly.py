@@ -190,7 +190,8 @@ def fetch_monthly_sales_from_calendar(driver):
         cumsum_map_current = dict(zip(dates_current, df_current["cumsum"].tolist()))
         # For each date in previous month, get corresponding cumsum of current month or None for future dates
         today_day = now.strftime("%d")
-        now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+        update_mode = "M" if args.manual else "B"
+        now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
         if DEBUG:
             print(f"[DEBUG] now_str: {now_str}")
         cumsums_current = []

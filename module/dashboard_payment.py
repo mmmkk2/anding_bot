@@ -268,7 +268,8 @@ def save_payment_dashboard_html(payments):
         print(f"[DEBUG] save_payment_dashboard_html: 전달된 결제 내역 개수: {len(payments)}")
         if not payments:
             print("[DEBUG] save_payment_dashboard_html: 결제 내역이 비어 있음. HTML은 그래도 생성됨.")
-    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+    update_mode = "M" if args.manual else "B"
+    now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
     if not payments:
         html_rows = "<tr><td colspan='5'>오늘 결제 내역이 없습니다.</td></tr>"
     else:
