@@ -228,10 +228,10 @@ def fetch_monthly_sales_from_calendar(driver):
                             labels: {json.dumps(dates)},
                             datasets: [
                                 {{
-                                    label: '이전달 매출 (원)',
-                                    data: cumsumsPrev,
-                                    borderColor: 'rgba(75, 192, 192, 1)',
-                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    label: '이번달 매출 (원)',
+                                    data: cumsumsCur,
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
                                     fill: true,
                                     borderWidth: 2,
                                     tension: 0.1,
@@ -241,10 +241,10 @@ def fetch_monthly_sales_from_calendar(driver):
                                     spanGaps: false
                                 }},
                                 {{
-                                    label: '이번달 매출 (원)',
-                                    data: cumsumsCur,
-                                    borderColor: 'rgba(255, 99, 132, 1)',
-                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    label: '이전달 매출 (원)',
+                                    data: cumsumsPrev,
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
                                     fill: true,
                                     borderWidth: 2,
                                     tension: 0.1,
