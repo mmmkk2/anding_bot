@@ -24,16 +24,6 @@ body {
     display: block;
 }
 
-.summary-box {
-    border-radius: 1rem;
-    padding: 1rem 1.5rem;
-    width: 100%;
-    text-align: right;
-    margin: 0 auto;
-    max-width: 95vw;
-    background-color: transparent;
-    display: block;
-}
 
 @media (max-width: 480px) {
     .box {
@@ -91,3 +81,16 @@ th {
 tr:nth-child(even) {
     background-color: #f8f9fa;
 }
+
+
+.summary-box {
+    display: block;
+    text-align: right;
+    margin-top: 1rem;
+    margin-right: 0.1rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+.summary-text {
+    line-height: 1.3;
+}  

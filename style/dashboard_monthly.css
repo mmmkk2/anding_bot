@@ -49,3 +49,15 @@ h1 {
     max-height: 40vh;
   }
 }
+
+.summary-box {
+    display: block;
+    text-align: right;
+    margin-top: 1rem;
+    margin-right: 0.1rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+.summary-text {
+    line-height: 1.3;
+}  
