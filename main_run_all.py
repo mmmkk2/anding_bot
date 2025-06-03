@@ -22,11 +22,16 @@ if __name__ == "__main__":
     run_and_log(main_check_seat, "/home/mmkkshim/anding_bot/logs/run_s.log")
 
     # 나머지 3개는 병렬 실행
-    threads = [
-        threading.Thread(target=run_and_log, args=(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log")),
-        threading.Thread(target=run_and_log, args=(main_monthly_payment, "/home/mmkkshim/anding_bot/logs/run_m.log")),
-        threading.Thread(target=run_and_log, args=(main_check_studyroom, "/home/mmkkshim/anding_bot/logs/run_r.log")),
-    ]
+    print("▶️ 결제 확인 시작")
+    t1 = threading.Thread(target=run_and_log, args=(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log"))
+
+    print("▶️ 월별 매출 확인 시작")
+    t2 = threading.Thread(target=run_and_log, args=(main_monthly_payment, "/home/mmkkshim/anding_bot/logs/run_m.log"))
+
+    print("▶️ 스터디룸 확인 시작")
+    t3 = threading.Thread(target=run_and_log, args=(main_check_studyroom, "/home/mmkkshim/anding_bot/logs/run_r.log"))
+
+    threads = [t1, t2, t3]
 
     for t in threads:
         t.start()
