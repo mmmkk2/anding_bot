@@ -559,8 +559,17 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         html += render_table(title, rows)
     html += f"""
     </div>
-    </div>
     <div class="updated">Updated {now_str}</div>
+    """
+    html += """
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('table.sortable').forEach(function(table) {
+          table.classList.add('sortable');
+        });
+      });
+    </script>
     </body>
     </html>
     """
