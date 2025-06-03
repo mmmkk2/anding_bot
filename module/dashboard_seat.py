@@ -542,24 +542,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_seat.css">
         <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/sorttable/2.1.2/sorttable.min.js"></script>
-        <style>
-        .summary-box {{
-            display: block;
-            text-align: right;
-            margin-top: 1rem;
-            margin-right: 0.5rem;
-            font-size: 0.9rem;
-            color: #555;
-        }}
-        .summary-text {{
-            line-height: 1.3;
-        }}
-        canvas {{
-            width: 100% !important;
-            max-width: 100%;
-            height: auto !important;
-        }}
-        </style>
     </head>
     <body>
         <div class="box">
@@ -567,11 +549,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 <canvas id="seatChart"></canvas>
                 {chart_script}
             <div style="margin-top:0.5rem;">
-            <div class="summary-box">
-                <div class="summary-text">2인실 : 예약: {used_free}건</div>
-                <div class="summary-text">4인실 : 예약: {used_laptop}건</div>
-                <div class="updated">Updated {now_str}</div>
-            </div>
             </div>
 """
 
@@ -583,7 +560,10 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     
     html += """
     </div>
-    """
+    <div class="summary-box">
+        <div class="updated">Updated %s</div>
+    </div>
+    """ % now_str
     html += """
     </div>
     """
