@@ -32,7 +32,11 @@ canvas {
     font-size: 0.8rem;
     color: #888;
     margin-top: 1rem;
-    text-align: center;
+    width: 100%;
+    text-align: right !important;
+    padding-right: 1rem;
+    display: block;
+    box-sizing: border-box;
 }
 h1 {
     font-size: 1.1rem;
