@@ -558,13 +558,11 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     for title, rows in rows_dict.items():
         html += render_table(title, rows)
     
-    html += """
+    html += f"""
     </div>
-    <div class="summary-box">
-        <div class="updated">Updated %s</div>
-    </div>
-    """ % now_str
-    html += """
+        <div class="summary-box">
+            <div class="updated">Updated {now_str}</div>
+        </div>
     </div>
     """
     # Move the updated line outside the .box, after the entire box
