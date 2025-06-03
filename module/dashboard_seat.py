@@ -528,9 +528,9 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         }});
     </script>
     """
-
-    now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
-
+    update_mode = "M" if args.manual else "B"
+    now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
+    
     html = f"""
     <!DOCTYPE html>
     <html lang="ko">

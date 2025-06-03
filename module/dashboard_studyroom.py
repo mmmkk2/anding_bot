@@ -186,8 +186,8 @@ def check_studyroom(driver):
         f"<tr><td>{r['time']}</td><td>{r['name']}</td></tr>"
         for r in reservations_4
     )
-
-    now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
+    update_mode = "M" if args.manual else "B"
+    now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
 
     html = f"""
     <!DOCTYPE html>

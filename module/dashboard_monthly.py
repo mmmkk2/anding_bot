@@ -31,7 +31,7 @@ except:
 parser = argparse.ArgumentParser()
 parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 비활성화)")
 args = parser.parse_args()
-DEBUG = not args.manual and os.getenv("DEBUG", "true").lower() == "true"
+DEBUG = args.manual and os.getenv("DEBUG", "true").lower() == "true"
 
 # Dashboard path for logs and HTML
 DEBUG_PATH = os.getenv("DEBUG_PATH")
