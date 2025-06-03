@@ -103,17 +103,16 @@ table.sortable th {
     }
 }                
 
-.updated-box {
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    flex-direction: row;
-    overflow-x: auto;
+.updated {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 1rem;
+    margin-right: 0.1rem;
+    width: 100%;
+    text-align: right !important;
+    display: block;
+    box-sizing: border-box;
 }
-
 .pill {
     background-color: #dfe6de;
     color: #333;
