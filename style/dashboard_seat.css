@@ -42,9 +42,7 @@ h1 {
     width: 100%;
     text-align: right;
     padding-right: 1rem;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+    display: block;
     box-sizing: border-box;
 }
 .tables {
