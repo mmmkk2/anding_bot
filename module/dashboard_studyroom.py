@@ -225,15 +225,14 @@ def check_studyroom(driver):
                     </table>
                 </div>
             </div>
-        </div>
-        <div class="summary-box">
-            <div class="summary">
-                2인실 : 예약: {count_2}건<br>
-                4인실 : 예약: {count_4}건
+            <div class="summary-box" style="margin-top: 1.5rem;">
+                <div class="summary">
+                    2인실 : 예약: {count_2}건<br>
+                    4인실 : 예약: {count_4}건
+                </div>
+                <div class="updated">Updated {now_str}</div>
             </div>
-            <div class="updated">Updated {now_str}</div>
         </div>
-    </div>
     </body>
     </html>
     """
