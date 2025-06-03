@@ -192,7 +192,16 @@ def fetch_monthly_sales_from_calendar(driver):
         # Align current month cumulative sales to dates (labels)
         # Use two-digit day for label consistency
         dates_current = df_current["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}").tolist()
-        cumsum_map_current = dict(zip(dates_current, df_current["cumsum"].tolist()))
+        # Rebuild cumulative mapping with carry-forward logic
+        cumsum_map_current = {}
+        last_val = 0
+        for d in dates:
+            if d in dates_current:
+                last_val = cumsum_map_current[d] = cumsum_map_current.get(d, df_current[df_current["date"].dt.strftime("%d") == d]["cumsum"].values[0])
+            elif d <= today_day:
+                cumsum_map_current[d] = last_val
+            else:
+                cumsum_map_current[d] = None
 
 
 
@@ -205,7 +214,8 @@ def fetch_monthly_sales_from_calendar(driver):
         cumsums_current = []
         for d in dates:
             if d <= today_day:
-                cumsums_current.append(cumsum_map_current.get(d, 0))
+                last_val = cumsums_current[-1] if cumsums_current else 0
+                cumsums_current.append(cumsum_map_current.get(d, last_val))
             else:
                 cumsums_current.append(None)
         # Insert a zero at the start of cumsums_current
