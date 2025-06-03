@@ -226,7 +226,7 @@ def check_studyroom(driver):
                 </div>
             </div>
         </div>
-        <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; flex-direction: column; align-items: flex-end; gap: 0.2rem;">
+        <div class="summary-box">
             <div class="summary">
                 2인실 : 예약: {count_2}건<br>
                 4인실 : 예약: {count_4}건

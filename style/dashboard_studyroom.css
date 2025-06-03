@@ -22,6 +22,17 @@ body {
     margin: 0 auto;
     max-width: 95vw;
 }
+
+.summary-box {
+    border-radius: 1rem;
+    padding: 1rem;
+    width: 100%;
+    text-align: center;
+    margin: 1.5rem auto 0;
+    max-width: 95vw;
+    background-color: transparent;
+}
+
 @media (max-width: 480px) {
     .box {
     max-width: 95vw;
