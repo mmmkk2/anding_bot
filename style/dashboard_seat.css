@@ -39,9 +39,10 @@ h1 {
     font-size: 0.8rem;
     color: #888;
     margin-top: 1rem;
-    display: flex;
-    justify-content: flex-end;
-    text-align: right;
+    text-align: right;      /* 텍스트를 오른쪽 정렬 */
+    width: 100%;            /* 전체 너비를 차지하게 */
+    padding-right: 1rem;    /* 오른쪽에 약간의 여백 */
+    box-sizing: border-box;
 }
 .tables {
     display: flex;
