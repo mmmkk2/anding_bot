@@ -39,6 +39,7 @@ h1 {
     font-size: 0.8rem;
     color: #888;
     margin-top: 1rem;
+    text-align: right;  
 }
 .tables {
     display: flex;
