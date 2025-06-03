@@ -28,9 +28,10 @@ body {
     padding: 1rem;
     width: 100%;
     text-align: center;
-    margin: 1.5rem auto 0;
+    margin: 1.5rem auto 1rem;
     max-width: 95vw;
     background-color: transparent;
+    display: block;
 }
 
 @media (max-width: 480px) {
