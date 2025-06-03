@@ -546,7 +546,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     <body>
         <div class="box">
             <div class="stat">🪑 {used_free}/{total_free} · 💻 {used_laptop}/{total_laptop} · 🟩 {remaining}석 · 👥 {cum_user_counts[-1] if cum_user_counts else "정보 없음"}명</div>
-                <canvas id="seatChart"></canvas>
+                <canvas id="seatChart" style="max-width: 100%; height:></canvas>
                 {chart_script}
             <div style="margin-top:0.5rem;">
             </div>
