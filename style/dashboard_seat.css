@@ -142,7 +142,7 @@ table.sortable th {
     display: block;
     text-align: right;
     margin-top: 1rem;
-    margin-right: 0.5rem;
+    margin-right: 0.1rem;
     font-size: 0.9rem;
     color: #555;
 }
