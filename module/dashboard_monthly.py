@@ -217,64 +217,65 @@ def fetch_monthly_sales_from_calendar(driver):
         <body>
             <div class="box">
                 <canvas id="monthlyChart" style="max-width: 100%; height: auto;"></canvas>
-            </div>
-            <script>
-                // Prepare data for Chart.js: set first point to null, and pointRadius 0 for first.
-                const cumsumsPrev = [null, ...{json.dumps(cumsums[1:])}];
-                const cumsumsCur = [null, ...{json.dumps(cumsums_current[1:])}];
-                const ctx = document.getElementById('monthlyChart').getContext('2d');
-                new Chart(ctx, {{
-                    type: 'line',
-                    data: {{
-                        labels: {json.dumps(dates)},
-                        datasets: [
-                            {{
-                                label: '이전달 매출 (원)',
-                                data: cumsumsPrev,
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                fill: true,
-                                borderWidth: 2,
-                                tension: 0.1,
-                                pointRadius: function(context) {{
-                                    return context.dataIndex === 0 ? 0 : 2;
+                <script>
+                    // Prepare data for Chart.js: set first point to null, and pointRadius 0 for first.
+                    const cumsumsPrev = [null, ...{json.dumps(cumsums[1:])}];
+                    const cumsumsCur = [null, ...{json.dumps(cumsums_current[1:])}];
+                    const ctx = document.getElementById('monthlyChart').getContext('2d');
+                    new Chart(ctx, {{
+                        type: 'line',
+                        data: {{
+                            labels: {json.dumps(dates)},
+                            datasets: [
+                                {{
+                                    label: '이전달 매출 (원)',
+                                    data: cumsumsPrev,
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    fill: true,
+                                    borderWidth: 2,
+                                    tension: 0.1,
+                                    pointRadius: function(context) {{
+                                        return context.dataIndex === 0 ? 0 : 2;
+                                    }},
+                                    spanGaps: false
                                 }},
-                                spanGaps: false
-                            }},
-                            {{
-                                label: '이번달 매출 (원)',
-                                data: cumsumsCur,
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                fill: true,
-                                borderWidth: 2,
-                                tension: 0.1,
-                                pointRadius: function(context) {{
-                                    return context.dataIndex === 0 ? 0 : 2;
-                                }},
-                                spanGaps: false
-                            }}
-                        ]
-                    }},
-                    options: {{
-                        responsive: true,
-                        scales: {{
-                            y: {{
-                                beginAtZero: false,
-                                ticks: {{
-                                    callback: function(value) {{
-                                        return value.toLocaleString() + '원';
+                                {{
+                                    label: '이번달 매출 (원)',
+                                    data: cumsumsCur,
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    fill: true,
+                                    borderWidth: 2,
+                                    tension: 0.1,
+                                    pointRadius: function(context) {{
+                                        return context.dataIndex === 0 ? 0 : 2;
+                                    }},
+                                    spanGaps: false
+                                }}
+                            ]
+                        }},
+                        options: {{
+                            responsive: true,
+                            scales: {{
+                                y: {{
+                                    beginAtZero: false,
+                                    ticks: {{
+                                        callback: function(value) {{
+                                            return value.toLocaleString() + '원';
+                                        }}
                                     }}
                                 }}
                             }}
                         }}
-                    }}
-                }});
-            </script>
-            <div class="summary-box">
-                <div> 총 결제: {prev_month}월 {summary_amount_prev:,}원 / {curr_month}월 {summary_amount_curr:,}원<br> </div>
-                <div class="updated">Updated {now_str}</div>
+                    }});
+                </script>
+                <div class="summary-box">
+                    <div> 총 결제: {prev_month}월 {summary_amount_prev:,}원 / {curr_month}월 {summary_amount_curr:,}원<br> </div>
+                    <div class="updated">Updated {now_str}</div>
+                </div>                
             </div>
+
         </body>
         </html>
         """
