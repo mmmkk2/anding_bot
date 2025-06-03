@@ -223,13 +223,13 @@ def check_studyroom(driver):
                             {html_rows_4}
                         </tbody>
                     </table>
+                    <div class="summary">
+                        2인실 : 예약: {count_2}건<br>
+                        4인실 : 예약: {count_4}건
+                    </div>
+                    <div class="updated">Updated {now_str}</div>
                 </div>
             </div>
-            <div class="summary">
-                2인실 : 예약: {count_2}건<br>
-                4인실 : 예약: {count_4}건
-            </div>
-            <div class="updated">Updated {now_str}</div>            
         </div>
     </body>
     </html>
