@@ -8,10 +8,16 @@ from module.dashboard_seat import main_check_seat
 from module.dashboard_monthly import main_monthly_payment
 
 
-def run_and_log(func, log_path):
+
+def run_and_log(func, log_path, label=None):
     with open(log_path, "w") as f:
         with contextlib.redirect_stdout(f), contextlib.redirect_stderr(f):
-            func()
+            print(f"▶️ {label} 시작", flush=True)
+            try:
+                func()
+                print(f"✅ {label} 완료", flush=True)
+            except Exception as e:
+                print(f"❌ {label} 실패: {e}", flush=True)
 
 if __name__ == "__main__":
     ip = requests.get("https://api.ipify.org").text
@@ -19,21 +25,14 @@ if __name__ == "__main__":
     print(f"📡 Running on hostname: {socket.gethostname()}")
 
     # 먼저 seat은 단독 실행 (Selenium 안정성 확보용)
-    run_and_log(main_check_seat, "/home/mmkkshim/anding_bot/logs/run_s.log")
+    run_and_log(main_check_seat, "/home/mmkkshim/anding_bot/logs/run_s.log", label="좌석 확인")
 
-    # 나머지 3개는 병렬 실행
+    # 나머지 3개는 순차 실행
     print("▶️ 결제 확인 시작")
-    t1 = threading.Thread(target=run_and_log, args=(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log"))
+    run_and_log(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log", label="결제 확인")
 
     print("▶️ 월별 매출 확인 시작")
-    t2 = threading.Thread(target=run_and_log, args=(main_monthly_payment, "/home/mmkkshim/anding_bot/logs/run_m.log"))
+    run_and_log(main_monthly_payment, "/home/mmkkshim/anding_bot/logs/run_m.log", label="월별 매출")
 
     print("▶️ 스터디룸 확인 시작")
-    t3 = threading.Thread(target=run_and_log, args=(main_check_studyroom, "/home/mmkkshim/anding_bot/logs/run_r.log"))
-
-    threads = [t1, t2, t3]
-
-    for t in threads:
-        t.start()
-    for t in threads:
-        t.join()
+    run_and_log(main_check_studyroom, "/home/mmkkshim/anding_bot/logs/run_r.log", label="스터디룸 확인")
