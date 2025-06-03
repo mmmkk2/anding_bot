@@ -149,3 +149,7 @@ table.sortable th {
 .summary-text {
     line-height: 1.3;
 }  
+#seatChart {
+    max-width: 100%;
+    height: auto;
+}
