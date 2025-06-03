@@ -39,7 +39,6 @@ h1 {
     font-size: 0.8rem;
     color: #888;
     margin-top: 1rem;
-    margin-right: 0.1rem;
     width: 100%;
     text-align: right !important;
     padding-right: 1rem;
@@ -93,17 +92,18 @@ tr:nth-child(even) {
 table.sortable th {
     cursor: pointer;
 }
-@media (max-width: 480px) {
-    body {
-        /* max-height: 50vh; */
-        min-height: 100px;
-        max-height: 100px;
-    }            
-    .box {
-        max-height: 200vh;  /*  */
-    }
-}                
+      
 
+.updated {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 1rem;
+    margin-right: 0.1rem;
+    width: 100%;
+    text-align: right !important;
+    display: block;
+    box-sizing: border-box;
+}
 .pill {
     background-color: #dfe6de;
     color: #333;
@@ -113,19 +113,6 @@ table.sortable th {
     white-space: nowrap;
 }
 
-@media (max-width: 480px) {
-    .updated-box {
-        gap: 0.3rem;
-        flex-wrap: nowrap;
-        justify-content: start;
-        padding: 0 0.5rem;
-    }
-
-    .pill {
-        font-size: 0.8rem;
-        padding: 0.3rem 0.8rem;
-    }
-}
 
 .summary-box {
     display: block;
@@ -139,76 +126,29 @@ table.sortable th {
     line-height: 1.3;
 }  
 
-/* Additional styles merged from dashboard_payment.css */
-
-.payment-container {
-    padding: 1rem;
-    background-color: #fff;
-    border-radius: 1rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    max-width: 650px;
-    margin: 0 auto;
-    overflow-y: auto;
-}
-
-.payment-header {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    color: #444;
-}
-
-.payment-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.75rem;
-}
-
-.payment-table th, .payment-table td {
-    border: 1px solid #dee2e6;
-    padding: 0.3rem;
-    text-align: center;
-    background-color: white;
-}
-
-.payment-table th {
-    background-color: #495057;
-    color: white;
-    font-weight: bold;
-}
-
-.payment-table tr:nth-child(even) {
-    background-color: #f1f3f5;
-}
-
-.payment-status {
-    font-weight: 600;
-    color: #2f855a; /* green for success */
-}
-
-.payment-status.failed {
-    color: #e53e3e; /* red for failed */
-}
-
-.payment-summary {
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    color: #666;
-    text-align: right;
-}
-
 @media (max-width: 480px) {
-    .payment-container {
-        max-height: 200vh;
-        padding: 0.5rem;
+    body {
+        /* max-height: 50vh; */
+        min-height: 100px;
+        max-height: 100px;
+    }            
+    .box {
+        max-height: 200vh;  /*  */
     }
-    .payment-header {
-        font-size: 1rem;
+    .updated-box {
+        gap: 0.3rem;
+        flex-wrap: nowrap;
+        justify-content: start;
+        padding: 0 0.5rem;
     }
-    .payment-table {
-        font-size: 0.65rem;
-    }
-    .payment-summary {
+
+    .pill {
         font-size: 0.8rem;
+        padding: 0.3rem 0.8rem;
     }
+    canvas {
+        min-height: 40vh;
+        max-height: 40vh;
+    }    
 }
+
