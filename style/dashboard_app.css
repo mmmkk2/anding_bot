@@ -123,6 +123,7 @@ iframe {
     color: #333;
     border-radius: 999px;
     padding: 0.4rem 1rem;
+    border: none;
     font-size: 0.8rem;
 }
 
