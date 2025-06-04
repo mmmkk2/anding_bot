@@ -164,6 +164,16 @@ iframe {
     margin-left: auto;
 }
 
+
+.login-pill {
+    background-color: #dee0e6;
+    color: #333;
+    border: none;
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+}
+
 .summary-buttons form {
     margin: 0;
 }
