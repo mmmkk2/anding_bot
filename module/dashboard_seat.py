@@ -53,6 +53,7 @@ LAPTOP_SEAT_NUMBERS = list(map(int, os.getenv("LAPTOP_SEAT_NUMBERS").split(","))
 # === 좌석 색상 상태 정의 (기준값 .env에서 설정)
 WARNING_THRESHOLD = int(os.getenv("WARNING_THRESHOLD"))
 DANGER_THRESHOLD = int(os.getenv("DANGER_THRESHOLD"))
+WARNING_CUM_THRESHOLD = int(os.getenv("WARNING_CUM_THRESHOLD", "50"))
 
 
 chart_timedelta = float(os.getenv("CHART_TIME_DELTA"))
@@ -369,7 +370,20 @@ def main_check_seat():
                     if not already_written:
                         with open(daily_count_path, "a", encoding="utf-8") as f:
                             f.write(f"{today_date},{today_user_count}\n")
-                            
+
+                # === 누적 이용자수 경고 임계치 초과 1회 알림 ===
+                CUM_ALERT_FLAG_PATH = os.path.join(DASHBOARD_PATH, "cum_alert_flag.txt")
+                if today_user_count >= WARNING_CUM_THRESHOLD:
+                    already_alerted = False
+                    if os.path.exists(CUM_ALERT_FLAG_PATH):
+                        with open(CUM_ALERT_FLAG_PATH, "r") as f:
+                            if f.read().strip() == today_str:
+                                already_alerted = True
+                    if not already_alerted:
+                        send_broadcast_and_update(f"[안내] 👥 금일 누적 이용자 수 {today_user_count}명 초과", broadcast=True, category="seat")
+                        with open(CUM_ALERT_FLAG_PATH, "w") as f:
+                            f.write(today_str)
+
             free_rows, laptop_rows, seat_status_msg  = check_seat_status(driver)
             # Use the same now_str for the monitoring message
             loop_msg = (
