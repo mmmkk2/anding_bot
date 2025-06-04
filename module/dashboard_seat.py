@@ -1,4 +1,3 @@
-import sys
 import json
 from module.set import login, find_location, create_driver, send_broadcast_and_update, send_telegram_and_log
 
@@ -10,19 +9,14 @@ from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-# from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
-from datetime import datetime
-import argparse
-import pytz
-
 from datetime import timedelta
+import argparse
 
 
 kst = pytz.timezone("Asia/Seoul")
-now = datetime.now(kst)
-today_str = now.strftime("%Y.%m.%d")
+today_str = datetime.now(kst).strftime("%Y.%m.%d")
 
 
 try:
@@ -98,7 +92,6 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
         yesterday_date_str = (datetime.now(kst) - timedelta(days=1)).strftime("%Y.%m.%d")
         try:
             # 날짜 필터 설정
-            print(1)
             # start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_start_date_start']")))
             # start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_enter_date_start']")))
             # driver.execute_script(f"document.querySelector('input[name=\"s_start_date_start\"]').value = '{today_date_str}';")
@@ -136,13 +129,14 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
                         identifier = cols[offset + 3].text.strip()
                         product = cols[offset + 4].text.strip()
                         start_time = cols[offset + 5].text.strip()
+                        end_time = cols[offset + 6].text.strip()
                     except IndexError:
                         continue
                     if not identifier:
                         continue
                     
                     if (seat_type_filter is None) or (seat_type in seat_type_filter):
-                        all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
+                        all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time, end_time))
                 except Exception:
                     continue
             try:
@@ -178,9 +172,7 @@ def check_seat_status(driver):
     excluded_seats = fixed_set.union(laptop_set)
 
     free_rows_data = extract_seat_data(driver, SEAT_URL, seat_type_filter=["개인석"])
-    print(free_rows_data)
     fixed_rows_data = extract_seat_data(driver, FIXED_URL, seat_type_filter=["고정석"])
-    print(fixed_rows_data)
 
     all_rows_data = free_rows_data + fixed_rows_data
 
@@ -190,7 +182,7 @@ def check_seat_status(driver):
         free_rows = []
         fixed_rows = []
 
-        for seat_type, seat_number, name, product, start_time in all_rows_data:
+        for seat_type, seat_number, name, product, start_time, end_time in all_rows_data:
             try:
                 seat_number_int = int(seat_number)
             except ValueError:
@@ -199,22 +191,21 @@ def check_seat_status(driver):
             # Priority: 노트북석 > 고정석 > 자유석
             if seat_number_int in LAPTOP_SEAT_NUMBERS:
                 seat_type = "노트북석"
-                laptop_rows.append((seat_type, seat_number, name, product, start_time))
+                laptop_rows.append((seat_type, seat_number, name, product, start_time, end_time))
             elif seat_number_int in FIXED_SEAT_NUMBERS:
                 seat_type = "고정석"
-                fixed_rows.append((seat_type, seat_number, name, product, start_time))
+                fixed_rows.append((seat_type, seat_number, name, product, start_time, end_time))
             else:
                 seat_type = "자유석"
-                free_rows.append((seat_type, seat_number, name, product, start_time))
+                free_rows.append((seat_type, seat_number, name, product, start_time, end_time))
 
 
     # --- Sort rows by 시작시간 (start_time) ---
-    import datetime as dt
     def sort_by_start_time(row):
         try:
-            return dt.datetime.strptime(row[4], '%Y.%m.%d %H:%M')
+            return datetime.strptime(row[4], '%Y.%m.%d %H:%M')
         except:
-            return dt.datetime.min
+            return datetime.min
     free_rows.sort(key=sort_by_start_time, reverse=True)
     laptop_rows.sort(key=sort_by_start_time, reverse=True)
     fixed_rows.sort(key=sort_by_start_time, reverse=True)
@@ -262,10 +253,6 @@ def check_seat_status(driver):
         status_emoji = "🟡"
     else:
         status_emoji = "🟢"
-
-    # line_color = 'rgba(75, 192, 192, 1)'  # green
-    # line_color = 'rgba(255, 99, 132, 1)'  # red
-    # line_color = 'rgba(255, 206, 86, 1)'  # yellow
 
 
     # === 메시지 작성
