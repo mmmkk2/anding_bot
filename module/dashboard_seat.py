@@ -312,6 +312,26 @@ def render_table(title, rows):
     """
     return html_table
 
+def render_table_expire(title, rows):
+    html_table = f"""
+    <div class="table-box">
+        <h2>{title}</h2>
+        <table class="sortable" data-sortable>
+            <thead>
+                <tr><th>#</th><th>Seat#</th><th>이름</th><th>상품</th><th>종료시간</th></tr>
+            </thead>
+            <tbody>
+    """
+    for idx, (seat_type, seat_number, name, product, start_time, end_time) in enumerate(rows, 1):
+        html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td class='time'>{end_time.replace('.', '-')}</td></tr>"
+    html_table += """
+            </tbody>
+        </table>
+    </div>
+    """
+    return html_table
+
+
 
 # === 메인 실행 ===
 def main_check_seat():
@@ -566,8 +586,11 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 near_expire_rows.append(row)
         except Exception:
             continue
+
+    print(near_expire_rows)
+    
     if near_expire_rows:
-        html += render_table("종료 12시간 이내 자유석", near_expire_rows)
+        html += render_table_expire("종료 12시간 이내 자유석", near_expire_rows)
 
     for title, rows in rows_dict.items():
         html += render_table(title, rows)
