@@ -150,4 +150,7 @@ table.sortable th {
         max-height: 40vh;
     }    
 }
-
+canvas {
+    min-height: 40vh;
+    max-height: 40vh;
+}  
