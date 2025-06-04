@@ -303,7 +303,7 @@ def render_table(title, rows):
             </thead>
             <tbody>
     """
-    for idx, (seat_type, seat_number, name, product, start_time) in enumerate(rows, 1):
+    for idx, (seat_type, seat_number, name, product, start_time, end_time) in enumerate(rows, 1):
         html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td class='time'>{start_time.replace('.', '-')}</td></tr>"
     html_table += """
             </tbody>
