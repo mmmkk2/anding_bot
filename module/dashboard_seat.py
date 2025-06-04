@@ -50,8 +50,6 @@ DANGER_THRESHOLD = int(os.getenv("DANGER_THRESHOLD"))
 WARNING_CUM_THRESHOLD = int(os.getenv("WARNING_CUM_THRESHOLD", "50"))
 
 
-chart_timedelta = float(os.getenv("CHART_TIME_DELTA"))
-
 # Dashboard path for logs and HTML
 DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
 DEBUG_PATH = os.getenv("DEBUG_PATH")
