@@ -31,7 +31,7 @@ except:
 parser = argparse.ArgumentParser()
 parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 활성화)")
 args = parser.parse_args()
-DEBUG = args.manual and os.getenv("DEBUG", "true").lower() == "true"
+DEBUG = args.manual or os.getenv("DEBUG", "true").lower() == "true"
 
 print(args.manual)
 
