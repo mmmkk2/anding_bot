@@ -576,10 +576,10 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     html += """
     <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
     """
-    # Add separate table for 자유석 종료시간 12시간 이내
+    # Add separate table for 자유석 종료시간 6시간 이내
     near_expire_rows = []
     now_kst = datetime.now(kst)
-    threshold_time = now_kst + timedelta(hours=12)
+    threshold_time = now_kst + timedelta(hours=6)
     for row in rows_dict.get("자유석", []):
         try:
             end_time_str = row[5]
