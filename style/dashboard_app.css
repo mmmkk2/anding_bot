@@ -92,7 +92,7 @@ body {
 }
 iframe {
     width: 100%;
-    min-height: 600px;
+    min-height: 300px;
     border: none;
     border-radius: 0.5rem;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
