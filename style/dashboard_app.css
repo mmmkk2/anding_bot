@@ -147,10 +147,11 @@ iframe {
     margin-top: 0.25rem;
     margin-bottom: 0;
 }
+
 .summary-header-row {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center ;
     flex-wrap: wrap;
     gap: 0.25rem;
 }
@@ -173,6 +174,17 @@ iframe {
     font-size: 0.8rem;
 }
 
-.summary-buttons form {
-    margin: 0;
+
+
+.pill.small {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.8rem;
+}
+.pill.right {
+    margin-left: auto;
+}
+
+.box-right {
+    display: flex;
+    justify-content: flex-end;
 }
