@@ -592,8 +592,9 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 print(f"[DEBUG] 종료시간 파싱 실패: {e} | 값: {row[5]}")
             continue
 
-    print(near_expire_rows)
-    
+    # Sort near_expire_rows in ascending order of 종료시간
+    near_expire_rows.sort(key=lambda x: datetime.strptime(x[5], "%Y.%m.%d %H:%M"))
+
     if near_expire_rows:
         html += render_table_expire("종료 12시간 이내 자유석", near_expire_rows)
 
