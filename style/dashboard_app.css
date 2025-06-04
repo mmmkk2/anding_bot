@@ -1,4 +1,43 @@
 
+/* Log Viewer Styles */
+.log-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    max-width: 650px;
+    width: 100%;
+    margin: 2rem auto;
+    font-family: monospace;
+    position: relative;
+}
+
+.log-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+pre.log-output {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 0.85rem;
+}
+
+.back-link {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 0.85rem;
+    color: #007bff;
+    text-decoration: none;
+}
+
 body {
     font-family: 'Apple SD Gothic Neo', Arial, sans-serif;
     background: #f1f3f5;
@@ -22,6 +61,8 @@ body {
     font-size: 0.95rem;
     margin-bottom: 0.5rem;
     text-align: left;
+    margin-right: 0.1rem;
+    border: none;
 }
 .status {
     font-size: 1.2rem;
@@ -69,3 +110,60 @@ iframe {
 }
 
 
+/* Styles for refreshed timestamp and date display in pill format */
+.updated-box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.pill {
+    background-color: #dfe6de;
+    color: #333;
+    border: none;
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+}
+
+
+
+@media (max-width: 480px) {
+    .updated-box {
+        flex-direction: column;
+        align-items: center;
+    }
+    .pill {
+        font-size: 0.85rem;
+        padding: 0.3rem 0.8rem;
+    }
+}
+
+/* Compact button spacing for summary-header-row forms and buttons */
+.summary-header-row form {
+    display: inline-block;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0.25rem;
+    margin-bottom: 0;
+}
+.summary-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+
+.summary-buttons {
+    display: flex;
+    gap: 0.2rem;
+    margin-top: 0.25rem;
+    margin-left: auto;
+}
+
+.summary-buttons form {
+    margin: 0;
+}

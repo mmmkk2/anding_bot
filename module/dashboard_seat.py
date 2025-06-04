@@ -53,6 +53,7 @@ LAPTOP_SEAT_NUMBERS = list(map(int, os.getenv("LAPTOP_SEAT_NUMBERS").split(","))
 # === 좌석 색상 상태 정의 (기준값 .env에서 설정)
 WARNING_THRESHOLD = int(os.getenv("WARNING_THRESHOLD"))
 DANGER_THRESHOLD = int(os.getenv("DANGER_THRESHOLD"))
+WARNING_CUM_THRESHOLD = int(os.getenv("WARNING_CUM_THRESHOLD", "50"))
 
 
 chart_timedelta = float(os.getenv("CHART_TIME_DELTA"))
@@ -297,9 +298,9 @@ def check_seat_status(driver):
 
     # === 주의/경고/복구 (broadcast only, no flag logic)
     if remaining_seats <= DANGER_THRESHOLD:
-        send_broadcast_and_update(f"[경고] 🚨 자유석 {DANGER_THRESHOLD}석 이하 - 일일권 제한 강화 필요", broadcast=True, category="seat")
+        send_broadcast_and_update(f"[경고] 🚨 잔여 자유석 {remaining_seats}석 - 일일권 제한 강화 필요", broadcast=True, category="seat")
     elif remaining_seats <= WARNING_THRESHOLD:
-        send_broadcast_and_update(f"[주의] ⚠️ 자유석 {WARNING_THRESHOLD}석 이하 - 이용 주의 필요", broadcast=True, category="seat")
+        send_broadcast_and_update(f"[주의] ⚠️ 잔여 자유석 {remaining_seats}석 - 이용 주의 필요", broadcast=True, category="seat")
 
     # === 최종 CSV 로그
     return free_rows, laptop_rows, msg
@@ -369,7 +370,20 @@ def main_check_seat():
                     if not already_written:
                         with open(daily_count_path, "a", encoding="utf-8") as f:
                             f.write(f"{today_date},{today_user_count}\n")
-                            
+
+                # === 누적 이용자수 경고 임계치 초과 1회 알림 ===
+                CUM_ALERT_FLAG_PATH = os.path.join(DASHBOARD_PATH, "cum_alert_flag.txt")
+                if today_user_count >= WARNING_CUM_THRESHOLD:
+                    already_alerted = False
+                    if os.path.exists(CUM_ALERT_FLAG_PATH):
+                        with open(CUM_ALERT_FLAG_PATH, "r") as f:
+                            if f.read().strip() == today_str:
+                                already_alerted = True
+                    if not already_alerted:
+                        send_broadcast_and_update(f"[안내] 👥 금일 누적 이용자 수 {today_user_count}명 초과", broadcast=True, category="seat")
+                        with open(CUM_ALERT_FLAG_PATH, "w") as f:
+                            f.write(today_str)
+
             free_rows, laptop_rows, seat_status_msg  = check_seat_status(driver)
             # Use the same now_str for the monitoring message
             loop_msg = (
@@ -442,7 +456,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
 
     # --- 누적 이용자 수 이력 ---
     cum_users_rows = []
-    cum_users_points = []
+    cum_user_counts = []
     try:
         with open(cum_users_path, "r", encoding="utf-8") as f:
             for line in reversed(f.readlines()):
@@ -453,29 +467,15 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         cum_users_rows.insert(0, line)
                     else:
                         break
-        cum_timestamps = []
-        cum_user_counts = []
         for line in cum_users_rows:
             parts = line.strip().split(",")
             if len(parts) >= 2:
-                timestamp_obj = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
-                cum_timestamps.append(timestamp_obj.strftime("%Y-%m-%dT%H:%M:%S"))
                 cum_user_counts.append(int(parts[1]))
-        cum_users_points = [{"x": t, "y": y} for t, y in zip(cum_timestamps, cum_user_counts)]
     except Exception:
-        cum_users_points = []
-
-    # y1 axis min/max for 누적 이용자 수
-    if cum_users_points:
-        y_values = [pt["y"] for pt in cum_users_points]
-        y1_suggested_min = 0
-        y1_suggested_max = max(70, max(y_values) + 1)
+        cum_user_counts = []
     
 
-    # --- 차트 스크립트 ---
-    lineColor = 'rgba(75, 192, 192, 1)'  # default green
-    cum_lineColor = 'rgba(153, 102, 255, 1)'
-    cum_point_color='rgba(153, 102, 255, 0.11)'
+    # --- 차트 스크립트 (dashboard_monthly.py 스타일) ---
     chart_script = f"""
     <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns'></script>
@@ -484,31 +484,39 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         new Chart(ctx, {{
             type: 'line',
             data: {{
-                datasets: [
-                    {{
-                        label: '자유석 이용자 수',
-                        data: {json.dumps(data_points)},
-                        borderColor: '{lineColor}',
-                        pointBackgroundColor: {json.dumps(point_colors)},
-                        pointRadius: window.innerWidth > 768 ? 2 : 4,
-                        borderWidth: 1,
-                        tension: 0.1,
-                        yAxisID: 'y'
+                labels: {json.dumps(timestamps)},
+                datasets: [{{
+                    label: '자유석 이용자 수',
+                    data: {json.dumps(used_frees)},
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                    borderWidth: 2,
+                    tension: 0.1,
+                    pointRadius: function(context) {{
+                        const color = context.dataset.pointBackgroundColor[context.dataIndex];
+                        return (color === 'rgba(75, 192, 192, 0.1)') ? 0 : 3;
                     }},
-                    {{
-                        label: '누적 이용자 수',
-                        data: {json.dumps(cum_users_points)},
-                        borderColor: '{cum_lineColor}',
-                        pointBackgroundColor: '{cum_point_color}',
-                        borderWidth: 1,
-                        tension: 0.1,
-                        yAxisID: 'y1'
-                    }}
-                ]
+                    pointBackgroundColor: {json.dumps(point_colors)},
+                    spanGaps: false
+                }}]
             }},
             options: {{
                 responsive: true,
                 scales: {{
+                    y: {{
+                        beginAtZero: true,
+                        max: 30,
+                        title: {{
+                            display: true,
+                            text: '자유석 이용자 수'
+                        }},
+                        ticks: {{
+                            callback: function(value) {{
+                                return value + '명';
+                            }}
+                        }}
+                    }},
                     x: {{
                         type: 'time',
                         time: {{
@@ -528,34 +536,15 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         title: {{
                             display: false
                         }}
-                    }},
-                    y: {{
-                        beginAtZero: true,
-                        max: 30,
-                        title: {{
-                            display: true,
-                            text: '자유석 이용자 수'
-                        }},                        
-                    }},
-                    y1: {{
-                        position: 'right',
-                        grid: {{ drawOnChartArea: false }},
-                        title: {{
-                            display: true,
-                            text: '누적 이용자 수'
-                        }},
-                        beginAtZero: true,
-                        suggestedMin: {y1_suggested_min},
-                        suggestedMax: {y1_suggested_max}
                     }}
                 }}
             }}
         }});
     </script>
     """
-
-    now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
-
+    update_mode = "M" if args.manual else "B"
+    now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
+    
     html = f"""
     <!DOCTYPE html>
     <html lang="ko">
@@ -570,13 +559,9 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     </head>
     <body>
         <div class="box">
-            <div class="updated">📅 기준 날짜: <b>{today_str}</b></div>
-            <div class="stat">자유석: {used_free}/{total_free}</div>
-            <div class="stat">노트북석: {used_laptop}/{total_laptop}</div>
-            <div class="stat">남은 자유석: {remaining}석</div>            
-            <div class="updated">업데이트 시각: {now_str}</div>
-            <div style="margin-top:0.5rem;">            
-                 <canvas id="seatChart"  height="200"></canvas>
+            <div class="stat">🪑 {used_free}/{total_free} · 💻 {used_laptop}/{total_laptop} · 🟩 {remaining}석 · 👥 {cum_user_counts[-1] if cum_user_counts else "정보 없음"}명</div>
+            <div style="margin-top:0.5rem;"> 
+                <canvas id="seatChart" style="max-width: 100%; height: auto; aspect-ratio: 16 / 12;"></canvas>
                 {chart_script}
             </div>
 """
@@ -587,11 +572,16 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     for title, rows in rows_dict.items():
         html += render_table(title, rows)
     
-    html += """
+    html += f"""
+    </div>
+        <div class="summary-box">
+            <div class="updated">Updated {now_str}</div>
+        </div>
     </div>
     """
+    # Move the updated line outside the .box, after the entire box
+    # (already included inside summary-box, so omit here)
     html += """
-    </div>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('table.sortable').forEach(function(table) {

@@ -36,7 +36,7 @@ DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
 parser = argparse.ArgumentParser()
 parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 비활성화)")
 args = parser.parse_args()
-DEBUG = not args.manual and os.getenv("DEBUG", "true").lower() == "true"
+DEBUG = args.manual and os.getenv("DEBUG", "true").lower() == "true"
 
 PAYMENT_CACHE_FILE = os.getenv("COOKIE_FILE")
 
@@ -268,7 +268,8 @@ def save_payment_dashboard_html(payments):
         print(f"[DEBUG] save_payment_dashboard_html: 전달된 결제 내역 개수: {len(payments)}")
         if not payments:
             print("[DEBUG] save_payment_dashboard_html: 결제 내역이 비어 있음. HTML은 그래도 생성됨.")
-    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+    update_mode = "M" if args.manual else "B"
+    now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
     if not payments:
         html_rows = "<tr><td colspan='5'>오늘 결제 내역이 없습니다.</td></tr>"
     else:
@@ -296,11 +297,6 @@ def save_payment_dashboard_html(payments):
     </head>
     <body>
         <div class="box">
-            <div class="updated">📅 기준 날짜: <b>{today_str}</b></div>
-            <div class="summary">
-                총 결제: {summary_count}건 / {summary_amount:,}원<br>
-            </div>
-            <div class="updated">업데이트 시각: {now_str}</div>
             <table>
                 <thead>
                     <tr>
@@ -315,6 +311,10 @@ def save_payment_dashboard_html(payments):
                     {html_rows}
                 </tbody>
             </table>
+            <div class="summary-box">
+                <div>총 결제: {summary_count}건 / {summary_amount:,}원</div>
+                <div class="updated">Updated {now_str}</div>
+            </div>
         </div>
     </body>
     </html>

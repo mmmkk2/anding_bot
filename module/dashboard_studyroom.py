@@ -176,23 +176,7 @@ def check_studyroom(driver):
     reservations_2.sort(key=lambda x: x['time'].split('~')[0].strip())
     reservations_4.sort(key=lambda x: x['time'].split('~')[0].strip())
 
-    # --- 추가: 현재 사용중 여부 계산 ---
-    def is_currently_in_use(reservations):
-        now = datetime.now(kst)
-        for r in reservations:
-            try:
-                start_str, end_str = r['time'].split("~")
-                start_dt = kst.localize(datetime.strptime(start_str.strip(), "%Y.%m.%d %H:%M"))
-                end_dt = kst.localize(datetime.strptime(end_str.strip(), "%Y.%m.%d %H:%M"))
-
-                if start_dt <= now <= end_dt:
-                    return True
-            except:
-                continue
-        return False
-
-    using_2 = is_currently_in_use(reservations_2)
-    using_4 = is_currently_in_use(reservations_4)
+    # --- Removed is_currently_in_use function and usage calculation ---
 
     html_rows_2 = "\n".join(
         f"<tr><td>{r['time']}</td><td>{r['name']}</td></tr>"
@@ -202,8 +186,8 @@ def check_studyroom(driver):
         f"<tr><td>{r['time']}</td><td>{r['name']}</td></tr>"
         for r in reservations_4
     )
-
-    now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
+    update_mode = "M" if args.manual else "B"
+    now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
 
     html = f"""
     <!DOCTYPE html>
@@ -217,12 +201,6 @@ def check_studyroom(driver):
     </head>
     <body>
         <div class="box">
-            <div class="updated">📅 기준 날짜: <b>{today_str}</b></div>
-            <div class="summary">
-                [2인실] 예약: {count_2}건 {'🟢 사용중' if using_2 else '⚪ 비어있음'}<br>
-                [4인실] 예약: {count_4}건 {'🟢 사용중' if using_4 else '⚪ 비어있음'}
-            </div>
-            <div class="updated">업데이트 시각: {now_str}</div>
             <div class="tables">
                 <div class="table-box">
                     <h2>2인실</h2>
@@ -247,6 +225,13 @@ def check_studyroom(driver):
                     </table>
                 </div>
             </div>
+            <div class="summary-box">
+                <div> 
+                2인실 : 예약 {count_2}건<br>
+                4인실 : 예약 {count_4}건
+                </div>
+                <div class="updated">Updated {now_str}</div>
+            </div>    
         </div>
     </body>
     </html>

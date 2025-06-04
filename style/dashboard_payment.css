@@ -43,7 +43,11 @@ h1 {
     font-size: 0.8rem;
     color: #888;
     margin-top: 1rem;
-    text-align: center;
+    margin-right: 0.1rem;
+    width: 100%;
+    text-align: right !important;
+    display: block;
+    box-sizing: border-box;
 }
 table {
     width: 100%;
@@ -90,3 +94,15 @@ tr:nth-child(even) {
     min-width: 50px;               
     max-width: 90px; 
 }
+
+.summary-box {
+    display: block;
+    text-align: right;
+    margin-top: 1rem;
+    margin-right: 0.1rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+.summary-text {
+    line-height: 1.3;
+}  
