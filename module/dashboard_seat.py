@@ -200,7 +200,7 @@ def check_seat_status(driver):
                 free_rows.append((seat_type, seat_number, name, product, start_time, end_time))
 
 
-    # --- Sort rows by 시작시간 (start_time) ---
+    # --- Sort rows by 입실시간 (start_time) ---
     def sort_by_start_time(row):
         try:
             return datetime.strptime(row[4], '%Y.%m.%d %H:%M')
@@ -299,7 +299,7 @@ def render_table(title, rows):
         <h2>{title}</h2>
         <table class="sortable" data-sortable>
             <thead>
-                <tr><th>#</th><th>Seat#</th><th>이름</th><th>상품</th><th>시작시간</th></tr>
+                <tr><th>#</th><th>Seat#</th><th>이름</th><th>상품</th><th>입실시간</th></tr>
             </thead>
             <tbody>
     """
