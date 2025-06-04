@@ -10,7 +10,7 @@ body {
     text-align: center;
     max-width: 100vw;
     height: auto;
-
+    max-height: 50vw;
 }
 .box {
     background: white;
