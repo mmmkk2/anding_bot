@@ -596,7 +596,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     near_expire_rows.sort(key=lambda x: datetime.strptime(x[5], "%Y.%m.%d %H:%M"))
 
     if near_expire_rows:
-        html += render_table_expire("종료 12시간 이내 자유석", near_expire_rows)
+        html += render_table_expire("종료 예정 자유석", near_expire_rows)
 
     for title, rows in rows_dict.items():
         html += render_table(title, rows)
