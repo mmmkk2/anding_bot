@@ -37,6 +37,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 비활성화)")
 args = parser.parse_args()
 DEBUG = args.manual or os.getenv("DEBUG", "true").lower() == "true"
+print(DEBUG)
 
 PAYMENT_CACHE_FILE = os.getenv("COOKIE_FILE")
 
