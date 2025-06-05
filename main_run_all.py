@@ -6,6 +6,7 @@ from module.dashboard_studyroom import main_check_studyroom
 from module.dashboard_payment import main_check_payment
 from module.dashboard_seat import main_check_seat
 from module.dashboard_monthly import main_monthly_payment
+from module.dashboard_product import main_check_product
 
 
 
@@ -25,9 +26,12 @@ if __name__ == "__main__":
     print(f"📡 Running on hostname: {socket.gethostname()}")
 
     # 먼저 seat은 단독 실행 (Selenium 안정성 확보용)
+    print("▶️ 좌석 확인 시작")
     run_and_log(main_check_seat, "/home/mmkkshim/anding_bot/logs/run_s.log", label="좌석 확인")
 
-    # 나머지 3개는 순차 실행
+    print("▶️ 상품 확인 시작")
+    run_and_log(main_check_product, "/home/mmkkshim/anding_bot/logs/run_product.log", label="상품 확인")
+
     print("▶️ 결제 확인 시작")
     run_and_log(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log", label="결제 확인")
 
