@@ -90,27 +90,23 @@ table.sortable th {
     text-align: right;
 }
 
-/* Highlight active tab button */
-.tab-btn.active {
-    background-color: #a4bacd;
-    color: rgb(0, 0, 0);
-    font-weight: bold;
-    border-radius: 0.2rem;
-}
-
-/* Highlight active tab button */
 .tab-btn {
-    background-color: #c2cad2;
-    color: rgb(0, 0, 0);
-    font-weight: none;
-    border-radius: 0.2rem;
+    background: #e0e4e7;
+    color: #000;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
 }
 
+.tab-btn.active {
+    background: #a4bacd;
+    font-weight: bold;
+}
 
 .tab-wrapper.tabs {
     display: flex;
     justify-content: center;
     gap: 0.5rem;
-    margin: 1rem 0;
-    padding-top: 0.5rem;
+    margin-bottom: 1rem;
 }
