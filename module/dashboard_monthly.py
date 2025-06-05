@@ -203,8 +203,6 @@ def fetch_monthly_sales_from_calendar(driver):
             print(f"[DEBUG] 일평균 매출: {daily_avg:,}원")
             print(f"[DEBUG] 예측 매출: {predicted_amount:,}원")
 
-        daily_avg
-        predicted_amount
         
         # Align current month cumulative sales to dates (labels)
         # Use two-digit day for label consistency
@@ -295,7 +293,7 @@ def fetch_monthly_sales_from_calendar(driver):
                     <div> 총 매출: {prev_month}월 {summary_amount_prev:,}원 / {curr_month}월 {summary_amount_curr:,}원<br> </div>
                     <div> 일평균 매출: {daily_avg:,}원 / 예측 매출: {predicted_amount:,}원 </div>
                 </div>                
-            </div>
+            </div> 
         <div class="updated">Updated {now_str}</div>
         </body>
         </html>
