@@ -35,38 +35,56 @@ h1 {
     }
 }    
 
-
-.tab-wrapper {
+.tables {
     display: flex;
-    justify-content: center;
-    margin-bottom: 1rem;
+    justify-content: space-around;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
-
-.tab-btn {
-    background: #dee2e6;
-    border: none;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    font-size: 0.8rem;
-    border-radius: 0.3rem;
-    margin: 0 0.2rem;
+.table-box {
+    flex: 1;
+    min-width: 280px;
+    max-height: 230px;
+    overflow-y: auto;
+    display: block;
 }
-
-.tab-btn.active {
-    background: #a5d8ff;
+.table-box h2 {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.7rem;
+}
+th, td {
+    border: 1px solid #dee2e6;
+    padding: 0.2rem;
+    text-align: center;
+    background-color: white;
+}
+th {
+    background-color: #6c757d;
+    color: white;
     font-weight: bold;
 }
-
-.tab-content {
-    display: none;
+.time {
+    font-size: 0.7rem;
+    min-width: 90px;
+    max-width: 90px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-
-.tab-content.active {
-    display: block;
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+table.sortable th {
+    cursor: pointer;
 }
 
 .updated-box {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     color: #888;
     margin-top: 1rem;
     text-align: right;
