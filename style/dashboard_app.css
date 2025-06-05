@@ -118,8 +118,8 @@ iframe {
 }
 
 #toggle-iframe-monthly {
-    min-height: 45vh;
-    max-height: 45vh;
+    min-height: 50vh;
+    max-height: 50vh;
     width: 100%;
 }
 
