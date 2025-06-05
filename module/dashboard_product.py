@@ -102,6 +102,10 @@ def render_table(products):
     )
 
 def get_product_html_from_data(products_by_tab):
+    kst = pytz.timezone("Asia/Seoul")
+    now_kst = datetime.now(kst)
+    now_str = now_kst.strftime("%Y-%m-%d %H:%M:%S")
+    update_mode = "M" if args.manual else "B"
     return f"""
 <!DOCTYPE html>
 <html lang='ko'>
@@ -134,6 +138,7 @@ def get_product_html_from_data(products_by_tab):
             {render_table(products_by_tab["period"])}
         </tbody></table>
     </div>
+    <div class="updated">Updated {now_str} ({update_mode})</div>
 </div>
 <script>
 document.addEventListener("DOMContentLoaded", function () {{
