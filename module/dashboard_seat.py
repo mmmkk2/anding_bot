@@ -572,7 +572,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
 """
 
     html += """
-    <div class="innerbox">
     <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
     """
     # Add separate table for 자유석 종료시간 6시간 이내
@@ -601,7 +600,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         html += render_table(title, rows)
     
     html += f"""
-    </div>
     </div>        
     </div>
     <div class="summary-box">
