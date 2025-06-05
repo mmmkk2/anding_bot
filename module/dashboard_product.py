@@ -43,15 +43,13 @@ def log(msg):
         f.write(full_msg + "\n")
 
 
-# Internal function to get active products (dynamically from product_source.html)
+# Internal function to get active products (dynamically from HTML content)
 from bs4 import BeautifulSoup
-def _get_active_products():
-    html_path = os.path.join(DASHBOARD_PATH, "seatArea_personal.html")
+def _get_active_products(html):
     try:
-        with open(html_path, "r", encoding="utf-8") as f:
-            soup = BeautifulSoup(f, "html.parser")
+        soup = BeautifulSoup(html, "html.parser")
     except Exception as e:
-        log(f"[ERROR] 상품 소스 HTML 읽기 실패: {e}")
+        log(f"[ERROR] 상품 HTML 파싱 실패: {e}")
         return []
 
     product_rows = soup.select("tbody > tr")
@@ -80,14 +78,16 @@ def _get_active_products():
 
 # Returns a brief summary line for the active products.
 def summary_line():
-    products = _get_active_products()
+    html = fetch_product_html()
+    products = _get_active_products(html)
     return f"현재 사용 중인 시간권 {len(products)}종"
 
 
 # Returns the full HTML for the product dashboard.
 def get_product_html():
     log("활성 상품 수집 시작")
-    products = _get_active_products()
+    html = fetch_product_html()
+    products = _get_active_products(html)
     log(f"총 상품 수: {len(products)}")
     rows = "\n".join(
         f"<tr><td>{p['name']}</td><td>{p['time']}시간</td><td>{p['price']:,}원</td></tr>"
@@ -118,9 +118,10 @@ def get_product_html():
 
 
 # --- Main product dashboard check ---
-def fetch_product_source_html():
-    log("🌐 상품 페이지 로그인 및 HTML 저장 시도")
+def fetch_product_html():
+    log("🌐 상품 페이지 로그인 및 HTML 가져오기 시도")
     driver = create_driver()
+    html = ""
     try:
         if login(driver):
             driver.get(PRODUCT_URL)
@@ -129,20 +130,17 @@ def fetch_product_source_html():
             personal_tab.click()
             time.sleep(2)
             html = driver.page_source
-            save_path = os.path.join(DASHBOARD_PATH, "seatArea_personal.html")
-            with open(save_path, "w", encoding="utf-8") as f:
-                f.write(html)
-            log(f"✅ 개인석 상품 HTML 저장 완료: {save_path}")
+            log("✅ 개인석 상품 HTML 가져오기 완료")
         else:
             log("❌ 상품 페이지 로그인 실패")
     except Exception as e:
         log(f"[ERROR] 상품 HTML 수집 중 오류: {e}")
     finally:
         driver.quit()
+    return html
 
 
 def main_check_product():
-    fetch_product_source_html()
     log("🔍 [상품] 활성 상품 현황 수집 시작")
     summary = summary_line()
     log(f"✅ {summary}")
