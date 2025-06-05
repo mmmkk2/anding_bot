@@ -124,8 +124,8 @@ iframe {
 }
 
 #toggle-iframe-studyroom {
-    min-height: 400px;
-    max-height: 35vh;
+    min-height: 45vh;
+    max-height: 45vh;
     width: 100%;
 }
 
