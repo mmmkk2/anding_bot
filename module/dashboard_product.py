@@ -104,7 +104,6 @@ def get_product_html():
                     {rows}
                 </tbody>
             </table>
-            <a class="back-link" href='/admin'>⬅️ 대시보드로 돌아가기</a>
         </div>
     </body>
     </html>
