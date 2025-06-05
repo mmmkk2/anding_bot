@@ -82,22 +82,9 @@ def _get_active_products(html):
 
     return products
 
-
-# Returns a brief summary line for the active products.
-def summary_line():
-    html = fetch_product_html()
-    products = _get_active_products(html)
-    return f"현재 사용 중인 시간권 {len(products)}종"
-
-
-# Returns the full HTML for the product dashboard.
-def get_product_html():
-    log("활성 상품 수집 시작")
-    html = fetch_product_html()
-    products = _get_active_products(html)
-    log(f"총 상품 수: {len(products)}")
+def get_product_html_from_data(products):
     rows = "\n".join(
-        f"<tr><td>{p['name']}</td><td>{p['time']}시간</td><td>{p['price']:,}원</td></tr>"
+        f"<tr><td>{p['name']}</td><td>{p['time']}시간</td><td>{p['price']:,}원</td><td>{'✅' if p['active'] else '❌'}</td></tr>"
         for p in products
     )
     return f"""
@@ -113,7 +100,7 @@ def get_product_html():
         <div class="log-container">
             <div class="log-title">🛒 활성화된 시간권 상품</div>
             <table>
-                <thead><tr><th>상품명</th><th>시간</th><th>금액</th></tr></thead>
+                <thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>상태</th></tr></thead>
                 <tbody>
                     {rows}
                 </tbody>
@@ -149,12 +136,15 @@ def fetch_product_html():
 
 def main_check_product():
     log("🔍 [상품] 활성 상품 현황 수집 시작")
-    summary = summary_line()
+    html = fetch_product_html()
+    products = _get_active_products(html)
+    summary = f"현재 사용 중인 시간권 {len(products)}종"
     log(f"✅ {summary}")
-    html = get_product_html()
+
+    html_rendered = get_product_html_from_data(products)
     html_path = os.path.join(DASHBOARD_PATH, "product_dashboard.html")
     with open(html_path, "w", encoding="utf-8") as f:
-        f.write(html)
+        f.write(html_rendered)
     log(f"💾 HTML 저장 완료: {html_path}")
     print(summary)
 
