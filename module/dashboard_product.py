@@ -38,21 +38,37 @@ def log(msg):
         f.write(full_msg + "\n")
 
 
-# Internal function to get active products
+# Internal function to get active products (dynamically from product_source.html)
+from bs4 import BeautifulSoup
 def _get_active_products():
-    all_products = [
-        {"name": "1시간", "time": 1, "price": 1000, "active": True},
-        {"name": "2시간", "time": 2, "price": 2000, "active": True},
-        {"name": "3시간", "time": 3, "price": 3000, "active": True},
-        {"name": "4시간", "time": 4, "price": 3500, "active": True},
-        {"name": "6시간", "time": 6, "price": 5000, "active": True},
-        {"name": "9시간", "time": 9, "price": 7000, "active": True},
-        {"name": "12시간", "time": 12, "price": 9000, "active": True},
-        {"name": "좌석 상황에 따라 일회이용/연장이 제한될 수 있습니다.", "time": 0, "price": 1, "active": True},
-        {"name": "좌석 부족으로 일회이용/연장이 제한 상태(안내문 읽어주세요)", "time": 0, "price": 1, "active": True},
-        {"name": "테스트 상품 (비활성)", "time": 99, "price": 99999, "active": False},
-    ]
-    return [p for p in all_products if p["active"]]
+    html_path = os.path.join(DASHBOARD_PATH, "product_source.html")
+    try:
+        with open(html_path, "r", encoding="utf-8") as f:
+            soup = BeautifulSoup(f, "html.parser")
+    except Exception as e:
+        log(f"[ERROR] 상품 소스 HTML 읽기 실패: {e}")
+        return []
+
+    product_rows = soup.select("tbody > tr")
+    products = []
+
+    for tr in product_rows:
+        checkbox = tr.select_one('input[name="use_yn"]')
+        if checkbox and checkbox.has_attr("checked"):
+            name = tr.select_one('input[name="product_nm"]').get("value", "").strip()
+            time_val = tr.select_one('input[name="time_cnt"]').get("value", "0").strip()
+            price_val = tr.select_one('input[name="amount"]').get("value", "0").strip()
+            try:
+                products.append({
+                    "name": name,
+                    "time": int(time_val),
+                    "price": int(price_val),
+                    "active": True,
+                })
+            except ValueError:
+                continue  # Skip rows with invalid numbers
+
+    return products
 
 
 # Returns a brief summary line for the active products.
