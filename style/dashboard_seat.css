@@ -148,6 +148,15 @@ table.sortable th {
   
 }
 
+
+/* 추가: .innerbox 클래스 정의 */
+.innerbox {
+    padding: 0 1rem;
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 0.5rem; /* 여기 추가 */
+}
+
 canvas {
     width: 100%; /* 좌우 padding 1rem씩 고려 */
     min-height: 45vh;
