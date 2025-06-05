@@ -50,74 +50,93 @@ def _get_active_products(html):
         soup = BeautifulSoup(html, "html.parser")
     except Exception as e:
         log(f"[ERROR] 상품 HTML 파싱 실패: {e}")
-        return []
+        return {"once": [], "hour": [], "period": []}
 
-    product_rows = []
-    for tab_id in ["tab_1", "tab_2", "tab_3"]:
-        tab = soup.select_one(f"div{f'#{tab_id}'}")
+    tab_products = {"once": [], "hour": [], "period": []}
+    for tab_id, key in zip(["tab_1", "tab_2", "tab_3"], ["once", "hour", "period"]):
+        tab = soup.select_one(f"div#{tab_id}")
         if tab:
-            product_rows.extend(tab.select("tbody > tr"))
-    products = []
+            for tr in tab.select("tbody > tr"):
+                checkboxes = tr.select('input[type="checkbox"]')
+                name_input = tr.select_one('input[name="product_nm"]')
+                time_input = tr.select_one('input[name="time_cnt"]')
+                price_input = tr.select_one('input[name="amount"]')
 
-    for tr in product_rows:
-        checkboxes = tr.select('input[type="checkbox"]')
-        name_input = tr.select_one('input[name="product_nm"]')
-        time_input = tr.select_one('input[name="time_cnt"]')
-        price_input = tr.select_one('input[name="amount"]')
+                if len(checkboxes) < 2 or not (name_input and time_input and price_input):
+                    continue
 
-        if len(checkboxes) < 2 or not (name_input and time_input and price_input):
-            continue
+                name = name_input.get("value", "").strip()
+                # Optionally filter out unwanted products here if needed
+                use_checkbox, renew_checkbox = checkboxes[:2]
+                is_active = 'checked' in use_checkbox.attrs
+                is_renewable = 'checked' in renew_checkbox.attrs
 
-        name = name_input.get("value", "").strip()
-        if "행사상품" in name or "시간대별" in name:
-            continue
+                try:
+                    tab_products[key].append({
+                        "name": name,
+                        "time": int(time_input.get("value", "0").strip()),
+                        "price": int(price_input.get("value", "0").strip()),
+                        "active": is_active,
+                        "renewable": is_renewable,
+                    })
+                except ValueError:
+                    continue
+    return tab_products
 
-        use_checkbox, renew_checkbox = checkboxes[:2]
-        is_active = 'checked' in use_checkbox.attrs
-        is_renewable = 'checked' in renew_checkbox.attrs
-
-        log(f"상품 '{name}' - 판매: {is_active}, 연장: {is_renewable}")
-
-        try:
-            products.append({
-                "name": name,
-                "time": int(time_input.get("value", "0").strip()),
-                "price": int(price_input.get("value", "0").strip()),
-                "active": is_active,
-                "renewable": is_renewable,
-            })
-        except ValueError:
-            continue  # Skip rows with invalid numbers
-
-    return products
-
-def get_product_html_from_data(products):
-    rows = "\n".join(
+def render_table(products):
+    return "\n".join(
         f"<tr><td>{p['name']}</td><td>{p['time']}시간</td><td>{p['price']:,}원</td><td>{'✅' if p['active'] else '❌'}</td><td>{'🔁' if p.get('renewable') else '―'}</td></tr>"
         for p in products
     )
+
+def get_product_html_from_data(products_by_tab):
     return f"""
-    <!DOCTYPE html>
-    <html lang='ko'>
-    <head>
-        <meta charset='UTF-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1'>
-        <title>상품 현황</title>
-        <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_app.css">
-    </head>
-    <body>
-        <div class="log-container">
-            <div class="log-title">🛒 활성화된 시간권 상품</div>
-            <table>
-                <thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead>
-                <tbody>
-                    {rows}
-                </tbody>
-            </table>
+<!DOCTYPE html>
+<html lang='ko'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>상품 현황</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-4">
+    <h3 class="mb-4">🛒 시간권 상품 현황</h3>
+
+    <ul class="nav nav-tabs" id="productTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="once-tab" data-bs-toggle="tab" data-bs-target="#once" type="button" role="tab">1회이용권</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="hour-tab" data-bs-toggle="tab" data-bs-target="#hour" type="button" role="tab">시간이용권</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="period-tab" data-bs-toggle="tab" data-bs-target="#period" type="button" role="tab">기간이용권</button>
+        </li>
+    </ul>
+
+    <div class="tab-content pt-3">
+        <div class="tab-pane fade show active" id="once" role="tabpanel" aria-labelledby="once-tab">
+            <table class="table table-bordered"><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
+                {render_table(products_by_tab["once"])}
+            </tbody></table>
         </div>
-    </body>
-    </html>
-    """
+        <div class="tab-pane fade" id="hour" role="tabpanel" aria-labelledby="hour-tab">
+            <table class="table table-bordered"><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
+                {render_table(products_by_tab["hour"])}
+            </tbody></table>
+        </div>
+        <div class="tab-pane fade" id="period" role="tabpanel" aria-labelledby="period-tab">
+            <table class="table table-bordered"><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
+                {render_table(products_by_tab["period"])}
+            </tbody></table>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+"""
 
 
 # --- Main product dashboard check ---
@@ -146,11 +165,12 @@ def fetch_product_html():
 def main_check_product():
     log("🔍 [상품] 활성 상품 현황 수집 시작")
     html = fetch_product_html()
-    products = _get_active_products(html)
-    summary = f"현재 사용 중인 시간권 {len(products)}종"
+    products_by_tab = _get_active_products(html)
+    total_count = sum(len(v) for v in products_by_tab.values())
+    summary = f"현재 시간권 상품 총 {total_count}종"
     log(f"✅ {summary}")
 
-    html_rendered = get_product_html_from_data(products)
+    html_rendered = get_product_html_from_data(products_by_tab)
     html_path = os.path.join(DASHBOARD_PATH, "product_dashboard.html")
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(html_rendered)
