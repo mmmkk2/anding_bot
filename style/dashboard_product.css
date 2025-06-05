@@ -64,7 +64,7 @@ th, td {
     background-color: white;
 }
 th {
-    background-color: #9facb8;
+    background-color: #6c757d;
     color: white;
     font-weight: bold;
 }
@@ -92,18 +92,18 @@ table.sortable th {
 
 /* Highlight active tab button */
 .tab-btn.active {
-    background-color: #6c757d;
-    color: white;
+    background-color: #a4bacd;
+    color: rgb(0, 0, 0);
     font-weight: bold;
-    border-radius: 0.5rem;
+    border-radius: 0.2rem;
 }
 
 /* Highlight active tab button */
 .tab-btn {
-    background-color: #a2abb3;
+    background-color: #c2cad2;
     color: rgb(0, 0, 0);
-    font-weight: bold;
-    border-radius: 0.5rem;
+    font-weight: none;
+    border-radius: 0.2rem;
 }
 
 
