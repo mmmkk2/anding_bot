@@ -153,7 +153,7 @@ table.sortable th {
 .innerbox {
     padding: 0 1rem;
     box-sizing: border-box;
-    width: 100%;
+    width: calc(100% - 2rem);
     margin-top: 0.5rem; /* 여기 추가 */
 }
 
