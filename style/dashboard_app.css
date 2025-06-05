@@ -111,6 +111,18 @@ iframe {
     width: 100%;
 }
 
+#toggle-iframe-payment {
+    min-height: 400px;
+    max-height: 80vh;
+    width: 100%;
+}
+
+#toggle-iframe-monthly {
+    min-height: 400px;
+    max-height: 60vh;
+    width: 100%;
+}
+
 #toggle-iframe-studyroom {
     min-height: 400px;
     max-height: 40vh;
