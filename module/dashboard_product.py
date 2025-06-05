@@ -147,7 +147,7 @@ def get_product_html_from_data(products_by_tab):
         </div>
     </div>
 </div>
-<div class="updated updated-box">Updated {now_str}</div>
+<div class="updated">Updated {now_str}</div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {{
