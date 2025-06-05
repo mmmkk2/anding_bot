@@ -138,7 +138,9 @@ def get_product_html_from_data(products_by_tab):
             {render_table(products_by_tab["period"])}
         </tbody></table>
     </div>
-    <div class="updated">Updated {now_str} ({update_mode})</div>
+    <div class="summary-box">
+        <div class="updated">Updated {now_str} ({update_mode})</div>
+    </div>
 </div>
 <script>
 document.addEventListener("DOMContentLoaded", function () {{
