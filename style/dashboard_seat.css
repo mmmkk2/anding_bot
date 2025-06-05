@@ -114,7 +114,9 @@ table.sortable th {
 
 
 .summary-box {
-    display: block;
+    display: block;              /* 기본적으로 줄바꿈 유도 */
+    width: 100%;                 /* box 너비 맞춤 */
+    clear: both;                 /* 혹시 있을 float 해제 */
     text-align: right;
     margin-top: 1rem;
     margin-right: 0.1rem;
