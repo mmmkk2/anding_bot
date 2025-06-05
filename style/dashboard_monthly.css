@@ -54,3 +54,18 @@ h1 {
 .summary-text {
     line-height: 1.3;
 }  
+
+@media (max-width: 480px) {
+    body {
+        /* max-height: 50vh; */
+        min-height: 50vh;
+    }
+    .box {
+        max-height: 200vh;
+    }
+    /* Removed .updated-box and .pill tweaks as redundant or unused */
+    canvas {
+        min-height: 25vh !important;
+        max-height: 30vh;
+    }  
+}
