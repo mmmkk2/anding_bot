@@ -141,7 +141,7 @@ def get_product_html_from_data(products_by_tab):
         </tbody></table>
     </div>
     <div class="summary-box">
-        <div class="updated">Updated {now_str} ({update_mode})</div>
+        <div class="updated updated-box">Updated {now_str}</div>
     </div>
 </div>
 <script>
