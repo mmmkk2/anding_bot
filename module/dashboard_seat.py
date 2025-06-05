@@ -564,6 +564,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     </head>
     <body>
         <div class="box">
+            <div class="contents-wrapper>
             <div class="stat">🪑 {used_free}/{total_free} · 💻 {used_laptop}/{total_laptop} · 🟩 {remaining}석 · 👥 {cum_user_counts[-1] if cum_user_counts else "정보 없음"}명</div>
             <div style="margin-top:0.5rem;"> 
                 <canvas id="seatChart" style="max-width: 100%; height: auto; aspect-ratio: 16 / 12;"></canvas>
@@ -606,7 +607,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     <div class="summary-box">
             <div class="updated">Updated {now_str}</div>
     </div>
-
+    </div>
     """
     # Move the updated line outside the .box, after the entire box
     # (already included inside summary-box, so omit here)

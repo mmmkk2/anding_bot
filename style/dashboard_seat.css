@@ -147,6 +147,9 @@ table.sortable th {
     }
   
 }
+.contents-wrapper {
+    padding: 0 1rem;
+}
 canvas {
     width: 100% !important;
     min-height: 45vh;
