@@ -57,12 +57,19 @@ def _get_active_products(html):
 
     for tr in product_rows:
         checkbox = tr.select_one('input[name="use_yn"]')
-        name = tr.select_one('input[name="product_nm"]').get("value", "").strip()
-        is_checked = checkbox and 'checked' in checkbox.attrs
+        name_input = tr.select_one('input[name="product_nm"]')
+        time_input = tr.select_one('input[name="time_cnt"]')
+        price_input = tr.select_one('input[name="amount"]')
+
+        if not (checkbox and name_input and time_input and price_input):
+            continue
+
+        name = name_input.get("value", "").strip()
+        is_checked = 'checked' in checkbox.attrs
         log(f"상품 '{name}' - 체크 상태: {is_checked}")
         if is_checked:
-            time_val = tr.select_one('input[name="time_cnt"]').get("value", "0").strip()
-            price_val = tr.select_one('input[name="amount"]').get("value", "0").strip()
+            time_val = time_input.get("value", "0").strip()
+            price_val = price_input.get("value", "0").strip()
             try:
                 products.append({
                     "name": name,
