@@ -161,6 +161,6 @@ table.sortable th {
 
 canvas {
     width: 100%; /* 좌우 padding 1rem씩 고려 */
-    min-height: 45vh;
-    max-height: 45vh;
+    min-height: 50vh;
+    max-height: 50vh;
 }  
