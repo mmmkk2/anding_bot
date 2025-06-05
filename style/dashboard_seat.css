@@ -44,10 +44,12 @@ h1 {
     box-sizing: border-box;
 }
 .tables {
+    width: 100%;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     gap: 1rem;
     flex-wrap: wrap;
+    box-sizing: border-box;
 }
 .table-box {
     flex: 1;
@@ -153,7 +155,7 @@ table.sortable th {
 .innerbox {
     padding: 0 1rem;
     box-sizing: border-box;
-    width: calc(100% - 2rem);
+    width: 100% ;/* width: calc(100% - 2rem); */
     margin-top: 0.5rem; /* 여기 추가 */
 }
 
