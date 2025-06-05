@@ -68,6 +68,8 @@ def _get_active_products(html):
                 name = name_input.get("value", "").strip()
                 if "좌석" in name:
                     continue
+                if "9시간" in name or "12시간" in name:
+                    continue
                 # Optionally filter out unwanted products here if needed
                 use_checkbox, renew_checkbox = checkboxes[:2]
                 is_active = 'checked' in use_checkbox.attrs
