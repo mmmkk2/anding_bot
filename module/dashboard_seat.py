@@ -568,10 +568,11 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             <div class="innerbox" style="margin-top:0.5rem;">
                 <canvas id="seatChart" style="width: 100%; height: auto; max-width: 100%; padding: 0 1rem; box-sizing: border-box;"></canvas>
                 {chart_script}
-            
+            </div>
 """
 
     html += """
+    <div class="innerbox">
     <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
     """
     # Add separate table for 자유석 종료시간 6시간 이내
