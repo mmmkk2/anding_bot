@@ -1,5 +1,3 @@
-
-
 # Logging, environment, and argument setup
 import os
 import argparse
@@ -54,8 +52,10 @@ def _get_active_products():
 
     for tr in product_rows:
         checkbox = tr.select_one('input[name="use_yn"]')
-        if checkbox and checkbox.has_attr("checked"):
-            name = tr.select_one('input[name="product_nm"]').get("value", "").strip()
+        name = tr.select_one('input[name="product_nm"]').get("value", "").strip()
+        is_checked = checkbox and 'checked' in checkbox.attrs
+        log(f"상품 '{name}' - 체크 상태: {is_checked}")
+        if is_checked:
             time_val = tr.select_one('input[name="time_cnt"]').get("value", "0").strip()
             price_val = tr.select_one('input[name="amount"]').get("value", "0").strip()
             try:
