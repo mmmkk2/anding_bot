@@ -23,8 +23,7 @@ body {
 }    
 canvas {
     width: 100%;
-    min-height: 40vh;
-    min-height: 40vh;
+    min-height: 50vh;
     height: auto;
 }
 .updated {
@@ -42,12 +41,7 @@ h1 {
     margin-bottom: 1rem;
     color: #333;
 }
-@media (max-width: 480px) {
-  canvas {
-    min-height: 40vh;
-    max-height: 40vh;
-  }
-}
+
 
 .summary-box {
     display: block;
