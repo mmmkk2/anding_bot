@@ -124,41 +124,39 @@ def get_product_html_from_data(products_by_tab):
     </div>
 </div>
 <script>
-window.addEventListener("DOMContentLoaded", function () {
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+document.addEventListener("DOMContentLoaded", function () {{
+    var tabBtns = document.querySelectorAll('.tab-btn');
+    var tabContents = document.querySelectorAll('.tab-content');
 
-    tabBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            // Remove active class from all buttons and tab contents
-            tabBtns.forEach(function(b) {
+    tabBtns.forEach(function(btn) {{
+        btn.addEventListener('click', function() {{
+            tabBtns.forEach(function(b) {{
                 b.classList.remove('active');
-            });
-            tabContents.forEach(function(tc) {
+            }});
+            tabContents.forEach(function(tc) {{
                 tc.style.display = 'none';
                 tc.classList.remove('active');
-            });
+            }});
 
-            // Activate the clicked tab button
             btn.classList.add('active');
-
-            // Show and activate the corresponding tab content
-            const tabId = btn.getAttribute('data-tab');
-            const tabElement = document.getElementById(tabId);
-            if (tabElement) {
+            var tabId = btn.getAttribute('data-tab');
+            var tabElement = document.getElementById(tabId);
+            if (tabElement) {{
                 tabElement.style.display = 'block';
                 tabElement.classList.add('active');
-            }
-        });
-    });
+            }}
+        }});
+    }});
 
     // Initialize visibility
-    tabContents.forEach(function(tc) {
-        if (!tc.classList.contains('active')) {
+    tabContents.forEach(function(tc) {{
+        if (!tc.classList.contains('active')) {{
             tc.style.display = 'none';
-        }
-    });
-});
+        }} else {{
+            tc.style.display = 'block';
+        }}
+    }});
+}});
 </script>
 </body>
 </html>
