@@ -84,7 +84,7 @@ body {
     font-size: 0.9rem;
     cursor: pointer;
     text-align: left;
-    margin-top: 0.5rem;
+    margin-top: 0.3rem; /* Reduced vertical margin above button */
 }
 .content {
     display: none;
@@ -188,6 +188,17 @@ iframe {
     align-items: center ;
     flex-wrap: wrap;
     gap: 0.25rem;
+    margin-bottom: 0.3rem; /* Reduce margin below summary row */
+}
+
+/* Reduce space before the button in toggle-section */
+.toggle-section .summary-header-row {
+    margin-bottom: 0.3rem;
+}
+
+/* Tighten spacing above the "자세히 보기" button */
+.toggle-button {
+    margin-top: 0.3rem;
 }
 
 
