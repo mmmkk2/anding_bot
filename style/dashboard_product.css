@@ -89,3 +89,18 @@ table.sortable th {
     margin-top: 1rem;
     text-align: right;
 }
+
+/* Highlight active tab button */
+.tab-btn.active {
+    background-color: #6c757d;
+    color: white;
+    font-weight: bold;
+    border-radius: 0.5rem;
+}
+
+.tab-wrapper.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
