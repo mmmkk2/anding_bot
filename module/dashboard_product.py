@@ -40,17 +40,19 @@ def log(msg):
 
 # Internal function to get active products
 def _get_active_products():
-    return [
-        {"name": "1시간", "time": 1, "price": 1000},
-        {"name": "2시간", "time": 2, "price": 2000},
-        {"name": "3시간", "time": 3, "price": 3000},
-        {"name": "4시간", "time": 4, "price": 3500},
-        {"name": "6시간", "time": 6, "price": 5000},
-        {"name": "9시간", "time": 9, "price": 7000},
-        {"name": "12시간", "time": 12, "price": 9000},
-        {"name": "좌석 상황에 따라 일회이용/연장이 제한될 수 있습니다.", "time": 0, "price": 1},
-        {"name": "좌석 부족으로 일회이용/연장이 제한 상태(안내문 읽어주세요)", "time": 0, "price": 1},
+    all_products = [
+        {"name": "1시간", "time": 1, "price": 1000, "active": True},
+        {"name": "2시간", "time": 2, "price": 2000, "active": True},
+        {"name": "3시간", "time": 3, "price": 3000, "active": True},
+        {"name": "4시간", "time": 4, "price": 3500, "active": True},
+        {"name": "6시간", "time": 6, "price": 5000, "active": True},
+        {"name": "9시간", "time": 9, "price": 7000, "active": True},
+        {"name": "12시간", "time": 12, "price": 9000, "active": True},
+        {"name": "좌석 상황에 따라 일회이용/연장이 제한될 수 있습니다.", "time": 0, "price": 1, "active": True},
+        {"name": "좌석 부족으로 일회이용/연장이 제한 상태(안내문 읽어주세요)", "time": 0, "price": 1, "active": True},
+        {"name": "테스트 상품 (비활성)", "time": 99, "price": 99999, "active": False},
     ]
+    return [p for p in all_products if p["active"]]
 
 
 # Returns a brief summary line for the active products.
