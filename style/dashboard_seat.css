@@ -151,6 +151,7 @@ table.sortable th {
     }    
 }
 canvas {
+    width: 100% !important;
     min-height: 45vh;
     max-height: 45vh;
 }  
