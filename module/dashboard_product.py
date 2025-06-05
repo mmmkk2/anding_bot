@@ -101,12 +101,14 @@ def render_table(products):
         for p in products
     )
 
+
+update_mode = "M" if args.manual else "B"
+now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
+
 def get_product_html_from_data(products_by_tab):
-    kst = pytz.timezone("Asia/Seoul")
-    now_kst = datetime.now(kst)
-    now_str = now_kst.strftime("%Y-%m-%d %H:%M:%S")
-    update_mode = "M" if args.manual else "B"
     return f"""
+
+    
 <!DOCTYPE html>
 <html lang='ko'>
 <head>
