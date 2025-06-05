@@ -66,6 +66,8 @@ def _get_active_products(html):
                     continue
 
                 name = name_input.get("value", "").strip()
+                if "좌석" in name:
+                    continue
                 # Optionally filter out unwanted products here if needed
                 use_checkbox, renew_checkbox = checkboxes[:2]
                 is_active = 'checked' in use_checkbox.attrs
@@ -105,7 +107,7 @@ def get_product_html_from_data(products_by_tab):
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <title>상품 현황</title>
-    <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_app.css">
+    <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_product.css">
 </head>
 <body>
 <div class="log-container">
