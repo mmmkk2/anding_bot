@@ -199,7 +199,13 @@ def fetch_monthly_sales_from_calendar(driver):
         else:
             daily_avg = 0
             predicted_amount = 0
+        if DEBUG:
+            print(f"[DEBUG] 일평균 매출: {daily_avg:,}원")
+            print(f"[DEBUG] 예측 매출: {predicted_amount:,}원")
 
+        daily_avg
+        predicted_amount
+        
         # Align current month cumulative sales to dates (labels)
         # Use two-digit day for label consistency
         dates_current = df_current["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}").tolist()
