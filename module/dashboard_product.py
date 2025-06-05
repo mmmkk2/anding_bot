@@ -124,25 +124,25 @@ def get_product_html_from_data(products_by_tab):
     </div>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+window.addEventListener("DOMContentLoaded", function () {{
+    var tabBtns = document.querySelectorAll('.tab-btn');
+    var tabContents = document.querySelectorAll('.tab-content');
 
-    tabBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            tabBtns.forEach(function(b) {
+    tabBtns.forEach(function(btn) {{
+        btn.addEventListener('click', function() {{
+            tabBtns.forEach(function(b) {{
                 b.classList.remove('active');
-            });
-            tabContents.forEach(function(tc) {
+            }});
+            tabContents.forEach(function(tc) {{
                 tc.classList.remove('active');
-            });
+            }});
 
             btn.classList.add('active');
-            const tabId = btn.getAttribute('data-tab');
+            var tabId = btn.getAttribute('data-tab');
             document.getElementById(tabId).classList.add('active');
-        });
-    });
-});
+        }});
+    }});
+}});
 </script>
 </body>
 </html>
