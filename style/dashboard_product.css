@@ -98,9 +98,19 @@ table.sortable th {
     border-radius: 0.5rem;
 }
 
+/* Highlight active tab button */
+.tab-btn {
+    background-color: #a2abb3;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+    border-radius: 0.5rem;
+}
+
+
 .tab-wrapper.tabs {
     display: flex;
     justify-content: center;
     gap: 0.5rem;
     margin: 1rem 0;
+    padding-top: 0.5rem;
 }
