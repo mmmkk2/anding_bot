@@ -601,10 +601,12 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     
     html += f"""
     </div>
-        <div class="summary-box">
-            <div class="updated">Updated {now_str}</div>
-        </div>
+        
     </div>
+    <div class="summary-box">
+            <div class="updated">Updated {now_str}</div>
+    </div>
+
     """
     # Move the updated line outside the .box, after the entire box
     # (already included inside summary-box, so omit here)
