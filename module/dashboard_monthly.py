@@ -220,7 +220,7 @@ def fetch_monthly_sales_from_calendar(driver):
         </head>
         <body>
             <div class="box">
-                <canvas id="monthlyChart" style="max-width: 100%; height: auto;"></canvas>
+                <canvas id="monthlyChart" style="max-width: 100%; height: auto; aspect-ratio: 16 / 9;"></canvas>
                 <script>
                     // Prepare data for Chart.js: set first point to null, and pointRadius 0 for first.
                     const cumsumsPrev = [null, ...{json.dumps(cumsums[1:])}];

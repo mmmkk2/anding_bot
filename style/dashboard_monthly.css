@@ -21,11 +21,7 @@ body {
     overflow-y: auto;
     margin: 0 auto;
 }    
-canvas {
-    width: 100%;
-    min-height: 50vh;
-    height: auto;
-}
+
 .updated {
     font-size: 0.8rem;
     color: #888;
@@ -65,7 +61,12 @@ h1 {
     }
     /* Removed .updated-box and .pill tweaks as redundant or unused */
     canvas {
-        min-height: 25vh !important;
-        max-height: 30vh;
+        min-height: 40vh !important;
     }  
+}
+
+canvas {
+    width: 100%;
+    min-height: 50vh;
+
 }
