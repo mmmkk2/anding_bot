@@ -230,9 +230,9 @@ def check_studyroom(driver):
                 2인실 : 예약 {count_2}건<br>
                 4인실 : 예약 {count_4}건
                 </div>
-                <div class="updated">Updated {now_str}</div>
             </div>    
         </div>
+    <div class="updated">Updated {now_str}</div>        
     </body>
     </html>
     """
