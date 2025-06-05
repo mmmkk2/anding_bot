@@ -1,9 +1,12 @@
-# Logging, environment, and argument setup
 import os
 import argparse
 from datetime import datetime
 import pytz
 from dotenv import load_dotenv
+# --- Selenium login utility imports ---
+from module.set import login, create_driver
+from selenium.webdriver.common.by import By
+import time
 
 kst = pytz.timezone("Asia/Seoul")
 
@@ -11,6 +14,10 @@ try:
     load_dotenv("/home/mmkkshim/anding_bot/.env")
 except:
     pass
+
+# --- URL variables ---
+BASE_URL = os.getenv("BASE_URL")
+PRODUCT_URL = f"{BASE_URL}/product/seatArea"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--manual", action="store_true", help="수동 실행 모드")
@@ -111,7 +118,31 @@ def get_product_html():
 
 
 # --- Main product dashboard check ---
+def fetch_product_source_html():
+    log("🌐 상품 페이지 로그인 및 HTML 저장 시도")
+    driver = create_driver()
+    try:
+        if login(driver):
+            driver.get(PRODUCT_URL)
+            time.sleep(2)
+            personal_tab = driver.find_element(By.CSS_SELECTOR, "a[href='#person']")
+            personal_tab.click()
+            time.sleep(2)
+            html = driver.page_source
+            save_path = os.path.join(DASHBOARD_PATH, "seatArea_personal.html")
+            with open(save_path, "w", encoding="utf-8") as f:
+                f.write(html)
+            log(f"✅ 개인석 상품 HTML 저장 완료: {save_path}")
+        else:
+            log("❌ 상품 페이지 로그인 실패")
+    except Exception as e:
+        log(f"[ERROR] 상품 HTML 수집 중 오류: {e}")
+    finally:
+        driver.quit()
+
+
 def main_check_product():
+    fetch_product_source_html()
     log("🔍 [상품] 활성 상품 현황 수집 시작")
     summary = summary_line()
     log(f"✅ {summary}")
