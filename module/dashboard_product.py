@@ -71,17 +71,16 @@ def _get_active_products(html):
 
         log(f"상품 '{name}' - 판매: {is_active}, 연장: {is_renewable}")
 
-        if is_active:
-            try:
-                products.append({
-                    "name": name,
-                    "time": int(time_input.get("value", "0").strip()),
-                    "price": int(price_input.get("value", "0").strip()),
-                    "active": True,
-                    "renewable": is_renewable,
-                })
-            except ValueError:
-                continue  # Skip rows with invalid numbers
+        try:
+            products.append({
+                "name": name,
+                "time": int(time_input.get("value", "0").strip()),
+                "price": int(price_input.get("value", "0").strip()),
+                "active": is_active,
+                "renewable": is_renewable,
+            })
+        except ValueError:
+            continue  # Skip rows with invalid numbers
 
     return products
 
