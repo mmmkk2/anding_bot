@@ -107,7 +107,7 @@ iframe {
 
 #toggle-iframe-product {
     min-height: 25vh;
-    max-height: 40vh;
+    max-height: 35vh;
     width: 100%;
 }
 
@@ -119,7 +119,7 @@ iframe {
 
 #toggle-iframe-monthly {
     min-height: 400px;
-    max-height: 60vh;
+    max-height: 35vh;
     width: 100%;
 }
 
