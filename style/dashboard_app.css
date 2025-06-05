@@ -99,11 +99,21 @@ iframe {
 }
 
 
-#toggle-iframe-seat,
-#toggle-iframe-product,
-#toggle-iframe-studyroom {
+#toggle-iframe-seat {
     min-height: 400px;
     max-height: 80vh;
+    width: 100%;
+}
+
+#toggle-iframe-product {
+    min-height: 400px;
+    max-height: 80vh;
+    width: 100%;
+}
+
+#toggle-iframe-studyroom {
+    min-height: 400px;
+    max-height: 40vh;
     width: 100%;
 }
 
