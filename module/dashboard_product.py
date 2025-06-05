@@ -119,32 +119,30 @@ def get_product_html_from_data(products_by_tab):
 </head>
 <body>
 <div class="box">
-    <div class="log-container">
-        <h1>🛒 상품 현황</h1>
-        <div class="tab-wrapper">
-            <button class="tab-btn active" data-tab="once">1회이용권</button>
-            <button class="tab-btn" data-tab="hour">시간이용권</button>
-            <button class="tab-btn" data-tab="period">기간이용권</button>
-        </div>
-        <div id="once" class="tab-content active">
-            <table><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
-                {render_table(products_by_tab["once"])}
-            </tbody></table>
-        </div>
-        <div id="hour" class="tab-content">
-            <table><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
-                {render_table(products_by_tab["hour"])}
-            </tbody></table>
-        </div>
-        <div id="period" class="tab-content">
-            <table><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
-                {render_table(products_by_tab["period"])}
-            </tbody></table>
-        </div>
-        <div class="summary-box">
-            <div class="updated updated-box">Updated {now_str}</div>
-        </div>
+    <div class="tab-wrapper">
+        <button class="tab-btn active" data-tab="once">1회이용권</button>
+        <button class="tab-btn" data-tab="hour">시간이용권</button>
+        <button class="tab-btn" data-tab="period">기간이용권</button>
     </div>
+    <div id="once" class="tab-content active">
+        <table><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
+            {render_table(products_by_tab["once"])}
+        </tbody></table>
+    </div>
+    <div id="hour" class="tab-content">
+        <table><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
+            {render_table(products_by_tab["hour"])}
+        </tbody></table>
+    </div>
+    <div id="period" class="tab-content">
+        <table><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
+            {render_table(products_by_tab["period"])}
+        </tbody></table>
+    </div>
+    <div class="summary-box">
+        <div class="updated updated-box">Updated {now_str}</div>
+    </div>
+
 </div>
 <script>
 document.addEventListener("DOMContentLoaded", function () {{
