@@ -53,7 +53,7 @@ h1 {
 }
 .table-box {
     flex: 1;
-    min-width: 280px;
+    min-width: 260px;
     max-height: 230px;
     overflow-y: auto;
     display: block;
