@@ -106,8 +106,8 @@ iframe {
 }
 
 #toggle-iframe-product {
-    min-height: 400px;
-    max-height: 30vh;
+    min-height: 30vh;
+    max-height: 40vh;
     width: 100%;
 }
 
@@ -139,6 +139,7 @@ iframe {
     .box {
     padding: 1rem;
     }
+  
 }
 
 
