@@ -189,6 +189,17 @@ def fetch_monthly_sales_from_calendar(driver):
         summary_amount_prev = df_prev["amount"].sum()
         summary_amount_curr = df_current["amount"].sum()
 
+        # === 일평균 및 예측 매출 계산 ===
+        today_day_int = int(today_day)
+        if today_day_int > 0:
+            daily_avg = summary_amount_curr // today_day_int
+            days_in_month = now.replace(month=now.month % 12 + 1, day=1) - pd.Timedelta(days=1)
+            days_in_month = days_in_month.day
+            predicted_amount = daily_avg * days_in_month
+        else:
+            daily_avg = 0
+            predicted_amount = 0
+
         # Align current month cumulative sales to dates (labels)
         # Use two-digit day for label consistency
         dates_current = df_current["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}").tolist()
@@ -276,6 +287,7 @@ def fetch_monthly_sales_from_calendar(driver):
                 </script>
                 <div class="summary-box">
                     <div> 총 매출: {prev_month}월 {summary_amount_prev:,}원 / {curr_month}월 {summary_amount_curr:,}원<br> </div>
+                    <div> 일평균 매출: {daily_avg:,}원 / 예측 매출: {predicted_amount:,}원 </div>
                 </div>                
             </div>
         <div class="updated">Updated {now_str}</div>
