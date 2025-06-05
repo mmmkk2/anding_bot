@@ -228,6 +228,7 @@ def create_driver():
 
     # 2. Headless 모드 설정
     chrome_options.add_argument("--headless")  # 안정적인 headless 모드
+    chrome_options.add_argument("--remote-debugging-port=9222")
 
     # 3. 필수 안정성 옵션
     chrome_options.add_argument("--no-sandbox")
