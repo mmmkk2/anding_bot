@@ -34,6 +34,7 @@ h1 {
     font-size: 0.9rem;
     margin: 0.3rem 0;
 }
+/* Single, clean definition for .updated */
 .updated {
     font-size: 0.8rem;
     color: #888;
@@ -94,70 +95,21 @@ table.sortable th {
 }
       
 
-.updated {
-    font-size: 0.8rem;
-    color: #888;
-    margin-top: 1rem;
-    margin-right: 0.1rem;
-    width: 100%;
-    text-align: right !important;
-    display: block;
-    box-sizing: border-box;
-}
-.pill {
-    background-color: #dfe6de;
-    color: #333;
-    border-radius: 999px;
-    padding: 0.4rem 1rem;
-    font-size: 0.9rem;
-    white-space: nowrap;
-}
 
-
-.summary-box {
-    display: block;              /* 기본적으로 줄바꿈 유도 */
-    width: 100%;                 /* box 너비 맞춤 */
-    clear: both;                 /* 혹시 있을 float 해제 */
-    text-align: right;
-    margin-top: 1rem;
-    margin-right: 0.1rem;
-    font-size: 0.9rem;
-    color: #555;
-}
-.summary-text {
-    line-height: 1.3;
-}  
 
 @media (max-width: 480px) {
     body {
         /* max-height: 50vh; */
-        min-height: 50vh
-    }            
+        min-height: 50vh;
+    }
     .box {
-        max-height: 200vh;  /*  */
+        max-height: 200vh;
     }
-    .updated-box {
-        gap: 0.3rem;
-        flex-wrap: nowrap;
-        justify-content: start;
-        padding: 0 0.5rem;
-    }
-
-    .pill {
-        font-size: 0.8rem;
-        padding: 0.3rem 0.8rem;
-    }
-  
+    /* Removed .updated-box and .pill tweaks as redundant or unused */
 }
 
 
-/* 추가: .innerbox 클래스 정의 */
-.innerbox {
-    padding: 0 1rem;
-    box-sizing: border-box;
-    width: 100% ;/* width: calc(100% - 2rem); */
-    margin-top: 0.5rem; /* 여기 추가 */
-}
+
 
 canvas {
     width: 100%; /* 좌우 padding 1rem씩 고려 */

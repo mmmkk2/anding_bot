@@ -606,7 +606,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     
     """
     # Move the updated line outside the .box, after the entire box
-    # (already included inside summary-box, so omit here)
+    
     html += """
     <script>
       document.addEventListener('DOMContentLoaded', function () {
