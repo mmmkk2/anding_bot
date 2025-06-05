@@ -56,26 +56,29 @@ def _get_active_products(html):
     products = []
 
     for tr in product_rows:
-        checkbox = tr.select_one('input[name="use_yn"]')
+        checkboxes = tr.select('input[type="checkbox"]')
         name_input = tr.select_one('input[name="product_nm"]')
         time_input = tr.select_one('input[name="time_cnt"]')
         price_input = tr.select_one('input[name="amount"]')
 
-        if not (checkbox and name_input and time_input and price_input):
+        if len(checkboxes) < 2 or not (name_input and time_input and price_input):
             continue
 
+        use_checkbox, renew_checkbox = checkboxes[:2]
         name = name_input.get("value", "").strip()
-        is_checked = 'checked' in checkbox.attrs
-        log(f"상품 '{name}' - 체크 상태: {is_checked}")
-        if is_checked:
-            time_val = time_input.get("value", "0").strip()
-            price_val = price_input.get("value", "0").strip()
+        is_active = 'checked' in use_checkbox.attrs
+        is_renewable = 'checked' in renew_checkbox.attrs
+
+        log(f"상품 '{name}' - 판매: {is_active}, 연장: {is_renewable}")
+
+        if is_active:
             try:
                 products.append({
                     "name": name,
-                    "time": int(time_val),
-                    "price": int(price_val),
+                    "time": int(time_input.get("value", "0").strip()),
+                    "price": int(price_input.get("value", "0").strip()),
                     "active": True,
+                    "renewable": is_renewable,
                 })
             except ValueError:
                 continue  # Skip rows with invalid numbers
@@ -84,7 +87,7 @@ def _get_active_products(html):
 
 def get_product_html_from_data(products):
     rows = "\n".join(
-        f"<tr><td>{p['name']}</td><td>{p['time']}시간</td><td>{p['price']:,}원</td><td>{'✅' if p['active'] else '❌'}</td></tr>"
+        f"<tr><td>{p['name']}</td><td>{p['time']}시간</td><td>{p['price']:,}원</td><td>{'✅' if p['active'] else '❌'}</td><td>{'🔁' if p.get('renewable') else '―'}</td></tr>"
         for p in products
     )
     return f"""
@@ -100,7 +103,7 @@ def get_product_html_from_data(products):
         <div class="log-container">
             <div class="log-title">🛒 활성화된 시간권 상품</div>
             <table>
-                <thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>상태</th></tr></thead>
+                <thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead>
                 <tbody>
                     {rows}
                 </tbody>
