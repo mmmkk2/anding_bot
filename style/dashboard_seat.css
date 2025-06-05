@@ -112,7 +112,7 @@ table.sortable th {
 
 
 canvas {
-    width: 100%; /* 좌우 padding 1rem씩 고려 */
-    min-height: 50vh;
-    max-height: 50vh;
+    width: 100%; 
+    min-height: 40vh;
+    max-height: 40vh;
 }  
