@@ -120,7 +120,7 @@ def get_product_html_from_data(products_by_tab):
 <body>
 <div class="box">
     <div class="log-container">
-        <h3>🛒 상품 현황</h3>
+        <h1>🛒 상품 현황</h1>
         <div class="tab-wrapper">
             <button class="tab-btn active" data-tab="once">1회이용권</button>
             <button class="tab-btn" data-tab="hour">시간이용권</button>

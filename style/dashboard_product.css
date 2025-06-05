@@ -24,7 +24,11 @@ body {
     display: block;
 }
 
-
+h1 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
 @media (max-width: 480px) {
     .box {
     max-width: 95vw;
@@ -43,7 +47,7 @@ body {
     border: none;
     padding: 0.5rem 1rem;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     border-radius: 0.3rem;
     margin: 0 0.2rem;
 }
