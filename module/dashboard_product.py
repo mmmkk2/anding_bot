@@ -46,7 +46,7 @@ def log(msg):
 # Internal function to get active products (dynamically from product_source.html)
 from bs4 import BeautifulSoup
 def _get_active_products():
-    html_path = os.path.join(DASHBOARD_PATH, "product_source.html")
+    html_path = os.path.join(DASHBOARD_PATH, "seatArea_personal.html")
     try:
         with open(html_path, "r", encoding="utf-8") as f:
             soup = BeautifulSoup(f, "html.parser")
@@ -125,7 +125,7 @@ def fetch_product_source_html():
         if login(driver):
             driver.get(PRODUCT_URL)
             time.sleep(2)
-            personal_tab = driver.find_element(By.CSS_SELECTOR, "a[href='#person']")
+            personal_tab = driver.find_element(By.XPATH, "//a[contains(text(), '개인석')]")
             personal_tab.click()
             time.sleep(2)
             html = driver.page_source
