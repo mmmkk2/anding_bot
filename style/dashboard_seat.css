@@ -6,7 +6,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 180px;
+    min-height: 50vw;
     box-sizing: border-box;
     text-align: center;
 }
