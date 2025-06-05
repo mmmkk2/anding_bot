@@ -147,11 +147,9 @@ table.sortable th {
     }
   
 }
-.contents-wrapper {
-    padding: 0 1rem;
-}
+
 canvas {
-    width: 100% !important;
+    width: calc(100% - 2rem); /* 좌우 padding 1rem씩 고려 */
     min-height: 45vh;
     max-height: 45vh;
 }  
