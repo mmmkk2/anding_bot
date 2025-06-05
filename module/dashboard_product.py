@@ -52,7 +52,11 @@ def _get_active_products(html):
         log(f"[ERROR] 상품 HTML 파싱 실패: {e}")
         return []
 
-    product_rows = soup.select("tbody > tr")
+    product_rows = []
+    for tab_id in ["tab_1", "tab_2", "tab_3"]:
+        tab = soup.select_one(f"div{f'#{tab_id}'}")
+        if tab:
+            product_rows.extend(tab.select("tbody > tr"))
     products = []
 
     for tr in product_rows:
@@ -64,8 +68,11 @@ def _get_active_products(html):
         if len(checkboxes) < 2 or not (name_input and time_input and price_input):
             continue
 
-        use_checkbox, renew_checkbox = checkboxes[:2]
         name = name_input.get("value", "").strip()
+        if "행사상품" in name or "시간대별" in name:
+            continue
+
+        use_checkbox, renew_checkbox = checkboxes[:2]
         is_active = 'checked' in use_checkbox.attrs
         is_renewable = 'checked' in renew_checkbox.attrs
 
