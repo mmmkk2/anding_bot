@@ -97,43 +97,53 @@ def get_product_html_from_data(products_by_tab):
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <title>상품 현황</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_app.css">
 </head>
 <body>
-<div class="container py-4">
-    <h3 class="mb-4">🛒 시간권 상품 현황</h3>
-
-    <ul class="nav nav-tabs" id="productTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="once-tab" data-bs-toggle="tab" data-bs-target="#once" type="button" role="tab">1회이용권</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="hour-tab" data-bs-toggle="tab" data-bs-target="#hour" type="button" role="tab">시간이용권</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="period-tab" data-bs-toggle="tab" data-bs-target="#period" type="button" role="tab">기간이용권</button>
-        </li>
-    </ul>
-
-    <div class="tab-content pt-3">
-        <div class="tab-pane fade show active" id="once" role="tabpanel" aria-labelledby="once-tab">
-            <table class="table table-bordered"><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
-                {render_table(products_by_tab["once"])}
-            </tbody></table>
-        </div>
-        <div class="tab-pane fade" id="hour" role="tabpanel" aria-labelledby="hour-tab">
-            <table class="table table-bordered"><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
-                {render_table(products_by_tab["hour"])}
-            </tbody></table>
-        </div>
-        <div class="tab-pane fade" id="period" role="tabpanel" aria-labelledby="period-tab">
-            <table class="table table-bordered"><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
-                {render_table(products_by_tab["period"])}
-            </tbody></table>
-        </div>
+<div class="log-container">
+    <h3>🛒 시간권 상품 현황</h3>
+    <div class="tab-wrapper">
+        <button class="tab-btn active" data-tab="once">1회이용권</button>
+        <button class="tab-btn" data-tab="hour">시간이용권</button>
+        <button class="tab-btn" data-tab="period">기간이용권</button>
+    </div>
+    <div id="once" class="tab-content active">
+        <table><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
+            {render_table(products_by_tab["once"])}
+        </tbody></table>
+    </div>
+    <div id="hour" class="tab-content">
+        <table><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
+            {render_table(products_by_tab["hour"])}
+        </tbody></table>
+    </div>
+    <div id="period" class="tab-content">
+        <table><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
+            {render_table(products_by_tab["period"])}
+        </tbody></table>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            tabBtns.forEach(function(b) {
+                b.classList.remove('active');
+            });
+            tabContents.forEach(function(tc) {
+                tc.classList.remove('active');
+            });
+
+            btn.classList.add('active');
+            const tabId = btn.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+});
+</script>
 </body>
 </html>
 """
