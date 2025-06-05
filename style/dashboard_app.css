@@ -106,7 +106,7 @@ iframe {
 }
 
 #toggle-iframe-product {
-    min-height: 28vh;
+    min-height: 25vh;
     max-height: 40vh;
     width: 100%;
 }
