@@ -145,10 +145,7 @@ table.sortable th {
         font-size: 0.8rem;
         padding: 0.3rem 0.8rem;
     }
-    canvas {
-        min-height: 40vh;
-        max-height: 40vh;
-    }    
+  
 }
 canvas {
     width: 100% !important;
