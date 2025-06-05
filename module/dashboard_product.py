@@ -124,6 +124,7 @@ def get_product_html_from_data(products_by_tab):
         <button class="tab-btn" data-tab="hour">시간이용권</button>
         <button class="tab-btn" data-tab="period">기간이용권</button>
     </div>
+    <div style="margin-bottom: 1rem;"></div>
     <div id="once" class="tab-content active">
         <div class="table-box">
             <table class="sortable" data-sortable><thead><tr><th>상품명</th><th>시간</th><th>금액</th><th>판매</th><th>연장</th></tr></thead><tbody>
