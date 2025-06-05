@@ -85,7 +85,15 @@ def _get_active_products(html):
 
 def render_table(products):
     return "\n".join(
-        f"<tr><td>{p['name']}</td><td>{p['time']}시간</td><td>{p['price']:,}원</td><td>{'✅' if p['active'] else '❌'}</td><td>{'🔁' if p.get('renewable') else '―'}</td></tr>"
+        f"""
+<tr>
+    <td>{p['name']}</td>
+    <td>{p['time']}시간</td>
+    <td>{p['price']:,}원</td>
+    <td><input type="checkbox" {'checked' if p['active'] else ''} disabled></td>
+    <td><input type="checkbox" {'checked' if p.get('renewable') else ''} disabled></td>
+</tr>
+        """.strip()
         for p in products
     )
 
