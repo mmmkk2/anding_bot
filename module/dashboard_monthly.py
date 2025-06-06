@@ -209,17 +209,17 @@ def fetch_monthly_sales_from_calendar(driver):
         # Align current month cumulative sales to dates (labels)
         # Use two-digit day for label consistency
         dates_current = df_current["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}").tolist()
+        # Align current month cumulative sales to all labels (dates)
         cumsum_map_current = dict(zip(dates_current, df_current["cumsum"].tolist()))
+        dates = [f"{d:02d}" for d in range(1, 32)]
+        dates.insert(0, "00")
+        cumsums_current = [0] + [cumsum_map_current.get(d, None) for d in dates[1:]]
+        dates_current = dates
 
-        # Align current month cumulative sales to dates (labels), always include all dates for alignment
         update_mode = "M" if args.manual else "B"
         now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
         if DEBUG:
             print(f"[DEBUG] now_str: {now_str}")
-        # Build aligned cumulative sums for current month: None for missing, value for present
-        cumsums_current = [cumsum_map_current.get(d, None) for d in dates_current]
-        dates_current.insert(0, "00")
-        cumsums_current.insert(0, 0)
         print(cumsums_current)
         print(dates)
 
@@ -243,7 +243,7 @@ def fetch_monthly_sales_from_calendar(driver):
                     new Chart(ctx, {{
                         type: 'line',
                         data: {{
-                            labels: {json.dumps(dates_current)},
+                            labels: {json.dumps(dates)},
                             datasets: [
                                 {{
                                     label: '이번달 매출 (원)',
