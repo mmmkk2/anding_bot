@@ -216,13 +216,12 @@ def fetch_monthly_sales_from_calendar(driver):
         now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
         if DEBUG:
             print(f"[DEBUG] now_str: {now_str}")
+        # Build aligned cumulative sums for current month
+        # Use same "dates" list for x-axis labels
         cumsums_current = []
         for d in dates:
-            if d in cumsum_map_current:
-                cumsums_current.append(cumsum_map_current[d])
-            else:
-                cumsums_current.append(None)
-        # Insert a zero at the start of cumsums_current
+            cumsums_current.append(cumsum_map_current.get(d, None))
+        # Insert a zero at the start to align with dates[0] = "00"
         cumsums_current.insert(0, 0)
 
         chart_html = f"""
@@ -286,7 +285,23 @@ def fetch_monthly_sales_from_calendar(driver):
                                         }}
                                     }}
                                 }}
-                            }}
+                            }},
+                            plugins: {{
+                                tooltip: {{
+                                    callbacks: {{
+                                        label: function(context) {{
+                                            let label = context.dataset.label || '';
+                                            if (label) {{
+                                                label += ': ';
+                                            }}
+                                            if (context.parsed.y != null) {{
+                                                label += context.parsed.y.toLocaleString() + '원';
+                                            }}
+                                            return label;
+                                        }}
+                                    }}
+                                }}
+                            }},
                         }}
                     }});
                 </script>
