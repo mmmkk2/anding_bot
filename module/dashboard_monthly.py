@@ -190,9 +190,8 @@ def fetch_monthly_sales_from_calendar(driver):
         summary_amount_curr = df_current["amount"].sum()
 
         # === 일평균 및 예측 매출 계산 ===
-        today_day = now.strftime("%d")
         today_day_int = int(today_day)
-        if today_day_int > 0 and summary_amount_curr > 0:
+        if today_day_int > 0:
             daily_avg = summary_amount_curr // today_day_int
             days_in_month = now.replace(month=now.month % 12 + 1, day=1) - pd.Timedelta(days=1)
             days_in_month = days_in_month.day
@@ -216,12 +215,13 @@ def fetch_monthly_sales_from_calendar(driver):
         now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
         if DEBUG:
             print(f"[DEBUG] now_str: {now_str}")
-        # Build aligned cumulative sums for current month
-        # Use same "dates" list for x-axis labels
         cumsums_current = []
         for d in dates:
-            cumsums_current.append(cumsum_map_current.get(d, None))
-        # Insert a zero at the start to align with dates[0] = "00"
+            if d < today_day:
+                cumsums_current.append(cumsum_map_current.get(d, 0))
+            else:
+                cumsums_current.append(None)  # Leave future dates as blank
+        # Insert a zero at the start of cumsums_current
         cumsums_current.insert(0, 0)
 
         chart_html = f"""
@@ -285,23 +285,7 @@ def fetch_monthly_sales_from_calendar(driver):
                                         }}
                                     }}
                                 }}
-                            }},
-                            plugins: {{
-                                tooltip: {{
-                                    callbacks: {{
-                                        label: function(context) {{
-                                            let label = context.dataset.label || '';
-                                            if (label) {{
-                                                label += ': ';
-                                            }}
-                                            if (context.parsed.y != null) {{
-                                                label += context.parsed.y.toLocaleString() + '원';
-                                            }}
-                                            return label;
-                                        }}
-                                    }}
-                                }}
-                            }},
+                            }}
                         }}
                     }});
                 </script>
