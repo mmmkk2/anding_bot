@@ -61,7 +61,7 @@ h1 {
     }
     /* Removed .updated-box and .pill tweaks as redundant or unused */
     canvas {
-        min-height: 50vh !important;
+        min-height: 40vh !important;
     }  
 }
 
