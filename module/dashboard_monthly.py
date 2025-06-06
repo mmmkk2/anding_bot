@@ -163,12 +163,20 @@ def fetch_monthly_sales_from_calendar(driver):
         df_prev = df[df["month"] == prev_month].sort_values("date").drop(columns=["month"])
         df_prev["cumsum"] = df_prev["amount"].cumsum()
 
-        # Ensure date labels are always two digits (e.g., '01', '02d', ..., '31')
-        dates = df_prev["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}").tolist()
-        cumsums = df_prev["cumsum"].tolist()
-        # Insert "00" and 0 at the start of both lists
-        dates.insert(0, "00")
-        cumsums.insert(0, 0)
+        # Combine both current and previous month dates to find maximum day
+        all_dates = pd.concat([df_prev["date"], df_current["date"]])
+        max_day = all_dates.dt.day.max()
+        labels = [f"{d:02d}" for d in range(1, max_day + 1)]
+        labels.insert(0, "00")  # Add "00" as the first placeholder label
+
+        # Rebuild cumulative lists with aligned labels
+        cumsum_map_prev = dict(zip(df_prev["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}"), df_prev["cumsum"].tolist()))
+        cumsum_map_current = dict(zip(df_current["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}"), df_current["cumsum"].tolist()))
+
+        cumsums = [0] + [cumsum_map_prev.get(d, None) for d in labels[1:]]
+        cumsums_current = [0] + [cumsum_map_current.get(d, None) for d in labels[1:]]
+
+        dates = labels
 
         # Prepare current month sales for comparison
         current_month = now.month
@@ -189,7 +197,6 @@ def fetch_monthly_sales_from_calendar(driver):
         summary_amount_prev = df_prev["amount"].sum()
         summary_amount_curr = df_current["amount"].sum()
 
-        print(df_current["date"])
 
         # === 일평균 및 예측 매출 계산 ===
         today_day_int = len(df_current["date"])
@@ -206,25 +213,10 @@ def fetch_monthly_sales_from_calendar(driver):
             print(f"[DEBUG] 예측 매출: {predicted_amount:,}원")
 
         
-        # Align current month cumulative sales to dates (labels)
-        # Use two-digit day for label consistency
-        dates_current = df_current["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}").tolist()
-        cumsum_map_current = dict(zip(dates_current, df_current["cumsum"].tolist()))
-
-        # Align current month cumulative sales to dates (labels), always include all dates for alignment
         update_mode = "M" if args.manual else "B"
         now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
         if DEBUG:
             print(f"[DEBUG] now_str: {now_str}")
-        # Build aligned cumulative sums for current month: None for missing, value for present
-        cumsums_current = []
-        for d in dates:
-            if d in cumsum_map_current:
-                cumsums_current.append(cumsum_map_current[d])
-            else:
-                cumsums_current.append(None)
-        # Insert a zero at the start of cumsums_current
-        cumsums_current.insert(0, 0)
         print(cumsums_current)
         print(dates)
 
