@@ -198,8 +198,23 @@ def capture_dashboard(name, path, driver):
 
     if name.startswith("seat"):
         screenshot_path = os.path.join(screenshot_dir, f"{name}.png")
-        driver.save_screenshot(screenshot_path)
-        print(f"[완료] PNG 저장됨: {screenshot_path}")
+
+        try:
+            canvas_data = driver.execute_script("""
+                const canvas = document.querySelector("canvas");
+                return canvas ? canvas.toDataURL("image/png").substring("data:image/png;base64,".length) : null;
+            """)
+            if canvas_data:
+                import base64
+                with open(screenshot_path, "wb") as f:
+                    f.write(base64.b64decode(canvas_data))
+                print(f"[완료] PNG 저장됨 (canvas): {screenshot_path}")
+            else:
+                raise Exception("canvas 없음")
+        except Exception as e:
+            print(f"[실패] 캔버스 추출 실패, 일반 스크린샷 시도: {e}")
+            driver.save_screenshot(screenshot_path)
+            print(f"[완료] PNG 저장됨 (fallback): {screenshot_path}")
 
     if name.startswith("payment"):
         soup = BeautifulSoup(html, "html.parser")
