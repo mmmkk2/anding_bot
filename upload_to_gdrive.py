@@ -45,6 +45,7 @@ def create_folder_and_upload_file(service, folder_name, root_folder_id, screensh
         folder_id = folder.get("id")
         print(f"[폴더 생성 완료] {folder_name} → ID: {folder_id}")
 
+    print(f"[DEBUG] 업로드 대상 폴더 ID: {folder_id}")
     # 업로드
     for file in os.listdir(screenshot_folder):
         if file.endswith(".png") and file.startswith(folder_name):
@@ -52,6 +53,7 @@ def create_folder_and_upload_file(service, folder_name, root_folder_id, screensh
             file_metadata = {
                 "name": dated_filename,
                 "parents": [folder_id],
+                "mimeType": "image/png"
             }
             media = MediaFileUpload(os.path.join(screenshot_folder, file), resumable=True)
             try:
@@ -119,6 +121,7 @@ def capture_dashboard(name, path, driver):
         driver.find_element(By.NAME, "password").send_keys(LOGIN_PWD)
         driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
         time.sleep(2)
+        driver.get(url)
 
     WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
     time.sleep(1)
