@@ -11,7 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import argparse
 import pytz
 
@@ -35,6 +35,7 @@ DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
 # Default: DEBUG is True unless --manual is passed
 parser = argparse.ArgumentParser()
 parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 비활성화)")
+parser.add_argument("--days-ago", type=int, default=0, help="며칠 전의 매출을 계산할지 선택 (0=오늘)")
 args = parser.parse_args()
 DEBUG = args.manual or os.getenv("DEBUG", "true").lower() == "true"
 
@@ -58,8 +59,10 @@ def check_payment_status(driver):
     if DEBUG:
         print("[DEBUG] 페이지 진입 완료")
 
+    target_date = now - timedelta(days=args.days_ago)
+    today_date_str = target_date.strftime("%Y.%m.%d")
+
     # === 날짜 필터: 결제일자 시작~종료일을 오늘로 설정 ===
-    today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
     if DEBUG:
         print(f"[DEBUG] 오늘 날짜 기준 결제 필터: {today_date_str}")
     try:
@@ -102,7 +105,6 @@ def check_payment_status(driver):
         return
 
     # === 날짜 필터: 결제일자 시작~종료일을 오늘로 설정 ===
-    today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
     if DEBUG:
         print(f"[DEBUG] 오늘 날짜 기준 결제 필터: {today_date_str}")
     try:
@@ -202,7 +204,7 @@ def check_payment_status(driver):
     # 날짜 기준 필터링 (오늘 날짜만 유지)
     today_only = []
     for payment in payments:
-        if payment["date"].startswith(today_str):
+        if payment["date"].startswith(today_date_str):
             today_only.append(payment)
     if DEBUG:
         print(f"[DEBUG] 오늘 결제 내역 개수: {len(today_only)}")
@@ -256,8 +258,9 @@ def check_payment_status(driver):
 
 
 def save_payment_dashboard_html(payments):
-    today = now.strftime("%Y.%m.%d")
-    summary_time = now.strftime("%H:%M")
+    target_date = now - timedelta(days=args.days_ago)
+    today = target_date.strftime("%Y.%m.%d")
+    summary_time = target_date.strftime("%H:%M")
     summary_count = len(payments)
     # summary_amount = sum(int(p['amount'].replace(',', '').replace('원', '')) for p in payments if p['amount'])
     summary_amount = sum(
