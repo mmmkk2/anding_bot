@@ -287,13 +287,28 @@ def fetch_monthly_sales_from_calendar(driver):
                                         }}
                                     }}
                                 }}
+                            }},
+                            plugins: {{
+                                tooltip: {{
+                                    callbacks: {{
+                                        label: function(context) {{
+                                            const daily = context.raw - (context.dataset.data[context.dataIndex - 1] || 0);
+                                            const now = context.raw;
+                                            if (daily !== 0) {{
+                                                return `${{context.label}}일<br>일일매출: ${{daily.toLocaleString()}}원<br>누적 매출: ${{now.toLocaleString()}}원`;
+                                            }} else {{
+                                                return `${{context.label}}일<br>누적 매출: ${{now != null ? now.toLocaleString() + '원' : 'N/A'}}`;
+                                            }}
+                                        }}
+                                    }}
+                                }}
                             }}
                         }}
                     }});
                 </script>
                 <div class="summary-box">
-                    <div> 총 매출: {prev_month}월 {summary_amount_prev:,}원 / {curr_month}월 {summary_amount_curr:,}원<br> </div>
-                    <div> 일평균 매출: {daily_avg:,}원 / 예측 매출: {predicted_amount:,}원 </div>
+                    <div> 총 매출: {prev_month}월 {summary_amount_prev:,}원 / 일평균 매출: {daily_avg:,}원<br> </div>
+                    <div> {curr_month}월 {summary_amount_curr:,}원/ 예측 매출: {predicted_amount:,}원</div>
                 </div>                
             </div> 
         <div class="updated">Updated {now_str}</div>
