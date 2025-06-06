@@ -142,6 +142,22 @@ def create_driver():
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--window-size=1280,900")
+    # Set Chrome timezone and language to Asia/Seoul and Korean
+    options.add_experimental_option("prefs", {"intl.accept_languages": "ko_KR"})
+    options.add_argument("--lang=ko-KR")
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--force-device-scale-factor=1")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-background-networking")
+    options.add_argument("--disable-default-apps")
+    options.add_argument("--disable-sync")
+    options.add_argument("--disable-translate")
+    options.add_argument("--start-maximized")
+    options.add_argument("--disable-notifications")
+    options.add_argument("--disable-popup-blocking")
+    options.add_argument("--disable-infobars")
+    options.add_argument("--tz=Asia/Seoul")
     driver = webdriver.Chrome(options=options)
     return driver
 
