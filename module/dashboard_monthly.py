@@ -290,14 +290,16 @@ def fetch_monthly_sales_from_calendar(driver):
                             }},
                             plugins: {{
                                 tooltip: {{
+                                    usePointStyle: true,
+                                    displayColors: false,
                                     callbacks: {{
                                         label: function(context) {{
                                             const daily = context.raw - (context.dataset.data[context.dataIndex - 1] || 0);
                                             const now = context.raw;
                                             if (daily !== 0) {{
-                                                return `${{context.label}}일<br>일일매출: ${{daily.toLocaleString()}}원<br>누적 매출: ${{now.toLocaleString()}}원`;
+                                                return `$일일매출: ${{daily.toLocaleString()}}원\n누적 매출: ${{now.toLocaleString()}}원`;
                                             }} else {{
-                                                return `${{context.label}}일<br>누적 매출: ${{now != null ? now.toLocaleString() + '원' : 'N/A'}}`;
+                                                return `$누적 매출: ${{now != null ? now.toLocaleString() + '원' : 'N/A'}}`;
                                             }}
                                         }}
                                     }}
