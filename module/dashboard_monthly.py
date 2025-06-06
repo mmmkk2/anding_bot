@@ -206,13 +206,16 @@ def fetch_monthly_sales_from_calendar(driver):
             print(f"[DEBUG] 예측 매출: {predicted_amount:,}원")
 
         
-        # Align current month cumulative sales to dates (labels)
-        # Use two-digit day for label consistency
+        # Align current month cumulative sales to dates (labels) - dynamic max day for both months
         dates_current = df_current["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}").tolist()
-        # Align current month cumulative sales to all labels (dates)
         cumsum_map_current = dict(zip(dates_current, df_current["cumsum"].tolist()))
-        dates = [f"{d:02d}" for d in range(1, 32)]
+        # Determine max day between previous and current month
+        max_day = 31
+
+        dates = [f"{d:02d}" for d in range(1, max_day + 1)]
         dates.insert(0, "00")
+
+        # Rebuild cumsums_current with matching length
         cumsums_current = [0] + [cumsum_map_current.get(d, None) for d in dates[1:]]
         dates_current = dates
 
