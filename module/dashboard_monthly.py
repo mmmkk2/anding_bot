@@ -297,9 +297,9 @@ def fetch_monthly_sales_from_calendar(driver):
                                             const daily = context.raw - (context.dataset.data[context.dataIndex - 1] || 0);
                                             const now = context.raw;
                                             if (daily !== 0) {{
-                                                return `$일일매출: ${{daily.toLocaleString()}}원\n누적 매출: ${{now.toLocaleString()}}원`;
+                                                return `일일매출: ${{daily.toLocaleString()}}원 \n 누적 매출: ${{now.toLocaleString()}}원`;
                                             }} else {{
-                                                return `$누적 매출: ${{now != null ? now.toLocaleString() + '원' : 'N/A'}}`;
+                                                return `누적 매출: ${{now != null ? now.toLocaleString() + '원' : 'N/A'}}`;
                                             }}
                                         }}
                                     }}
