@@ -2,7 +2,9 @@ import os
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
-from datetime import datetime
+from datetime import datetime, timedelta
+from bs4 import BeautifulSoup
+import csv
 
 # --- 환경변수 및 설정 ---
 SERVICE_ACCOUNT_FILE = "credentials/service_account.json"  # OAuth 2.0 인증 JSON 파일 경로
@@ -130,7 +132,7 @@ LOGIN_PWD = os.getenv("LOGIN_PWD", "871104tla#")
 
 BASE_URL = "https://mmkkshim.pythonanywhere.com/"
 
-today_str = datetime.now().strftime("%Y-%m-%d")
+today_str = (datetime.now() - timedelta(minutes=20)).strftime("%Y-%m-%d")
 screenshot_dir = os.path.join(DASHBOARD_PATH, "screenshots", today_str)
 os.makedirs(screenshot_dir, exist_ok=True)
 
@@ -186,15 +188,31 @@ def capture_dashboard(name, path, driver):
     WebDriverWait(driver, 15).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, "canvas, svg, table"))
     )
-    time.sleep(2)  # 렌더링 안정화 대기
+    time.sleep(2)
 
-    screenshot_path = os.path.join(screenshot_dir, f"{name}.png")
+    html = driver.page_source
     html_path = os.path.join(screenshot_dir, f"{name}.html")
-    driver.save_screenshot(screenshot_path)
     with open(html_path, "w", encoding="utf-8") as f:
-        f.write(driver.page_source)
-    print(f"[완료] PNG 저장됨: {screenshot_path}")
+        f.write(html)
     print(f"[완료] HTML 저장됨: {html_path}")
+
+    if name.startswith("seat"):
+        screenshot_path = os.path.join(screenshot_dir, f"{name}.png")
+        driver.save_screenshot(screenshot_path)
+        print(f"[완료] PNG 저장됨: {screenshot_path}")
+
+    if name.startswith("payment"):
+        soup = BeautifulSoup(html, "html.parser")
+        table = soup.find("table")
+        rows = table.find_all("tr") if table else []
+
+        csv_path = os.path.join(screenshot_dir, f"{name}.csv")
+        with open(csv_path, "w", newline="", encoding="utf-8-sig") as f:
+            writer = csv.writer(f)
+            for row in rows:
+                cols = [td.get_text(strip=True) for td in row.find_all(["td", "th"])]
+                writer.writerow(cols)
+        print(f"[완료] CSV 저장됨: {csv_path}")
 
 def main():
     creds = service_account.Credentials.from_service_account_file(
