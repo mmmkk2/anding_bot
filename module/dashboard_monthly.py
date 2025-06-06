@@ -308,8 +308,14 @@ def fetch_monthly_sales_from_calendar(driver):
                         }}
                     }});
                 </script>
-                <div class="summary-box">
+                <div class="summary-box-right">
+                  <div class="summary-box">
                     <table class="summary-table">
+                      <tr>
+                        <td>{prev_month}월 누적 매출</td>
+                        <td>:</td>
+                        <td>{summary_amount_prev:,}원</td>
+                      </tr>                    
                       <tr>
                         <td>{curr_month}월 누적 매출</td>
                         <td>:</td>
@@ -325,13 +331,9 @@ def fetch_monthly_sales_from_calendar(driver):
                         <td>:</td>
                         <td>{predicted_amount:,}원</td>
                       </tr>
-                      <tr>
-                        <td>{prev_month}월 누적 매출</td>
-                        <td>:</td>
-                        <td>{summary_amount_prev:,}원</td>
-                      </tr>
                     </table>
-                </div>                    
+                  </div>
+                </div>
                 </div>                
             </div> 
         <div class="updated">Updated {now_str}</div>
