@@ -93,7 +93,7 @@ LOGIN_ID = os.getenv("LOGIN_ID", "anding_bot")
 LOGIN_PWD = os.getenv("LOGIN_PWD", "871104tla#")
 
 
-BASE_URL = "https://mmkkshim.pythonanywhere.com"
+BASE_URL = "https://mmkkshim.pythonanywhere.com/seat"
 
 today_str = datetime.now().strftime("%Y-%m-%d")
 screenshot_dir = os.path.join(DASHBOARD_PATH, "screenshots", today_str)
