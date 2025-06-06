@@ -16,29 +16,31 @@ FOLDER_IDS = {
     "studyroom": "1BE8GLf2VrtOxqDvkEY_E2L6GDoZHeMXs",
 }
 
-def create_folder(service, name, parent_id=None):
+def create_folder_and_upload_file(service, folder_name, root_folder_id, screenshot_folder, today_str):
+    # 폴더 생성
     file_metadata = {
-        "name": name,
+        "name": folder_name,
         "mimeType": "application/vnd.google-apps.folder",
+        "parents": [root_folder_id],
     }
-    if parent_id:
-        file_metadata["parents"] = [parent_id]
     folder = service.files().create(body=file_metadata, fields="id").execute()
-    print(f"[폴더 생성 완료] {name} → ID: {folder.get('id')}")
-    return folder.get("id")
+    folder_id = folder.get("id")
+    print(f"[폴더 생성 완료] {folder_name} → ID: {folder_id}")
 
-def upload_file(filepath, service, folder_id, dated_filename):
-    base_filename = dated_filename  # dated_filename is now just the filename without prefix
-    file_metadata = {
-        "name": base_filename,
-        "parents": [folder_id],
-    }
-    media = MediaFileUpload(filepath, resumable=True)
-    try:
-        file = service.files().create(body=file_metadata, media_body=media, fields="id").execute()
-        print(f"[업로드 완료] {base_filename} → https://drive.google.com/file/d/{file.get('id')}")
-    except Exception as e:
-        print(f"[업로드 실패] {base_filename}: {e}")
+    # 업로드
+    for file in os.listdir(screenshot_folder):
+        if file.endswith(".html") and file.startswith(folder_name):
+            dated_filename = f"{file.split('.')[0]}_{today_str}.html"
+            file_metadata = {
+                "name": dated_filename,
+                "parents": [folder_id],
+            }
+            media = MediaFileUpload(os.path.join(screenshot_folder, file), resumable=True)
+            try:
+                uploaded_file = service.files().create(body=file_metadata, media_body=media, fields="id").execute()
+                print(f"[업로드 완료] {dated_filename} (HTML) → https://drive.google.com/file/d/{uploaded_file.get('id')}")
+            except Exception as e:
+                print(f"[업로드 실패] {dated_filename} (HTML): {e}")
 
 def main():
     creds = service_account.Credentials.from_service_account_file(
@@ -47,11 +49,6 @@ def main():
     )
     service = build("drive", "v3", credentials=creds)
 
-    ROOT_FOLDER_ID = "1BE8GLf2VrtOxqDvkEY_E2L6GDoZHeMXs"
-    created_folder_ids = {}
-    for folder_name in ["seat", "main", "payment", "studyroom"]:
-        created_folder_ids[folder_name] = create_folder(service, folder_name, ROOT_FOLDER_ID)
-
     today_str = datetime.now().strftime("%Y-%m-%d")
     screenshot_folder = os.path.join(LOCAL_SCREENSHOT_DIR, today_str)
 
@@ -59,15 +56,8 @@ def main():
         print(f"[오류] 경로 없음: {screenshot_folder}")
         return
 
-    for file in os.listdir(screenshot_folder):
-        if file.endswith(".png"):
-            prefix = file.split("_")[0]
-            folder_id = created_folder_ids.get(prefix)
-            if not folder_id:
-                print(f"[건너뜀] 알 수 없는 prefix: {prefix}")
-                continue
-            dated_filename = f"{file.split('.')[0]}_{today_str}.png"
-            upload_file(os.path.join(screenshot_folder, file), service, folder_id, dated_filename)
+    for folder_name in ["seat", "main", "payment", "studyroom"]:
+        create_folder_and_upload_file(service, folder_name, FOLDER_IDS["main"], screenshot_folder, today_str)
 
 if __name__ == "__main__":
     main()
