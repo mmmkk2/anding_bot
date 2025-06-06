@@ -68,23 +68,36 @@ def create_folder_and_upload_file(service, folder_name, root_folder_id, screensh
     print(f"[DEBUG] 업로드 대상 폴더 ID: {folder_id}")
     # 업로드
     for file in os.listdir(screenshot_folder):
-        if file.endswith(".png") and file.startswith(folder_name):
-            dated_filename = f"{file.split('.')[0]}_{today_str}.png"
+        if (
+            file.startswith(folder_name)
+            and file.endswith((".png", ".csv", ".html"))
+        ):
+            ext = file.split(".")[-1]
+            dated_filename = f"{file.split('.')[0]}_{today_str}.{ext}"
+            mime_map = {
+                "png": "image/png",
+                "csv": "text/csv",
+                "html": "text/html",
+            }
             file_metadata = {
                 "name": dated_filename,
                 "parents": [folder_id],
-                "mimeType": "image/png"
+                "mimeType": mime_map.get(ext, "application/octet-stream"),
             }
             media = MediaFileUpload(os.path.join(screenshot_folder, file), resumable=True)
             try:
-                uploaded_file = service.files().create(body=file_metadata, media_body=media, fields="id").execute()
-                service.permissions().create(
-                    fileId=uploaded_file.get('id'),
-                    body={"role": "reader", "type": "anyone"}
+                uploaded_file = service.files().create(
+                    body=file_metadata, media_body=media, fields="id"
                 ).execute()
-                print(f"[업로드 완료] {dated_filename} (PNG) → https://drive.google.com/file/d/{uploaded_file.get('id')}")
+                service.permissions().create(
+                    fileId=uploaded_file.get("id"),
+                    body={"role": "reader", "type": "anyone"},
+                ).execute()
+                print(
+                    f"[업로드 완료] {dated_filename} ({ext.upper()}) → https://drive.google.com/file/d/{uploaded_file.get('id')}"
+                )
             except Exception as e:
-                print(f"[업로드 실패] {dated_filename} (HTML): {e}")
+                print(f"[업로드 실패] {dated_filename}: {e}")
 
 
 
@@ -138,15 +151,20 @@ for folder in glob.glob(os.path.join(DASHBOARD_PATH, "screenshots", "*")):
 
 def create_driver():
     options = Options()
-    # options.add_argument("--headless")  # Headless mode disabled for graphical rendering
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--window-size=1280,900")
-    # Improve graphical rendering in headful mode
+
+    # 그래픽 렌더링 개선
     options.add_argument("--enable-webgl")
     options.add_argument("--ignore-gpu-blocklist")
     options.add_argument("--use-gl=desktop")
+
+    # 언어 및 타임존 설정
+    options.add_argument("--lang=ko-KR")
+    options.add_argument("--blink-settings=timezone=Asia/Seoul")
+
     driver = webdriver.Chrome(options=options)
     return driver
 
