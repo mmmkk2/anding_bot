@@ -190,10 +190,10 @@ def fetch_monthly_sales_from_calendar(driver):
         summary_amount_curr = df_current["amount"].sum()
 
         # === 일평균 및 예측 매출 계산 ===
-        if summary_amount_curr > 0:
-            today_day_int = int(now.strftime("%d"))
+        today_day_int = int(today_day)
+        if today_day_int > 0:
             daily_avg = summary_amount_curr // today_day_int
-            days_in_month = (now.replace(day=28) + pd.Timedelta(days=4)).replace(day=1) - pd.Timedelta(days=1)
+            days_in_month = now.replace(month=now.month % 12 + 1, day=1) - pd.Timedelta(days=1)
             days_in_month = days_in_month.day
             predicted_amount = daily_avg * days_in_month
         else:
@@ -209,14 +209,21 @@ def fetch_monthly_sales_from_calendar(driver):
         dates_current = df_current["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}").tolist()
         cumsum_map_current = dict(zip(dates_current, df_current["cumsum"].tolist()))
 
-        # Align current month cumulative sales to dates (labels), always include all dates for alignment
+        print(dates_current)
+        print(df_current["cumsum"].tolist())
+
+        # For each date in previous month, get corresponding cumsum of current month or None for future dates
+        today_day = now.strftime("%d")
         update_mode = "M" if args.manual else "B"
         now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
         if DEBUG:
             print(f"[DEBUG] now_str: {now_str}")
         cumsums_current = []
         for d in dates:
-            cumsums_current.append(cumsum_map_current.get(d, None))
+            if d < today_day:
+                cumsums_current.append(cumsum_map_current.get(d, 0))
+            else:
+                cumsums_current.append(None)  # Leave future dates as blank
         # Insert a zero at the start of cumsums_current
         cumsums_current.insert(0, 0)
 
