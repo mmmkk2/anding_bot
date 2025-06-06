@@ -11,10 +11,17 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv("/home/mmkkshim/anding_bot/.env")
 
-LOGIN_ID = "anding_bot"
-LOGIN_PWD = "871104tla#"
+try:
+    load_dotenv("/home/mmkkshim/anding_bot/.env")
+except:
+    pass
+
 
 DASHBOARD_PATH = os.getenv("DASHBOARD_PATH", "/home/mmkkshim/anding_bot/dashboard_log/")
+
+LOGIN_ID = os.getenv("LOGIN_ID", "anding_bot")
+LOGIN_PWD = os.getenv("LOGIN_PWD", "871104tla#")
+
 
 BASE_URL = "https://mmkkshim.pythonanywhere.com"
 
