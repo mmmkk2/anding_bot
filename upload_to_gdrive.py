@@ -142,22 +142,6 @@ def create_driver():
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--window-size=1280,900")
-    # Set Chrome timezone and language to Asia/Seoul and Korean
-    options.add_experimental_option("prefs", {"intl.accept_languages": "ko_KR"})
-    options.add_argument("--lang=ko-KR")
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_argument("--force-device-scale-factor=1")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--disable-extensions")
-    options.add_argument("--disable-background-networking")
-    options.add_argument("--disable-default-apps")
-    options.add_argument("--disable-sync")
-    options.add_argument("--disable-translate")
-    options.add_argument("--start-maximized")
-    options.add_argument("--disable-notifications")
-    options.add_argument("--disable-popup-blocking")
-    options.add_argument("--disable-infobars")
-    options.add_argument("--tz=Asia/Seoul")
     driver = webdriver.Chrome(options=options)
     return driver
 
@@ -176,9 +160,7 @@ def capture_dashboard(name, path, driver):
 
     WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
     time.sleep(1)
-    WebDriverWait(driver, 15).until(
-        EC.presence_of_element_located((By.XPATH, "//td[contains(text(), '자유석')]"))
-    )
+    time.sleep(5)  # 그래프 등 비동기 데이터 로딩 대기
     if name.startswith("seat"):
         screenshot_path = os.path.join(screenshot_dir, f"{name}.png")
         driver.save_screenshot(screenshot_path)
