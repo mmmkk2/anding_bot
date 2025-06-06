@@ -40,10 +40,30 @@ def create_folder_and_upload_file(service, folder_name, root_folder_id, screensh
     if folders:
         folder_id = folders[0]['id']
         print(f"[기존 폴더 존재] {folder_name} → ID: {folder_id}")
+        # 폴더 권한 부여
+        service.permissions().create(
+            fileId=folder_id,
+            body={
+                "type": "user",
+                "role": "writer",
+                "emailAddress": "mmkkshim@gmail.com"
+            },
+            sendNotificationEmail=False
+        ).execute()
     else:
         folder = service.files().create(body=file_metadata, fields="id").execute()
         folder_id = folder.get("id")
         print(f"[폴더 생성 완료] {folder_name} → ID: {folder_id}")
+        # 폴더 권한 부여
+        service.permissions().create(
+            fileId=folder_id,
+            body={
+                "type": "user",
+                "role": "writer",
+                "emailAddress": "mmkkshim@gmail.com"
+            },
+            sendNotificationEmail=False
+        ).execute()
 
     print(f"[DEBUG] 업로드 대상 폴더 ID: {folder_id}")
     # 업로드
