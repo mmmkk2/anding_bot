@@ -139,6 +139,7 @@ for folder in glob.glob(os.path.join(DASHBOARD_PATH, "screenshots", "*")):
 def create_driver():
     options = Options()
     # options.add_argument("--headless")  # Headless mode disabled for graphical rendering
+    options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--window-size=1280,900")
