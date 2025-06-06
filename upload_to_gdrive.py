@@ -168,14 +168,14 @@ def capture_dashboard(name, path, driver):
         EC.presence_of_element_located((By.CSS_SELECTOR, "canvas, svg, table"))
     )
     time.sleep(2)  # 렌더링 안정화 대기
-    if name.startswith("seat"):
-        screenshot_path = os.path.join(screenshot_dir, f"{name}.png")
-        html_path = os.path.join(screenshot_dir, f"{name}.html")
-        driver.save_screenshot(screenshot_path)
-        with open(html_path, "w", encoding="utf-8") as f:
-            f.write(driver.page_source)
-        print(f"[완료] PNG 저장됨: {screenshot_path}")
-        print(f"[완료] HTML 저장됨: {html_path}")
+
+    screenshot_path = os.path.join(screenshot_dir, f"{name}.png")
+    html_path = os.path.join(screenshot_dir, f"{name}.html")
+    driver.save_screenshot(screenshot_path)
+    with open(html_path, "w", encoding="utf-8") as f:
+        f.write(driver.page_source)
+    print(f"[완료] PNG 저장됨: {screenshot_path}")
+    print(f"[완료] HTML 저장됨: {html_path}")
 
 def main():
     creds = service_account.Credentials.from_service_account_file(
