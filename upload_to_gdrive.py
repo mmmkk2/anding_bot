@@ -47,8 +47,8 @@ def create_folder_and_upload_file(service, folder_name, root_folder_id, screensh
 
     # 업로드
     for file in os.listdir(screenshot_folder):
-        if file.endswith(".html") and file.startswith(folder_name):
-            dated_filename = f"{file.split('.')[0]}_{today_str}.html"
+        if file.endswith(".png") and file.startswith(folder_name):
+            dated_filename = f"{file.split('.')[0]}_{today_str}.png"
             file_metadata = {
                 "name": dated_filename,
                 "parents": [folder_id],
@@ -56,7 +56,11 @@ def create_folder_and_upload_file(service, folder_name, root_folder_id, screensh
             media = MediaFileUpload(os.path.join(screenshot_folder, file), resumable=True)
             try:
                 uploaded_file = service.files().create(body=file_metadata, media_body=media, fields="id").execute()
-                print(f"[업로드 완료] {dated_filename} (HTML) → https://drive.google.com/file/d/{uploaded_file.get('id')}")
+                service.permissions().create(
+                    fileId=uploaded_file.get('id'),
+                    body={"role": "reader", "type": "anyone"}
+                ).execute()
+                print(f"[업로드 완료] {dated_filename} (PNG) → https://drive.google.com/file/d/{uploaded_file.get('id')}")
             except Exception as e:
                 print(f"[업로드 실패] {dated_filename} (HTML): {e}")
 
@@ -118,10 +122,10 @@ def capture_dashboard(name, path, driver):
 
     WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
     time.sleep(1)
-    html_path = os.path.join(screenshot_dir, f"{name}.html")
-    with open(html_path, "w", encoding="utf-8") as f:
-        f.write(driver.page_source)
-    print(f"[완료] HTML 저장됨: {html_path}")
+    if name.startswith("seat"):
+        screenshot_path = os.path.join(screenshot_dir, f"{name}.png")
+        driver.save_screenshot(screenshot_path)
+        print(f"[완료] PNG 저장됨: {screenshot_path}")
 
 def main():
     creds = service_account.Credentials.from_service_account_file(
@@ -139,9 +143,9 @@ def main():
 
     capture_targets = {
         "seat": "seat",
-        "payment": "payment",
-        "studyroom": "studyroom",
-        "main": "",
+        # "payment": "payment",
+        # "studyroom": "studyroom",
+        # "main": "",
     }
 
     for name, path in capture_targets.items():
