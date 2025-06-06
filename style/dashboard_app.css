@@ -1,6 +1,6 @@
 .summary-box-right {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-end;    
 }
 
 /* Log Viewer Styles */
@@ -225,6 +225,7 @@ iframe {
 
 
 
+
 .pill.small {
     font-size: 0.75rem;
     padding: 0.3rem 0.8rem;
@@ -243,6 +244,7 @@ iframe {
     width: 100%;
     font-size: 0.85rem;
     border-collapse: collapse;
+    margin-left: auto;
 }
 
 .summary-table td:nth-child(1) {
