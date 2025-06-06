@@ -118,20 +118,12 @@ def capture_dashboard(name, path, driver):
 
     WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
     time.sleep(1)
-    screenshot_path = os.path.join(screenshot_dir, f"{name}.png")
-    driver.save_screenshot(screenshot_path)
-    print(f"[완료] 캡처됨: {screenshot_path}")
+    html_path = os.path.join(screenshot_dir, f"{name}.html")
+    with open(html_path, "w", encoding="utf-8") as f:
+        f.write(driver.page_source)
+    print(f"[완료] HTML 저장됨: {html_path}")
 
 def main():
-    driver = create_driver()
-    try:
-        capture_dashboard("seat_dashboard", "seat", driver)
-        capture_dashboard("payment_dashboard", "payment", driver)
-        capture_dashboard("studyroom_dashboard", "studyroom", driver)
-        capture_dashboard("main_dashboard", "", driver)
-    finally:
-        driver.quit()
-
     creds = service_account.Credentials.from_service_account_file(
         SERVICE_ACCOUNT_FILE,
         scopes=["https://www.googleapis.com/auth/drive.file"]
