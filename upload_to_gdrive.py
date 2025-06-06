@@ -160,7 +160,10 @@ def capture_dashboard(name, path, driver):
 
     WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
     time.sleep(1)
-    time.sleep(5)  # 그래프 등 비동기 데이터 로딩 대기
+    WebDriverWait(driver, 15).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "canvas, svg, table"))
+    )
+    time.sleep(2)  # 렌더링 안정화 대기
     if name.startswith("seat"):
         screenshot_path = os.path.join(screenshot_dir, f"{name}.png")
         driver.save_screenshot(screenshot_path)
