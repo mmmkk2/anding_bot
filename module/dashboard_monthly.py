@@ -219,9 +219,9 @@ def fetch_monthly_sales_from_calendar(driver):
         cumsums_current = []
         for d in dates:
             if d <= today_day:
-                cumsums_current.append(cumsum_map_current.get(d, 0))
+                cumsums_current.append(cumsum_map_current.get(d, None))
             else:
-                cumsums_current.append(None)  # Leave future dates as blank
+                cumsums_current.append(None)
         # Insert a zero at the start of cumsums_current
         cumsums_current.insert(0, 0)
 
