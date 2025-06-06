@@ -311,7 +311,7 @@ def fetch_monthly_sales_from_calendar(driver):
                 <div class="summary-box">
                     <div> 
                     {prev_month}월 누적 매출 : {summary_amount_prev:,}원<br>
-                    {curr_month}월 누적 매출 : {summary_amount_curr:,}원
+                    {curr_month}월 누적 매출 : {summary_amount_curr:,}원<br>
                     {curr_month}월 일평균 매출: {daily_avg:,}원<br>
                     {curr_month}월 예측 매출: {predicted_amount:,}원</div>
                 </div>                
