@@ -214,16 +214,13 @@ def fetch_monthly_sales_from_calendar(driver):
         now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
         if DEBUG:
             print(f"[DEBUG] now_str: {now_str}")
-        # Build aligned cumulative sums for current month (fill with last known value if today or later has no data)
+        # Build aligned cumulative sums for current month: None for missing, value for present
         cumsums_current = []
-        last_value = 0
         for d in dates:
-            value = cumsum_map_current.get(d)
-            if value is not None:
-                last_value = value
-                cumsums_current.append(value)
+            if d in cumsum_map_current:
+                cumsums_current.append(cumsum_map_current[d])
             else:
-                cumsums_current.append(last_value)
+                cumsums_current.append(None)
         # Insert a zero at the start of cumsums_current
         cumsums_current.insert(0, 0)
 
