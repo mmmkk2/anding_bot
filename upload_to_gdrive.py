@@ -155,7 +155,7 @@ def main():
         finally:
             driver.quit()
 
-        root_folder_id = get_or_create_folder_id(service, "anding_dashboard_root", "root")
+        root_folder_id = get_or_create_folder_id(service, "anding-bot", "root")
         create_folder_and_upload_file(service, name, root_folder_id, screenshot_folder, today_str)
 
 if __name__ == "__main__":
