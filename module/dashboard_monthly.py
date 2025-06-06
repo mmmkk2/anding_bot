@@ -225,6 +225,8 @@ def fetch_monthly_sales_from_calendar(driver):
                 cumsums_current.append(None)
         # Insert a zero at the start of cumsums_current
         cumsums_current.insert(0, 0)
+        print(cumsums_current)
+        print(dates)
 
         chart_html = f"""
         <!DOCTYPE html>
