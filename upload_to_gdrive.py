@@ -8,13 +8,23 @@ from datetime import datetime
 SERVICE_ACCOUNT_FILE = "credentials/service_account.json"  # OAuth 2.0 인증 JSON 파일 경로
 LOCAL_SCREENSHOT_DIR = os.getenv("DASHBOARD_PATH", "/home/mmkkshim/anding_bot/dashboard_log/") + "/screenshots"
 
-# Google Drive 상의 폴더 ID 목록
-FOLDER_IDS = {
-    "main": "1BE8GLf2VrtOxqDvkEY_E2L6GDoZHeMXs",
-    "seat": "1BE8GLf2VrtOxqDvkEY_E2L6GDoZHeMXs",
-    "payment": "1BE8GLf2VrtOxqDvkEY_E2L6GDoZHeMXs",
-    "studyroom": "1BE8GLf2VrtOxqDvkEY_E2L6GDoZHeMXs",
-}
+
+
+# Google Drive 폴더 ID를 동적으로 가져오거나 생성하는 함수
+def get_or_create_folder_id(service, folder_name, parent_id):
+    query = f"mimeType='application/vnd.google-apps.folder' and name='{folder_name}' and '{parent_id}' in parents and trashed=false"
+    results = service.files().list(q=query, fields="files(id)").execute()
+    folders = results.get("files", [])
+    if folders:
+        return folders[0]["id"]
+    metadata = {
+        "name": folder_name,
+        "mimeType": "application/vnd.google-apps.folder",
+        "parents": [parent_id],
+    }
+    folder = service.files().create(body=metadata, fields="id").execute()
+    return folder["id"]
+
 
 def create_folder_and_upload_file(service, folder_name, root_folder_id, screenshot_folder, today_str):
     # 폴더 생성
@@ -50,7 +60,78 @@ def create_folder_and_upload_file(service, folder_name, root_folder_id, screensh
             except Exception as e:
                 print(f"[업로드 실패] {dated_filename} (HTML): {e}")
 
+
+
+
+
+import os
+import time
+from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv("/home/mmkkshim/anding_bot/.env")
+
+try:
+    load_dotenv("/home/mmkkshim/anding_bot/.env")
+except:
+    pass
+
+
+DASHBOARD_PATH = os.getenv("DASHBOARD_PATH", "/home/mmkkshim/anding_bot/dashboard_log/")
+
+LOGIN_ID = os.getenv("LOGIN_ID", "anding_bot")
+LOGIN_PWD = os.getenv("LOGIN_PWD", "871104tla#")
+
+
+BASE_URL = "https://mmkkshim.pythonanywhere.com"
+
+today_str = datetime.now().strftime("%Y-%m-%d")
+screenshot_dir = os.path.join(DASHBOARD_PATH, "screenshots", today_str)
+os.makedirs(screenshot_dir, exist_ok=True)
+
+def create_driver():
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--window-size=1280,900")
+    driver = webdriver.Chrome(options=options)
+    return driver
+
+def capture_dashboard(name, path, driver):
+    url = f"{BASE_URL}/{path}" if path else BASE_URL
+    driver.get(url)
+
+    if "login" in driver.current_url:
+        print("[INFO] 로그인 필요 - 로그인 시도 중")
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, "username")))
+        driver.find_element(By.NAME, "username").send_keys(LOGIN_ID)
+        driver.find_element(By.NAME, "password").send_keys(LOGIN_PWD)
+        driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+        time.sleep(2)
+
+    WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+    time.sleep(1)
+    screenshot_path = os.path.join(screenshot_dir, f"{name}.png")
+    driver.save_screenshot(screenshot_path)
+    print(f"[완료] 캡처됨: {screenshot_path}")
+
 def main():
+    driver = create_driver()
+    try:
+        capture_dashboard("seat_dashboard", "seat", driver)
+        capture_dashboard("payment_dashboard", "payment", driver)
+        capture_dashboard("studyroom_dashboard", "studyroom", driver)
+        capture_dashboard("main_dashboard", "", driver)
+    finally:
+        driver.quit()
+
     creds = service_account.Credentials.from_service_account_file(
         SERVICE_ACCOUNT_FILE,
         scopes=["https://www.googleapis.com/auth/drive.file"]
@@ -64,8 +145,22 @@ def main():
         print(f"[오류] 경로 없음: {screenshot_folder}")
         return
 
-    for folder_name in ["seat", "main", "payment", "studyroom"]:
-        create_folder_and_upload_file(service, folder_name, FOLDER_IDS["main"], screenshot_folder, today_str)
+    capture_targets = {
+        "seat": "seat",
+        "payment": "payment",
+        "studyroom": "studyroom",
+        "main": "",
+    }
+
+    for name, path in capture_targets.items():
+        driver = create_driver()
+        try:
+            capture_dashboard(f"{name}_dashboard", path, driver)
+        finally:
+            driver.quit()
+
+        root_folder_id = get_or_create_folder_id(service, "anding_dashboard_root", "root")
+        create_folder_and_upload_file(service, name, root_folder_id, screenshot_folder, today_str)
 
 if __name__ == "__main__":
     main()
