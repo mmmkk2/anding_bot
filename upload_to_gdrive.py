@@ -23,9 +23,17 @@ def create_folder_and_upload_file(service, folder_name, root_folder_id, screensh
         "mimeType": "application/vnd.google-apps.folder",
         "parents": [root_folder_id],
     }
-    folder = service.files().create(body=file_metadata, fields="id").execute()
-    folder_id = folder.get("id")
-    print(f"[폴더 생성 완료] {folder_name} → ID: {folder_id}")
+    # 기존 폴더 확인
+    query = f"mimeType='application/vnd.google-apps.folder' and name='{folder_name}' and '{root_folder_id}' in parents and trashed=false"
+    results = service.files().list(q=query, fields="files(id, name)").execute()
+    folders = results.get('files', [])
+    if folders:
+        folder_id = folders[0]['id']
+        print(f"[기존 폴더 존재] {folder_name} → ID: {folder_id}")
+    else:
+        folder = service.files().create(body=file_metadata, fields="id").execute()
+        folder_id = folder.get("id")
+        print(f"[폴더 생성 완료] {folder_name} → ID: {folder_id}")
 
     # 업로드
     for file in os.listdir(screenshot_folder):
