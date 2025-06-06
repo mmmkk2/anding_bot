@@ -190,10 +190,10 @@ def fetch_monthly_sales_from_calendar(driver):
         summary_amount_curr = df_current["amount"].sum()
 
         # === 일평균 및 예측 매출 계산 ===
-        today_day_int = int(today_day)
-        if today_day_int > 0:
+        if summary_amount_curr > 0:
+            today_day_int = int(now.strftime("%d"))
             daily_avg = summary_amount_curr // today_day_int
-            days_in_month = now.replace(month=now.month % 12 + 1, day=1) - pd.Timedelta(days=1)
+            days_in_month = (now.replace(day=28) + pd.Timedelta(days=4)).replace(day=1) - pd.Timedelta(days=1)
             days_in_month = days_in_month.day
             predicted_amount = daily_avg * days_in_month
         else:
