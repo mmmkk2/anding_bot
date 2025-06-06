@@ -1,3 +1,7 @@
+.summary-box-right {
+    display: flex;
+    justify-content: flex-end;
+}
 
 /* Log Viewer Styles */
 .log-container {
@@ -241,14 +245,14 @@ iframe {
     border-collapse: collapse;
 }
 
-.summary-table td.left {
+.summary-table td:nth-child(1) {
     text-align: left;
 }
 
-.summary-table td.center {
+.summary-table td:nth-child(2) {
     text-align: center;
 }
 
-.summary-table td.right {
+.summary-table td:nth-child(3) {
     text-align: right;
 }
