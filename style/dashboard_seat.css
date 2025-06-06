@@ -108,7 +108,7 @@ table.sortable th {
     /* Removed .updated-box and .pill tweaks as redundant or unused */
     canvas {
         min-height: 27vh !important;
-        max-height: 27vh;
+        max-height: 27vh !important;
     }
 }
 
