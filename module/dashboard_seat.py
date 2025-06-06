@@ -483,8 +483,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     # --- 차트 스크립트 (dashboard_monthly.py 스타일) ---
     chart_script = f"""
     <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/luxon'></script>
-    <script src='https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon'></script>
+    <script src='https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns'></script>
     <script>
         const ctx = document.getElementById('seatChart').getContext('2d');
         new Chart(ctx, {{
@@ -530,8 +529,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                             displayFormats: {{
                                 minute: 'HH:mm'
                             }},
-                            stepSize: 30,
-                            zone: 'Asia/Seoul'
+                            stepSize: 30
                         }},
                         ticks: {{
                             autoSkip: false,
@@ -616,17 +614,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
           table.classList.add('sortable');
         });
       });
-    </script>
-    <script>
-      setTimeout(() => {
-        const canvas = document.querySelector("canvas");
-        if (canvas) {
-          const ctx = canvas.getContext("2d");
-          ctx.globalCompositeOperation = "destination-over";
-          ctx.fillStyle = "#FFFFFF";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-      }, 300);
     </script>
     </body>
     </html>
