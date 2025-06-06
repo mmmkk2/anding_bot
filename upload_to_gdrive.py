@@ -200,21 +200,29 @@ def capture_dashboard(name, path, driver):
         screenshot_path = os.path.join(screenshot_dir, f"{name}.png")
 
         try:
-            canvas_data = driver.execute_script("""
-                const canvas = document.querySelector("canvas");
-                return canvas ? canvas.toDataURL("image/png").substring("data:image/png;base64,".length) : null;
-            """)
+            import base64
+            canvas_data = None
+            for _ in range(10):
+                canvas_data = driver.execute_script("""
+                    const canvas = document.querySelector("canvas");
+                    if (!canvas) return null;
+                    const hasData = canvas.toDataURL().length > 10000;
+                    return hasData ? canvas.toDataURL("image/png").substring("data:image/png;base64,".length) : null;
+                """)
+                if canvas_data:
+                    break
+                time.sleep(1)
+
             if canvas_data:
-                import base64
                 with open(screenshot_path, "wb") as f:
                     f.write(base64.b64decode(canvas_data))
                 print(f"[완료] PNG 저장됨 (canvas): {screenshot_path}")
             else:
-                raise Exception("canvas 없음")
+                print("[실패] 캔버스 렌더링 완료되지 않음. 일반 스크린샷 시도")
+                driver.save_screenshot(screenshot_path)
+                print(f"[완료] PNG 저장됨 (fallback): {screenshot_path}")
         except Exception as e:
-            print(f"[실패] 캔버스 추출 실패, 일반 스크린샷 시도: {e}")
-            driver.save_screenshot(screenshot_path)
-            print(f"[완료] PNG 저장됨 (fallback): {screenshot_path}")
+            print(f"[오류] 캔버스 PNG 저장 실패: {e}")
 
     if name.startswith("payment"):
         soup = BeautifulSoup(html, "html.parser")
