@@ -121,6 +121,21 @@ today_str = datetime.now().strftime("%Y-%m-%d")
 screenshot_dir = os.path.join(DASHBOARD_PATH, "screenshots", today_str)
 os.makedirs(screenshot_dir, exist_ok=True)
 
+import glob
+import time
+
+# 오래된 스크린샷 삭제 (1일 이상 지난 파일)
+for folder in glob.glob(os.path.join(DASHBOARD_PATH, "screenshots", "*")):
+    try:
+        if os.path.isdir(folder):
+            folder_time = os.path.getmtime(folder)
+            if time.time() - folder_time > 86400:  # 1일(60*60*24초)
+                import shutil
+                shutil.rmtree(folder)
+                print(f"[정리] 오래된 폴더 삭제됨: {folder}")
+    except Exception as e:
+        print(f"[정리 실패] {folder}: {e}")
+
 def create_driver():
     options = Options()
     options.add_argument("--headless")
@@ -145,6 +160,7 @@ def capture_dashboard(name, path, driver):
 
     WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
     time.sleep(1)
+    time.sleep(2)  # 그래프 등 비동기 데이터 로딩 대기
     if name.startswith("seat"):
         screenshot_path = os.path.join(screenshot_dir, f"{name}.png")
         driver.save_screenshot(screenshot_path)
