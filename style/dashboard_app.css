@@ -233,3 +233,22 @@ iframe {
     display: flex;
     justify-content: flex-end;
 }
+
+
+.summary-table {
+    width: 100%;
+    font-size: 0.85rem;
+    border-collapse: collapse;
+}
+
+.summary-table td.left {
+    text-align: left;
+}
+
+.summary-table td.center {
+    text-align: center;
+}
+
+.summary-table td.right {
+    text-align: right;
+}
