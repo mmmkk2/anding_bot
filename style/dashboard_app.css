@@ -279,7 +279,7 @@ iframe {
     display: flex;
     align-items: center;
     justify-content: center;
-    line-height: 1;
+    line-height: 50px;
     text-align: center;
     text-decoration: none;    
     padding: 0;
