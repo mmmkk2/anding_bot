@@ -423,6 +423,9 @@ def render_dashboard(is_admin=True, is_viewer=False):
                 <form method="get" action="/env_config" style="margin: 0; padding: 0;">
                   <button class="pill" type="submit" style="display: block; width: 100%; text-align: left; background: none; border: none; color: #222; padding: 0.5em 1em; cursor: pointer;">.env 설정</button>
                 </form>
+                <form method="get" action="/admin" style="margin: 0; padding: 0;">
+                  <button class="pill small" type="submit" style="display: block; width: 100%; text-align: left; background: none; border: none; color: #222; padding: 0.5em 1em; cursor: pointer;">🔄 새로고침</button>
+                </form>
                 <a href="/logout" style="display: block; padding: 0.5em 1em; color: #c00; text-decoration: none;">로그아웃</a>
             </div>
         </div>
