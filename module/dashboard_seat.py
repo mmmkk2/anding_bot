@@ -528,8 +528,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         beginAtZero: true,
                         max: 30,
                         title: {{
-                            display: true,
-                            text: '자유석 이용자 수'
+                            display: false
                         }},
                         ticks: {{
                             callback: function(value) {{
