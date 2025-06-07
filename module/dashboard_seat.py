@@ -396,6 +396,8 @@ def main_check_seat():
                 time.sleep(2)
                 map_screenshot_path = os.path.join(DASHBOARD_PATH, "../static/images/seat_map.png")
                 os.makedirs(os.path.dirname(map_screenshot_path), exist_ok=True)
+                driver.execute_script("window.scrollTo(0, document.body.scrollHeight * 0.2);")
+                time.sleep(0.5)
                 element = driver.find_element(By.CSS_SELECTOR, "div#store_map_container > div#store_map_wrap")
                 element.screenshot(map_screenshot_path)
                 print(f"[DEBUG] 좌석맵 캡처 저장됨: {map_screenshot_path}")
