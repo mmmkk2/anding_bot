@@ -639,7 +639,7 @@ def env_config():
     <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_app.css">
 </head>
 <body>
-    {{floating_menu_html|safe}}
+    {floating_menu_html}
     <div class="log-container">
         <div class="log-title">⚙️ .env 임계값 설정</div>
         <form method="POST" action="/update_env_config">
@@ -650,10 +650,9 @@ def env_config():
             <button class="pill small" type="submit">저장</button>
         </form>
     </div>
-    {{ floating_menu_html|safe }}
 </body>
 </html>
-""".replace("{{floating_menu_html|safe}}", floating_menu_html)
+"""
 
 @app.route("/update_env_config", methods=["POST"])
 def update_env_config():
