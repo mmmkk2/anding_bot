@@ -291,3 +291,10 @@ iframe {
     text-decoration: none;    
 }
 
+.floating-refresh.back {
+    bottom: 80px;  /* ⬅️ 위쪽 */
+}
+
+.floating-refresh.reload {
+    bottom: 20px;  /* 🔄 아래쪽 */
+}
