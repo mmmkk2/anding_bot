@@ -631,12 +631,16 @@ def env_config():
     danger = int(os.getenv("DANGER_THRESHOLD", "5"))
     warning = int(os.getenv("WARNING_THRESHOLD", "8"))
     cum = int(os.getenv("WARNING_CUM_THRESHOLD", "50"))
+    floating_menu_html = generate_floating_menu_html()
+    # Render the env_config page with the floating menu injected near the top of the <body>
+    # If you have a Jinja template, ensure it uses {{ floating_menu_html|safe }} near <body>
+    # Otherwise, provide a minimal HTML here for clarity
     return render_template(
         "env_config.html",
         danger=danger,
         warning=warning,
         cum=cum,
-        floating_menu_html=generate_floating_menu_html()
+        floating_menu_html=floating_menu_html
     )
 
 @app.route("/update_env_config", methods=["POST"])
