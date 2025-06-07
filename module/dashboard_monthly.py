@@ -283,7 +283,11 @@ def fetch_monthly_sales_from_calendar(driver):
                                     beginAtZero: false,
                                     ticks: {{
                                         callback: function(value) {{
-                                            return value.toLocaleString() + '원';
+                                            if (window.innerWidth <= 480) {{
+                                                return (value / 1000000).toFixed(1) + 'M원';
+                                            }} else {{
+                                                return value.toLocaleString() + '원';
+                                            }}
                                         }}
                                     }}
                                 }}
@@ -308,7 +312,7 @@ def fetch_monthly_sales_from_calendar(driver):
                         }}
                     }});
                 </script>
-                <div class="summary-box-right">
+               <div class="summary-box-right" style="width: 100%;">
                   <div class="summary-box">
                     <table class="summary-table">
                       <tr>
