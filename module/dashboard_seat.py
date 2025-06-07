@@ -396,7 +396,8 @@ def main_check_seat():
                 time.sleep(2)
                 map_screenshot_path = os.path.join(DASHBOARD_PATH, "../static/images/seat_map.png")
                 os.makedirs(os.path.dirname(map_screenshot_path), exist_ok=True)
-                driver.save_screenshot(map_screenshot_path)
+                element = driver.find_element(By.CSS_SELECTOR, "div.col-12")
+                element.screenshot(map_screenshot_path)
                 print(f"[DEBUG] 좌석맵 캡처 저장됨: {map_screenshot_path}")
             except Exception as e:
                 print(f"[DEBUG] 좌석맵 캡처 실패: {e}")
