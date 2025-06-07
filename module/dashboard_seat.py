@@ -389,6 +389,18 @@ def main_check_seat():
                         with open(CUM_ALERT_FLAG_PATH, "w") as f:
                             f.write(today_str)
 
+            # ✅ 좌석 맵 캡처
+            try:
+                map_url = f"{BASE_URL}/use/mapUse"
+                driver.get(map_url)
+                time.sleep(2)
+                map_screenshot_path = os.path.join(DASHBOARD_PATH, "../static/images/seat_map.png")
+                os.makedirs(os.path.dirname(map_screenshot_path), exist_ok=True)
+                driver.save_screenshot(map_screenshot_path)
+                print(f"[DEBUG] 좌석맵 캡처 저장됨: {map_screenshot_path}")
+            except Exception as e:
+                print(f"[DEBUG] 좌석맵 캡처 실패: {e}")
+
             free_rows, laptop_rows, seat_status_msg  = check_seat_status(driver)
             # Use the same now_str for the monitoring message
             loop_msg = (
@@ -568,8 +580,14 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             <div class="stat">🪑 {used_free}/{total_free} · 💻 {used_laptop}/{total_laptop} · 🟩 {remaining}석 · 👥 {cum_user_counts[-1] if cum_user_counts else "정보 없음"}명</div>                        
             <canvas id="seatChart" style="max-width: 100%; height: auto; aspect-ratio: 16 / 9;"></canvas>
             {chart_script}
-        
-"""
+    """
+
+    # Insert the seat map image just below the chart area
+    html += f"""
+        <div style="text-align: center; margin: 1rem 0;">
+            <img src="https://mmkkshim.pythonanywhere.com/static/images/seat_map.png" alt="좌석 배치도" style="max-width: 100%; border: 1px solid #ccc; border-radius: 8px;">
+        </div>
+    """
 
     html += """
     <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
