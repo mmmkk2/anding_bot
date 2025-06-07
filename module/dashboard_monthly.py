@@ -284,7 +284,7 @@ def fetch_monthly_sales_from_calendar(driver):
                                     ticks: {{
                                         callback: function(value) {{
                                             if (window.innerWidth <= 480) {{
-                                                return (value / 1000000).toFixed(1) + '백만원';
+                                                return (value / 1000000).toFixed(0) + '백만원';
                                             }} else {{
                                                 return value.toLocaleString() + '원';
                                             }}
