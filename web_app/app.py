@@ -418,7 +418,7 @@ def render_dashboard(is_admin=True, is_viewer=False):
         <div class="floating-menu-wrapper" style="position: fixed; bottom: 20px; left: 20px; z-index: 999;">
             <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">⋯</button>
             <div class="floating-menu" style="display: none;">
-                <a href="/admin" class="menu-option">관리자</a>
+                {admin_link}
                 <a href="/viewer" class="menu-option">뷰어</a>
                 <form method="get" action="/env_config" style="margin: 0; padding: 0;">
                   <button class="menu-option" type="submit">설정</button>
@@ -430,21 +430,23 @@ def render_dashboard(is_admin=True, is_viewer=False):
             </div>
         </div>
         <script>
-        (function() {
+        (function() {{
             var btn = document.querySelector('.floating-menu-toggle');
             var menu = document.querySelector('.floating-menu');
-            if (btn && menu) {
-                btn.addEventListener('click', function(e) {
+            if (btn && menu) {{
+                btn.addEventListener('click', function(e) {{
                     e.stopPropagation();
                     menu.style.display = (menu.style.display === "block") ? "none" : "block";
-                });
-                document.addEventListener('click', function(e) {
+                }});
+                document.addEventListener('click', function(e) {{
                     menu.style.display = "none";
-                });
-            }
-        })();
+                }});
+            }}
+        }})();
         </script>
-        """
+        """.format(
+            admin_link='<a href="/admin" class="menu-option">관리자</a>' if is_admin else ""
+        )
     return f"""
     <!DOCTYPE html>
     <html lang="ko">
