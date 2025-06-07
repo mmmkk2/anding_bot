@@ -299,3 +299,18 @@ iframe {
 .floating-refresh.reload {
     bottom: 20px;  /* 🔄 아래쪽 */
 }
+
+.floating-logout-dot {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    font-size: 20px;
+    color: #888;
+    text-decoration: none;
+    opacity: 0.5;
+    z-index: 999;
+}
+.floating-logout-dot:hover {
+    opacity: 1;
+    color: #333;
+}
