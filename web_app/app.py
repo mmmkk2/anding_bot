@@ -579,13 +579,20 @@ def render_dashboard(is_admin=True, is_viewer=False):
 # --- .env config routes ---
 from dotenv import set_key
 from pathlib import Path
-from flask import render_template
 
-def generate_floating_menu_html():
+@app.route("/env_config", methods=["GET"])
+def env_config():
+    if not session.get("is_admin"):
+        return redirect(url_for("login"))
+    danger = int(os.getenv("DANGER_THRESHOLD", "5"))
+    warning = int(os.getenv("WARNING_THRESHOLD", "8"))
+    cum = int(os.getenv("WARNING_CUM_THRESHOLD", "50"))
+    # Floating menu: three-dot menu for admin or viewer only (reuse logic as in dashboard)
     is_admin = session.get("is_admin", False)
     is_viewer = not is_admin and session.get("logged_in", False)
+    floating_menu_html = ""
     if is_admin or is_viewer:
-        return """
+        floating_menu_html = """
         <div class="floating-menu-wrapper">
             <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">⋯</button>
             <div class="floating-menu">
@@ -622,26 +629,31 @@ def generate_floating_menu_html():
         """.format(
             admin_link='<a href="/admin" class="menu-option">관리자</a>' if is_admin else ""
         )
-    return ""
-
-@app.route("/env_config", methods=["GET"])
-def env_config():
-    if not session.get("is_admin"):
-        return redirect(url_for("login"))
-    danger = int(os.getenv("DANGER_THRESHOLD", "5"))
-    warning = int(os.getenv("WARNING_THRESHOLD", "8"))
-    cum = int(os.getenv("WARNING_CUM_THRESHOLD", "50"))
-    floating_menu_html = generate_floating_menu_html()
-    # Render the env_config page with the floating menu injected near the top of the <body>
-    # If you have a Jinja template, ensure it uses {{ floating_menu_html|safe }} near <body>
-    # Otherwise, provide a minimal HTML here for clarity
-    return render_template(
-        "env_config.html",
-        danger=danger,
-        warning=warning,
-        cum=cum,
-        floating_menu_html=floating_menu_html
-    )
+    return f"""
+<!DOCTYPE html>
+<html lang='ko'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>env 설정</title>
+    <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_app.css">
+</head>
+<body>
+    {{floating_menu_html|safe}}
+    <div class="log-container">
+        <div class="log-title">⚙️ .env 임계값 설정</div>
+        <form method="POST" action="/update_env_config">
+            <label>DANGER_THRESHOLD: <input type="number" name="danger" value={danger}></label><br>
+            <label>WARNING_THRESHOLD: <input type="number" name="warning" value={warning}></label><br>
+            <label>WARNING_CUM_THRESHOLD: <input type="number" name="cum" value={cum}></label><br>
+            <div style="margin-top: 1rem;"></div>
+            <button class="pill small" type="submit">저장</button>
+        </form>
+    </div>
+    {{ floating_menu_html|safe }}
+</body>
+</html>
+""".replace("{{floating_menu_html|safe}}", floating_menu_html)
 
 @app.route("/update_env_config", methods=["POST"])
 def update_env_config():
