@@ -50,16 +50,20 @@ def login():
         if username == LOGIN_ID and password == LOGIN_PWD:
             session["logged_in"] = True
             session["is_admin"] = True
-            session["is_viewer"] = False
             return redirect(url_for("admin_dashboard"))
         if os.getenv("VIEWER_BLOCK", "false").lower() == "true":
             return "뷰어 로그인은 현재 차단되어 있습니다.", 403
         elif username == VIEWER_ID and password == VIEWER_PWD:
             session["logged_in"] = True
             session["is_admin"] = False
-            session["is_viewer"] = True
-            return redirect(url_for("viewer"))
+            return redirect(url_for("viewer_dashboard"))
         return "로그인 실패", 401
+
+    # Redirect already logged-in users to correct dashboard
+    if session.get("logged_in"):
+        if session.get("is_admin"):
+            return redirect(url_for("admin_dashboard"))
+        return redirect(url_for("viewer_dashboard"))
     return render_template_string('''
 <!DOCTYPE html>
 <html lang="ko">
@@ -138,11 +142,7 @@ def logout():
 @app.before_request
 def require_login():
     session.permanent = True
-    # Allow access to login and static routes without session
     if request.endpoint in ("login", "static"):
-        return
-    # Allow access to static files (if using blueprint or static_folder)
-    if request.path.startswith("/static"):
         return
     if not session.get("logged_in"):
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -157,14 +157,10 @@ def admin_dashboard():
     return render_dashboard(is_admin=True, is_viewer=False)
 
 @app.route("/viewer")
-def viewer():
-    if session.get("is_admin"):
-        return redirect(url_for("admin_dashboard"))
-    elif session.get("logged_in") and (session.get("is_viewer") or session.get("is_admin") is False):
-        # Accept legacy session or explicit viewer session
-        return render_dashboard(is_admin=False, is_viewer=True)
-    else:
+def viewer_dashboard():
+    if not session.get("logged_in"):
         return redirect(url_for("login"))
+    return render_dashboard(is_admin=session.get("is_admin", False), is_viewer=True)
 
 # --- Direct mode switch routes ---
 @app.route("/set_viewer", methods=["POST"])
@@ -183,13 +179,8 @@ def set_admin():
     return redirect(url_for("login"))
 
 @app.route("/")
-def root():
-    if session.get("is_admin"):
-        return redirect(url_for("admin_dashboard"))
-    elif session.get("logged_in") and (session.get("is_viewer") or session.get("is_admin") is False):
-        return redirect(url_for("viewer"))
-    else:
-        return redirect(url_for("login"))
+def index_redirect():
+    return redirect(url_for("login"))
 
 def render_dashboard(is_admin=True, is_viewer=False):
     # --- 상품 현황: 1회이용권 판매중 상품 요약 추출 ---
@@ -463,24 +454,10 @@ def render_dashboard(is_admin=True, is_viewer=False):
                 display: flex;
                 justify-content: flex-end;
             }}
-            .floating-logout-dot {{
-                position: fixed;
-                bottom: 10px;
-                left: 10px;
-                font-size: 20px;
-                color: #888;
-                text-decoration: none;
-                opacity: 0.5;
-                z-index: 999;
-            }}
-            .floating-logout-dot:hover {{
-                opacity: 1;
-                color: #333;
-            }}
         </style>
     </head>
     <body>
-        <a class="floating-logout-dot" href="/logout" title="Logout">•</a>
+        <a class="floating-refresh logout" href="/logout">⏏️</a>
         <a class="floating-refresh" onclick="window.location.href='/admin'">🔄</a>   
         <div class="box">
             {left_button_group}
