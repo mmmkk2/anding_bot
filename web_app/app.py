@@ -412,13 +412,13 @@ def render_dashboard(is_admin=True, is_viewer=False):
             </div>
         """
 
-    # Compose left-side button group (Viewer, Logout, .env 설정 left; Refresh right)
+    # Compose left-side button group (.env 설정 left; Refresh right)
     left_button_group = ""
     if is_admin and not is_viewer:
         left_button_group = (
             '<div style="display: flex; justify-content: space-between;">'
             '<div style="display: flex; gap: 0.5rem;">'
-            '<form method="post" action="/set_viewer"><button class="pill small" type="submit">Viewer</button></form>'
+            '<a class="pill small" href="/viewer">Viewer</a>'
             + (
                 '<form method="get" action="/env_config"><button class="pill small" type="submit">.env 설정</button></form>'
                 if is_admin and not is_viewer else ""
@@ -427,6 +427,34 @@ def render_dashboard(is_admin=True, is_viewer=False):
             '</div>'
             '<div style="margin-bottom: 1.5rem;"></div>'
         )
+    # Floating menu: three-dot menu for admin only
+    floating_menu_html = ""
+    if is_admin and not is_viewer:
+        floating_menu_html = """
+        <div class="floating-menu-wrapper" style="position: fixed; bottom: 20px; left: 20px; z-index: 999;">
+            <button class="floating-menu-toggle" style="background: #eee; border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 1.7em; cursor: pointer;">⋯</button>
+            <div class="floating-menu" style="display: none; position: absolute; bottom: 55px; left: 0; background: #fff; border: 1px solid #ddd; border-radius: 0.7em; box-shadow: 0 4px 12px rgba(0,0,0,0.13); min-width: 100px; padding: 0.5em 0;">
+                <a href="/admin" style="display: block; padding: 0.5em 1em; color: #222; text-decoration: none;">관리자</a>
+                <a href="/viewer" style="display: block; padding: 0.5em 1em; color: #222; text-decoration: none;">뷰어</a>
+                <a href="/logout" style="display: block; padding: 0.5em 1em; color: #c00; text-decoration: none;">로그아웃</a>
+            </div>
+        </div>
+        <script>
+        (function() {
+            var btn = document.querySelector('.floating-menu-toggle');
+            var menu = document.querySelector('.floating-menu');
+            if (btn && menu) {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+                });
+                document.addEventListener('click', function(e) {
+                    menu.style.display = "none";
+                });
+            }
+        })();
+        </script>
+        """
     return f"""
     <!DOCTYPE html>
     <html lang="ko">
@@ -457,6 +485,7 @@ def render_dashboard(is_admin=True, is_viewer=False):
     </head>
     <body>
         <a class="floating-logout-dot" href="/logout" title="Logout">•</a>
+        {floating_menu_html}
         <div class="box">
             {left_button_group}
             <div class="toggle-section">
