@@ -421,10 +421,10 @@ def render_dashboard(is_admin=True, is_viewer=False):
                 <a href="/admin" class="menu-option">관리자</a>
                 <a href="/viewer" class="menu-option">뷰어</a>
                 <form method="get" action="/env_config" style="margin: 0; padding: 0;">
-                  <button class="menu-option" type="submit">.env 설정</button>
+                  <button class="menu-option" type="submit">설정</button>
                 </form>
                 <form method="get" action="/admin" style="margin: 0; padding: 0;">
-                  <button class="menu-option" type="submit">🔄 새로고침</button>
+                  <button class="menu-option" type="submit">새로고침</button>
                 </form>
                 <a href="/logout" class="menu-option" style="color: #c00;">로그아웃</a>
             </div>
