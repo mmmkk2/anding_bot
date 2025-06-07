@@ -299,8 +299,3 @@ iframe {
 .floating-refresh.reload {
     bottom: 20px;  /* 🔄 아래쪽 */
 }
-
-.floating-refresh.logout {
-    right: 80px;
-    bottom: 20px;  /* 🔄 아래쪽 */
-}
