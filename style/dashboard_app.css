@@ -393,7 +393,7 @@ iframe {
 /* Floating menu wrapper and menu styles (for floating-menu) */
 .floating-menu-wrapper {
     position: fixed;
-    bottom: 25px;
+    bottom: 40px;
     right: 20px;
     z-index: 1000;
 }

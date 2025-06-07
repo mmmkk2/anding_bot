@@ -822,6 +822,51 @@ def render_log(log_path):
             content = f.read()
     except Exception as e:
         content = f"⚠️ 로그를 불러오는 중 오류 발생: {e}"
+
+    # Floating menu: three-dot menu for admin or viewer only (same as dashboard)
+    is_admin = session.get("is_admin", False)
+    is_viewer = not is_admin and session.get("logged_in", False)
+    floating_menu_html = ""
+    # Show menu if admin or viewer (same logic as dashboard)
+    if is_admin or is_viewer:
+        floating_menu_html = """
+        <div class="floating-menu-wrapper">
+            <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">⋯</button>
+            <div class="floating-menu">
+                {admin_link}
+                <a href="/viewer" class="menu-option">뷰어</a>
+                <form method="get" action="/env_config" style="margin: 0; padding: 0;">
+                  <button class="menu-option" type="submit">설정</button>
+                </form>
+                <form method="get" action="/admin" style="margin: 0; padding: 0;">
+                  <button class="menu-option" type="submit">새로고침</button>
+                </form>
+                <a href="/logout" class="menu-option" style="color: #c00;">로그아웃</a>
+            </div>
+        </div>
+        <script>
+        (function() {{
+            var wrapper = document.querySelector('.floating-menu-wrapper');
+            if (!wrapper) return;
+            var btn = wrapper.querySelector('.floating-menu-toggle');
+            var menu = wrapper.querySelector('.floating-menu');
+            if (btn && menu) {{
+                btn.addEventListener('click', function(e) {{
+                    e.stopPropagation();
+                    menu.classList.toggle('show');
+                }});
+                document.addEventListener('click', function(e) {{
+                    if (!wrapper.contains(e.target)) {{
+                        menu.classList.remove('show');
+                    }}
+                }});
+            }}
+        }})();
+        </script>
+        """.format(
+            admin_link='<a href="/admin" class="menu-option">관리자</a>' if is_admin else ""
+        )
+
     return f"""
     <!DOCTYPE html>
     <html lang='ko'>
@@ -830,8 +875,42 @@ def render_log(log_path):
         <meta name='viewport' content='width=device-width, initial-scale=1'>
         <title>실행 로그</title>
         <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_app.css">
+        <style>
+            /* Floating menu wrapper and menu styles for log page */
+            .floating-menu-wrapper {{
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 1000;
+            }}
+            .floating-menu {{
+                position: absolute;
+                bottom: 40px;
+                right: 0;
+                background-color: rgba(255, 255, 255, 0.95);
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                display: none;
+                flex-direction: column;
+                min-width: 120px;
+                padding: 5px 0;
+            }}
+            .floating-menu .menu-option {{
+                padding: 8px 12px;
+                text-decoration: none;
+                color: #333;
+                font-size: 14px;
+            }}
+            .floating-menu .menu-option:hover {{
+                background-color: #f0f0f0;
+            }}
+            .floating-menu.show {{
+                display: flex;
+            }}
+        </style>
     </head>
     <body>
+        {floating_menu_html}
         <a class="floating-refresh reload" href="/admin">⬅️</a> 
         <div class="log-container">
             <div class="log-title">실행 로그</div>
