@@ -132,8 +132,8 @@ LOGIN_PWD = os.getenv("LOGIN_PWD", "871104tla#")
 
 BASE_URL = "https://mmkkshim.pythonanywhere.com/"
 
-today_str = (datetime.now() - timedelta(minutes=5)).strftime("%Y-%m-%d")
-print("5분전 날짜로 캡쳐")
+# today_str = (datetime.now() - timedelta(minutes=5)).strftime("%Y-%m-%d")
+# print("5분전 날짜로 캡쳐")
 screenshot_dir = os.path.join(DASHBOARD_PATH, "screenshots", today_str)
 os.makedirs(screenshot_dir, exist_ok=True)
 
