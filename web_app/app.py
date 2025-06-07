@@ -411,22 +411,22 @@ def render_dashboard(is_admin=True, is_viewer=False):
             </div>
         """
 
-    # Floating menu: three-dot menu for admin only
+    # Floating menu: three-dot menu for admin or viewer only
     floating_menu_html = ""
     if is_admin or is_viewer:
         floating_menu_html = """
         <div class="floating-menu-wrapper" style="position: fixed; bottom: 20px; left: 20px; z-index: 999;">
             <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">⋯</button>
             <div class="floating-menu" style="display: none;">
-                <a href="/admin" style="display: block; padding: 0.5em 1em; color: #222; text-decoration: none;">관리자</a>
-                <a href="/viewer" style="display: block; padding: 0.5em 1em; color: #222; text-decoration: none;">뷰어</a>
+                <a href="/admin" class="menu-option">관리자</a>
+                <a href="/viewer" class="menu-option">뷰어</a>
                 <form method="get" action="/env_config" style="margin: 0; padding: 0;">
-                  <button class="pill" type="submit" style="display: block; width: 100%; text-align: left; background: none; border: none; color: #222; padding: 0.5em 1em; cursor: pointer;">.env 설정</button>
+                  <button class="menu-option" type="submit">.env 설정</button>
                 </form>
                 <form method="get" action="/admin" style="margin: 0; padding: 0;">
-                  <button class="pill small" type="submit" style="display: block; width: 100%; text-align: left; background: none; border: none; color: #222; padding: 0.5em 1em; cursor: pointer;">🔄 새로고침</button>
+                  <button class="menu-option" type="submit">🔄 새로고침</button>
                 </form>
-                <a href="/logout" style="display: block; padding: 0.5em 1em; color: #c00; text-decoration: none;">로그아웃</a>
+                <a href="/logout" class="menu-option" style="color: #c00;">로그아웃</a>
             </div>
         </div>
         <script>
