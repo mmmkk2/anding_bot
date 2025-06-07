@@ -38,6 +38,10 @@ h1 {
     color: #333;
 }
 
+.summary-box-right {
+  display: flex;
+  justify-content: flex-end;
+}
 
 .summary-box {
     display: block;

@@ -308,6 +308,7 @@ def fetch_monthly_sales_from_calendar(driver):
                         }}
                     }});
                 </script>
+                <div class="summary-box-right">
                   <div class="summary-box">
                     <table class="summary-table">
                       <tr>
@@ -332,6 +333,7 @@ def fetch_monthly_sales_from_calendar(driver):
                       </tr>
                     </table>
                   </div>
+                </div>
                 </div>                
             </div> 
         <div class="updated">Updated {now_str}</div>
