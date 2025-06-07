@@ -48,11 +48,17 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
         if username == LOGIN_ID and password == LOGIN_PWD:
+            session["logged_in"] = True
+            session["is_admin"] = True
+            session["is_viewer"] = False
             return redirect(url_for("admin_dashboard"))
         if os.getenv("VIEWER_BLOCK", "false").lower() == "true":
             return "뷰어 로그인은 현재 차단되어 있습니다.", 403
         elif username == VIEWER_ID and password == VIEWER_PWD:
-            return redirect(url_for("viewer_dashboard"))
+            session["logged_in"] = True
+            session["is_admin"] = False
+            session["is_viewer"] = True
+            return redirect(url_for("viewer"))
         return "로그인 실패", 401
     return render_template_string('''
 <!DOCTYPE html>
@@ -132,7 +138,11 @@ def logout():
 @app.before_request
 def require_login():
     session.permanent = True
+    # Allow access to login and static routes without session
     if request.endpoint in ("login", "static"):
+        return
+    # Allow access to static files (if using blueprint or static_folder)
+    if request.path.startswith("/static"):
         return
     if not session.get("logged_in"):
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
