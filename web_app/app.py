@@ -44,6 +44,7 @@ app.secret_key = "your_secret_key"  # change this to a secure value
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    # The login page should always be accessible regardless of session state
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
@@ -59,11 +60,7 @@ def login():
             return redirect(url_for("viewer_dashboard"))
         return "로그인 실패", 401
 
-    # Redirect already logged-in users to correct dashboard
-    if session.get("logged_in"):
-        if session.get("is_admin"):
-            return redirect(url_for("admin_dashboard"))
-        return redirect(url_for("viewer_dashboard"))
+    # Always render login page for GET requests (do not redirect based on session here)
     return render_template_string('''
 <!DOCTYPE html>
 <html lang="ko">
@@ -142,6 +139,7 @@ def logout():
 @app.before_request
 def require_login():
     session.permanent = True
+    # Always allow access to login and static routes
     if request.endpoint in ("login", "static"):
         return
     if not session.get("logged_in"):
