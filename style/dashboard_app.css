@@ -260,7 +260,6 @@ iframe {
     text-align: right;
 }
 
-/* Floating Refresh Button: Center emoji/icon perfectly in the circle */
 .floating-refresh {
     position: fixed;
     bottom: 20px;
@@ -276,12 +275,6 @@ iframe {
     cursor: pointer;
     z-index: 999;
     transition: background-color 0.3s, border-color 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    text-align: center;
-    padding: 0;
 }
 
 .floating-refresh:hover {
@@ -289,3 +282,28 @@ iframe {
     border-color: #999;
 }
 
+.floating-back {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: black;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.floating-back:hover {
+    background-color: rgba(255, 255, 255, 1);
+    border-color: #999;
+    text-decoration: none;
+}
