@@ -415,9 +415,9 @@ def render_dashboard(is_admin=True, is_viewer=False):
     floating_menu_html = ""
     if is_admin or is_viewer:
         floating_menu_html = """
-        <div class="floating-menu-wrapper" style="position: fixed; bottom: 20px; left: 20px; z-index: 999;">
+        <div class="floating-menu-wrapper">
             <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">⋯</button>
-            <div class="floating-menu" style="display: none;">
+            <div class="floating-menu">
                 {admin_link}
                 <a href="/viewer" class="menu-option">뷰어</a>
                 <form method="get" action="/env_config" style="margin: 0; padding: 0;">
@@ -431,15 +431,19 @@ def render_dashboard(is_admin=True, is_viewer=False):
         </div>
         <script>
         (function() {{
-            var btn = document.querySelector('.floating-menu-toggle');
-            var menu = document.querySelector('.floating-menu');
+            var wrapper = document.querySelector('.floating-menu-wrapper');
+            if (!wrapper) return;
+            var btn = wrapper.querySelector('.floating-menu-toggle');
+            var menu = wrapper.querySelector('.floating-menu');
             if (btn && menu) {{
                 btn.addEventListener('click', function(e) {{
                     e.stopPropagation();
-                    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+                    menu.classList.toggle('show');
                 }});
                 document.addEventListener('click', function(e) {{
-                    menu.style.display = "none";
+                    if (!wrapper.contains(e.target)) {{
+                        menu.classList.remove('show');
+                    }}
                 }});
             }}
         }})();
@@ -472,6 +476,37 @@ def render_dashboard(is_admin=True, is_viewer=False):
             .box-right {{
                 display: flex;
                 justify-content: flex-end;
+            }}
+            /* Floating menu wrapper and menu styles */
+            .floating-menu-wrapper {{
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 1000;
+            }}
+            .floating-menu {{
+                position: absolute;
+                bottom: 40px;
+                right: 0;
+                background-color: rgba(255, 255, 255, 0.95);
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                display: none;
+                flex-direction: column;
+                min-width: 120px;
+                padding: 5px 0;
+            }}
+            .floating-menu .menu-option {{
+                padding: 8px 12px;
+                text-decoration: none;
+                color: #333;
+                font-size: 14px;
+            }}
+            .floating-menu .menu-option:hover {{
+                background-color: #f0f0f0;
+            }}
+            .floating-menu.show {{
+                display: flex;
             }}
         </style>
     </head>
