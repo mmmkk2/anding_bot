@@ -579,6 +579,50 @@ def render_dashboard(is_admin=True, is_viewer=False):
 # --- .env config routes ---
 from dotenv import set_key
 from pathlib import Path
+from flask import render_template
+
+def generate_floating_menu_html():
+    is_admin = session.get("is_admin", False)
+    is_viewer = not is_admin and session.get("logged_in", False)
+    if is_admin or is_viewer:
+        return """
+        <div class="floating-menu-wrapper">
+            <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">⋯</button>
+            <div class="floating-menu">
+                {admin_link}
+                <a href="/viewer" class="menu-option">뷰어</a>
+                <form method="get" action="/env_config" style="margin: 0; padding: 0;">
+                  <button class="menu-option" type="submit">설정</button>
+                </form>
+                <form method="get" action="/admin" style="margin: 0; padding: 0;">
+                  <button class="menu-option" type="submit">새로고침</button>
+                </form>
+                <a href="/logout" class="menu-option" style="color: #c00;">로그아웃</a>
+            </div>
+        </div>
+        <script>
+        (function() {{
+            var wrapper = document.querySelector('.floating-menu-wrapper');
+            if (!wrapper) return;
+            var btn = wrapper.querySelector('.floating-menu-toggle');
+            var menu = wrapper.querySelector('.floating-menu');
+            if (btn && menu) {{
+                btn.addEventListener('click', function(e) {{
+                    e.stopPropagation();
+                    menu.classList.toggle('show');
+                }});
+                document.addEventListener('click', function(e) {{
+                    if (!wrapper.contains(e.target)) {{
+                        menu.classList.remove('show');
+                    }}
+                }});
+            }}
+        }})();
+        </script>
+        """.format(
+            admin_link='<a href="/admin" class="menu-option">관리자</a>' if is_admin else ""
+        )
+    return ""
 
 @app.route("/env_config", methods=["GET"])
 def env_config():
@@ -587,31 +631,13 @@ def env_config():
     danger = int(os.getenv("DANGER_THRESHOLD", "5"))
     warning = int(os.getenv("WARNING_THRESHOLD", "8"))
     cum = int(os.getenv("WARNING_CUM_THRESHOLD", "50"))
-    return f"""
-<!DOCTYPE html>
-<html lang='ko'>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <title>.env 설정</title>
-    <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_app.css">
-</head>
-<body>
-    {{ floating_menu_html | safe }}
-    <div class="log-container">
-        <div class="log-title">⚙️ .env 임계값 설정</div>
-        <form method="POST" action="/update_env_config">
-            <label>DANGER_THRESHOLD: <input type="number" name="danger" value={danger}></label><br>
-            <label>WARNING_THRESHOLD: <input type="number" name="warning" value={warning}></label><br>
-            <label>WARNING_CUM_THRESHOLD: <input type="number" name="cum" value={cum}></label><br>
-            <div style="margin-top: 1rem;"></div>
-            <button class="pill small" type="submit">저장</button>
-        </form>
-    </div>
-
-</body>
-</html>
-"""
+    return render_template(
+        "env_config.html",
+        danger=danger,
+        warning=warning,
+        cum=cum,
+        floating_menu_html=generate_floating_menu_html()
+    )
 
 @app.route("/update_env_config", methods=["POST"])
 def update_env_config():
