@@ -423,9 +423,7 @@ def render_dashboard(is_admin=True, is_viewer=False):
                 <form method="get" action="/env_config" style="margin: 0; padding: 0;">
                   <button class="menu-option" type="submit">설정</button>
                 </form>
-                <form method="get" action="/admin" style="margin: 0; padding: 0;">
-                  <button class="menu-option" type="submit">새로고침</button>
-                </form>
+                <a class="menu-option" href="#" onclick="location.reload(); return false;">새로고침</a>
                 <a href="/logout" class="menu-option" style="color: #c00;">로그아웃</a>
             </div>
         </div>
@@ -601,9 +599,7 @@ def env_config():
                 <form method="get" action="/env_config" style="margin: 0; padding: 0;">
                   <button class="menu-option" type="submit">설정</button>
                 </form>
-                <form method="get" action="/admin" style="margin: 0; padding: 0;">
-                  <button class="menu-option" type="submit">새로고침</button>
-                </form>
+                <a class="menu-option" href="#" onclick="location.reload(); return false;">🔄 새로고침</a>
                 <a href="/logout" class="menu-option" style="color: #c00;">로그아웃</a>
             </div>
         </div>
@@ -879,9 +875,7 @@ def render_log(log_path):
                 <form method="get" action="/env_config" style="margin: 0; padding: 0;">
                   <button class="menu-option" type="submit">설정</button>
                 </form>
-                <form method="get" action="/admin" style="margin: 0; padding: 0;">
-                  <button class="menu-option" type="submit">새로고침</button>
-                </form>
+                <a class="menu-option" href="#" onclick="location.reload(); return false;">새로고침</a>
                 <a href="/logout" class="menu-option" style="color: #c00;">로그아웃</a>
             </div>
         </div>
