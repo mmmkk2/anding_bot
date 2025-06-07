@@ -597,7 +597,7 @@ def env_config():
     <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_app.css">
 </head>
 <body>
-    <a class="floating-refresh reload" href="/admin">⬅️</a> 
+    {{ floating_menu_html | safe }}
     <div class="log-container">
         <div class="log-title">⚙️ .env 임계값 설정</div>
         <form method="POST" action="/update_env_config">
@@ -911,7 +911,6 @@ def render_log(log_path):
     </head>
     <body>
         {floating_menu_html}
-        <a class="floating-refresh reload" href="/admin">⬅️</a> 
         <div class="log-container">
             <div class="log-title">실행 로그</div>
             <pre class="log-output">{content}</pre>
