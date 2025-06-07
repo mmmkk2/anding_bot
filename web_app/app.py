@@ -152,7 +152,8 @@ def require_login():
 
 @app.route("/admin")
 def admin_dashboard():
-    if not session.get("logged_in") or not session.get("is_admin"):
+    # Only allow access if is_admin is True, else redirect to login
+    if not session.get("is_admin"):
         return redirect(url_for("login"))
     return render_dashboard(is_admin=True, is_viewer=False)
 
