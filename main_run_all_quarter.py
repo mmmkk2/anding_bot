@@ -46,6 +46,8 @@ if __name__ == "__main__":
         print(f"[경고] DANGER_THRESHOLD 로딩 실패: {e}")
         danger_threshold = 5
 
+
+    danger_threshold = 8
     total_free = 28
     used_free = total_free - last_count
 
