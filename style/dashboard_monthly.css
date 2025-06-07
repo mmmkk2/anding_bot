@@ -39,8 +39,9 @@ h1 {
 }
 
 .summary-box-right {
-  display: flex;
-  justify-content: flex-end;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
 }
 
 .summary-box {
