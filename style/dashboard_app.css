@@ -285,18 +285,6 @@ iframe {
     padding: 0;
 }
 
-.floating-logout {
-    position: fixed;
-    bottom: 20px;
-    right: 80px;
-    background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 50%;
-    padding: 10px;
-    text-align: center;
-    font-size: 0.8em;
-    text-decoration: none;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
 
 .floating-refresh:hover {
     background-color: rgba(255, 255, 255, 1);
@@ -309,5 +297,10 @@ iframe {
 }
 
 .floating-refresh.reload {
+    bottom: 20px;  /* 🔄 아래쪽 */
+}
+
+.floating-refresh.reload {
+    right: 80px;
     bottom: 20px;  /* 🔄 아래쪽 */
 }
