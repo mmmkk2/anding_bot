@@ -41,17 +41,18 @@ if __name__ == "__main__":
     try:
         from dotenv import load_dotenv
         load_dotenv("/home/mmkkshim/anding_bot/.env")
-        danger_threshold = int(os.getenv("DANGER_THRESHOLD", "5"))
+        # threshold = int(os.getenv("DANGER_THRESHOLD", "5"))
+        threshold = int(os.getenv("WARNING_THRESHOLD", "8"))
     except Exception as e:
         print(f"[경고] DANGER_THRESHOLD 로딩 실패: {e}")
-        danger_threshold = 5
+        threshold = 5
 
     # for test
     # danger_threshold = 8
     total_free = 28
     used_free = total_free - last_count
 
-    if used_free <= danger_threshold:
+    if used_free <= threshold:
         # 먼저 seat은 단독 실행 (Selenium 안정성 확보용)
         print("▶️ 좌석 확인 시작")
         run_and_log(main_check_seat, "/home/mmkkshim/anding_bot/logs/run_s.log", label="좌석 확인")
@@ -59,4 +60,4 @@ if __name__ == "__main__":
         print("▶️ 상품 확인 시작")
         run_and_log(main_check_product, "/home/mmkkshim/anding_bot/logs/run_product.log", label="상품 확인")
     else:
-        print(f"[스킵] 좌석 수 {used_free} > DANGER_THRESHOLD {danger_threshold} → 좌석 및 상품 확인 생략")
+        print(f"[스킵] 좌석 수 {used_free} > THRESHOLD {threshold} → 좌석 및 상품 확인 생략")
