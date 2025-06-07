@@ -457,7 +457,6 @@ def render_dashboard(is_admin=True, is_viewer=False):
     </head>
     <body>
         <a class="floating-logout-dot" href="/logout" title="Logout">•</a>
-        <a class="floating-refresh" onclick="window.location.href='/admin'">🔄</a>   
         <div class="box">
             {left_button_group}
             <div class="toggle-section">
