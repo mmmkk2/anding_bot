@@ -417,7 +417,7 @@ def render_dashboard(is_admin=True, is_viewer=False):
         floating_menu_html = """
         <div class="floating-menu-wrapper" style="position: fixed; bottom: 20px; left: 20px; z-index: 999;">
             <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">⋯</button>
-            <div class="floating-menu" style="display: none;">
+            <div class="floating-menu" style="display: none; position: absolute; right: 60px; bottom: 0; z-index: 1000;">
                 <a href="/admin" class="menu-option">관리자</a>
                 <a href="/viewer" class="menu-option">뷰어</a>
                 <form method="get" action="/env_config" style="margin: 0; padding: 0;">
