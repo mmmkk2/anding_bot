@@ -419,7 +419,6 @@ def render_dashboard(is_admin=True, is_viewer=False):
             '<div style="display: flex; justify-content: space-between;">'
             '<div style="display: flex; gap: 0.5rem;">'
             '<form method="post" action="/set_viewer"><button class="pill small" type="submit">Viewer</button></form>'
-            '<form method="get" action="/logout"><button class="pill small" type="submit">Logout</button></form>'
             + (
                 '<form method="get" action="/env_config"><button class="pill small" type="submit">.env 설정</button></form>'
                 if is_admin and not is_viewer else ""
@@ -457,7 +456,7 @@ def render_dashboard(is_admin=True, is_viewer=False):
         </style>
     </head>
     <body>
-        <a class="floating-refresh logout" href="/logout">⏏️</a>
+        <a class="floating-logout-dot" href="/logout" title="Logout">•</a>
         <a class="floating-refresh" onclick="window.location.href='/admin'">🔄</a>   
         <div class="box">
             {left_button_group}
