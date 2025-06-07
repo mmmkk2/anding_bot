@@ -413,7 +413,7 @@ def render_dashboard(is_admin=True, is_viewer=False):
 
     # Floating menu: three-dot menu for admin only
     floating_menu_html = ""
-    if is_admin and not is_viewer:
+    if is_admin and is_viewer:
         floating_menu_html = """
         <div class="floating-menu-wrapper" style="position: fixed; bottom: 20px; left: 20px; z-index: 999;">
             <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">⋯</button>
