@@ -355,7 +355,7 @@ iframe {
 /* Floating menu container background */
 .floating-menu {
     position: absolute;
-    right: 100%;
+    right: 30px;
     bottom: 0;
     background-color: rgba(255, 255, 255, 0.9);
     border: 1px solid #ccc;
