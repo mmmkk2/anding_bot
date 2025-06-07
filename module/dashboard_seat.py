@@ -574,6 +574,8 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
         <link rel="stylesheet" href="https://mmkkshim.pythonanywhere.com/style/dashboard_seat.css">
         <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/sorttable/2.1.2/sorttable.min.js"></script>
+        <!-- Bootstrap CSS for responsive image -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     </head>
     <body>
         <div class="box">
@@ -581,13 +583,11 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             <div class="stat">🪑 {used_free}/{total_free} · 💻 {used_laptop}/{total_laptop} · 🟩 {remaining}석 · 👥 {cum_user_counts[-1] if cum_user_counts else "정보 없음"}명</div>                        
             <canvas id="seatChart" style="max-width: 100%; height: auto; aspect-ratio: 16 / 9;"></canvas>
             {chart_script}
-    """
-
-    # Insert the seat map image just below the chart area
-    html += f"""
-        <div style="text-align: center; margin: 1rem 0;">
-            <img src="https://mmkkshim.pythonanywhere.com/static/images/seat_map.png" alt="좌석 배치도" style="max-width: 100%; border: 1px solid #ccc; border-radius: 8px;">
-        </div>
+            <div class="row mt-3">
+              <div class="col-12 text-center">
+                <img src="/static/images/seat_map.png" alt="Seat Map" class="img-fluid" style="max-width: 100%; height: auto;">
+              </div>
+            </div>
     """
 
     html += """
