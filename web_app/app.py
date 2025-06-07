@@ -412,21 +412,6 @@ def render_dashboard(is_admin=True, is_viewer=False):
             </div>
         """
 
-    # Compose left-side button group (.env 설정 left; Refresh right)
-    left_button_group = ""
-    if is_admin and not is_viewer:
-        left_button_group = (
-            '<div style="display: flex; justify-content: space-between;">'
-            '<div style="display: flex; gap: 0.5rem;">'
-            '<a class="pill small" href="/viewer">Viewer</a>'
-            + (
-                '<form method="get" action="/env_config"><button class="pill small" type="submit">.env 설정</button></form>'
-                if is_admin and not is_viewer else ""
-            ) +
-            '</div>'
-            '</div>'
-            '<div style="margin-bottom: 1.5rem;"></div>'
-        )
     # Floating menu: three-dot menu for admin only
     floating_menu_html = ""
     if is_admin and not is_viewer:
@@ -436,6 +421,9 @@ def render_dashboard(is_admin=True, is_viewer=False):
             <div class="floating-menu" style="display: none; position: absolute; bottom: 55px; left: 0; background: #fff; border: 1px solid #ddd; border-radius: 0.7em; box-shadow: 0 4px 12px rgba(0,0,0,0.13); min-width: 100px; padding: 0.5em 0;">
                 <a href="/admin" style="display: block; padding: 0.5em 1em; color: #222; text-decoration: none;">관리자</a>
                 <a href="/viewer" style="display: block; padding: 0.5em 1em; color: #222; text-decoration: none;">뷰어</a>
+                <form method="get" action="/env_config" style="margin: 0; padding: 0;">
+                  <button class="pill small" type="submit" style="display: block; width: 100%; text-align: left; background: none; border: none; color: #222; padding: 0.5em 1em; cursor: pointer;">.env 설정</button>
+                </form>
                 <a href="/logout" style="display: block; padding: 0.5em 1em; color: #c00; text-decoration: none;">로그아웃</a>
             </div>
         </div>
@@ -484,10 +472,8 @@ def render_dashboard(is_admin=True, is_viewer=False):
         </style>
     </head>
     <body>
-        <a class="floating-logout-dot" href="/logout" title="Logout">•</a>
         {floating_menu_html}
         <div class="box">
-            {left_button_group}
             <div class="toggle-section">
                 <div class="summary-header-row">
                     <div class="summary-header">
