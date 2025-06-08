@@ -396,7 +396,7 @@ def main_check_seat():
                 time.sleep(2)
                 map_screenshot_path = os.path.join(DASHBOARD_PATH, "../static/images/seat_map.png")
                 os.makedirs(os.path.dirname(map_screenshot_path), exist_ok=True)
-                driver.execute_script("window.scrollTo(0, 80);")
+                driver.execute_script("window.scrollTo(0, 120);")
                 time.sleep(0.5)
                 element = driver.find_element(By.CSS_SELECTOR, "div#store_map_container > div#store_map_wrap")
                 element.screenshot(map_screenshot_path)
@@ -584,16 +584,10 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
             {chart_script}
     """
 
-    # Insert the seat map image just below the chart area
-    html += f"""
-        <div style="text-align: center; margin: 1rem 0;">
-            <img src="https://mmkkshim.pythonanywhere.com/static/images/seat_map.png" alt="좌석 배치도" style="max-width: 100%; border: 1px solid #ccc; border-radius: 8px;">
-        </div>
-    """
-
     html += """
     <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
     """
+
     # Add separate table for 자유석 종료시간 6시간 이내
     near_expire_rows = []
     now_kst = datetime.now(kst)
@@ -616,6 +610,13 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     if near_expire_rows:
         html += render_table_expire("종료 예정 자유석", near_expire_rows)
 
+    # Insert the seat map image just below the chart area
+    html += f"""
+        <div style="text-align: center; margin: 1rem 0;">
+            <img src="https://mmkkshim.pythonanywhere.com/static/images/seat_map.png" alt="좌석 배치도" style="max-width: 100%; border: 1px solid #ccc; border-radius: 8px;">
+        </div>
+    """
+    
     for title, rows in rows_dict.items():
         html += render_table(title, rows)
     
