@@ -416,7 +416,7 @@ def render_dashboard(is_admin=True, is_viewer=False):
     if is_admin or is_viewer:
         floating_menu_html = """
         <div class="floating-menu-wrapper">
-            <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">⋯</button>
+            <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">+</button>
             <div class="floating-menu">
                 {admin_link}
                 <a href="/admin" class="menu-option">관리자</a>
@@ -595,10 +595,6 @@ def env_config():
             <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">+</button>
             <div class="floating-menu">
                 {admin_link}
-                <a href="/viewer" class="menu-option">뷰어</a>
-                <form method="get" action="/env_config" style="margin: 0; padding: 0;">
-                  <button class="menu-option" type="submit">설정</button>
-                </form>
                 <a class="menu-option" href="#" onclick="location.reload(); return false;">새로고침</a>
                 <a href="/logout" class="menu-option" style="color: #c00;">로그아웃</a>
             </div>
