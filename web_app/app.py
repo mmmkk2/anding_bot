@@ -419,7 +419,6 @@ def render_dashboard(is_admin=True, is_viewer=False):
             <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">+</button>
             <div class="floating-menu">
                 {admin_link}
-                <a href="/admin" class="menu-option">관리자</a>
                 <a class="menu-option" href="#" onclick="location.reload(); return false;">새로고침</a>
                 <a href="/logout" class="menu-option" style="color: #c00;">로그아웃</a>
             </div>
@@ -444,7 +443,8 @@ def render_dashboard(is_admin=True, is_viewer=False):
         }})();
         </script>
         """.format(
-            admin_link='<a href="/viewer" class="menu-option">뷰어</a> \
+            admin_link= '<a href="/admin" class="menu-option">관리자</a> \
+            <a href="/viewer" class="menu-option">뷰어</a> \
             <form method="get" action="/env_config" style="margin: 0; padding: 0;"> \
             <button class="menu-option" type="submit">설정</button> \
             </form>' if is_admin else ""
@@ -619,7 +619,11 @@ def env_config():
         }})();
         </script>
         """.format(
-            admin_link='<a href="/admin" class="menu-option">관리자</a>' if is_admin else ""
+            admin_link= '<a href="/admin" class="menu-option">관리자</a> \
+            <a href="/viewer" class="menu-option">뷰어</a> \
+            <form method="get" action="/env_config" style="margin: 0; padding: 0;"> \
+            <button class="menu-option" type="submit">설정</button> \
+            </form>' if is_admin else ""
         )
     return f"""
 <!DOCTYPE html>
@@ -867,10 +871,6 @@ def render_log(log_path):
             <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">+</button>
             <div class="floating-menu">
                 {admin_link}
-                <a href="/viewer" class="menu-option">뷰어</a>
-                <form method="get" action="/env_config" style="margin: 0; padding: 0;">
-                  <button class="menu-option" type="submit">설정</button>
-                </form>
                 <a class="menu-option" href="#" onclick="location.reload(); return false;">새로고침</a>
                 <a href="/logout" class="menu-option" style="color: #c00;">로그아웃</a>
             </div>
@@ -895,7 +895,8 @@ def render_log(log_path):
         }})();
         </script>
         """.format(
-            admin_link='<a href="/viewer" class="menu-option">뷰어</a> \
+            admin_link= '<a href="/admin" class="menu-option">관리자</a> \
+            <a href="/viewer" class="menu-option">뷰어</a> \
             <form method="get" action="/env_config" style="margin: 0; padding: 0;"> \
             <button class="menu-option" type="submit">설정</button> \
             </form>' if is_admin else ""
