@@ -280,13 +280,28 @@ def check_seat_status(driver):
         rows_dict=rows_dict
     )
 
+    # === DANGER_THRESHOLD 이하일 때만 좌석 + 상품 실행 ===
+    seat_csv_path = "/home/mmkkshim/anding_bot/dashboard_log/seat_history.csv"
+    try:
+        with open(seat_csv_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            last_line = lines[-1] if lines else None
+            last_count = int(last_line.strip().split(",")[1]) if last_line else 99
+    except Exception as e:
+        print(f"[경고] 좌석 이력 CSV 로딩 실패: {e}")
+        last_count = 99
 
+
+    total_free = 28
+    last_used_free = total_free - last_count
+    
     # === 주의/경고/복구 (broadcast only, no flag logic)
-    if remaining_seats <= DANGER_THRESHOLD:
-        send_broadcast_and_update(f"[경고] 🚨 잔여 자유석 {remaining_seats}석 - 일일권 제한 강화 필요", broadcast=True, category="seat")
-    elif remaining_seats <= WARNING_THRESHOLD:
-        send_broadcast_and_update(f"[주의] ⚠️ 잔여 자유석 {remaining_seats}석 - 이용 주의 필요", broadcast=True, category="seat")
-
+    if (remaining_seats < last_used_free):
+        if (remaining_seats <= DANGER_THRESHOLD):
+            send_broadcast_and_update(f"[경고] 🚨 잔여 자유석 {remaining_seats}석 - 일일권 제한 강화 필요", broadcast=True, category="seat")
+        elif (remaining_seats <= WARNING_THRESHOLD):
+            send_broadcast_and_update(f"[주의] ⚠️ 잔여 자유석 {remaining_seats}석 - 이용 주의 필요", broadcast=True, category="seat")
+    
     # === 최종 CSV 로그
     return free_rows, laptop_rows, msg
 
