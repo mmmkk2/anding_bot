@@ -363,7 +363,7 @@ def render_dashboard(is_admin=True, is_viewer=False):
         using_2 = is_currently_in_use(reservations_2, now_str)
         using_4 = is_currently_in_use(reservations_4, now_str)
     # Mask names in studyroom reservation table if not admin and not viewer
-    if not (is_admin and not is_viewer) and html:
+    if (is_viewer) and html:
         # 두 글자 이름: 앞글자만 보이고 뒤는 'x'로 마스킹 (권범 → 권x)
         html = re.sub(r'\b([가-힣])([가-힣])\b', r'\1x', html)  # 두 글자 이름
         # 세 글자 이상인 경우: 앞글자만 보이고 나머지는 'xx'로 마스킹 (홍길동 → 홍xx)
@@ -419,10 +419,7 @@ def render_dashboard(is_admin=True, is_viewer=False):
             <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">⋯</button>
             <div class="floating-menu">
                 {admin_link}
-                <a href="/viewer" class="menu-option">뷰어</a>
-                <form method="get" action="/env_config" style="margin: 0; padding: 0;">
-                  <button class="menu-option" type="submit">설정</button>
-                </form>
+                <a href="/admin" class="menu-option">관리자</a>
                 <a class="menu-option" href="#" onclick="location.reload(); return false;">새로고침</a>
                 <a href="/logout" class="menu-option" style="color: #c00;">로그아웃</a>
             </div>
@@ -592,7 +589,7 @@ def env_config():
     if is_admin or is_viewer:
         floating_menu_html = """
         <div class="floating-menu-wrapper">
-            <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">⋯</button>
+            <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">+</button>
             <div class="floating-menu">
                 {admin_link}
                 <a href="/viewer" class="menu-option">뷰어</a>
@@ -868,7 +865,7 @@ def render_log(log_path):
     if is_admin or is_viewer:
         floating_menu_html = """
         <div class="floating-menu-wrapper">
-            <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">⋯</button>
+            <button class="floating-menu-toggle floating-menu-button" style="background: #eee; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 20px; cursor: pointer;">+</button>
             <div class="floating-menu">
                 {admin_link}
                 <a href="/viewer" class="menu-option">뷰어</a>
@@ -899,7 +896,11 @@ def render_log(log_path):
         }})();
         </script>
         """.format(
-            admin_link='<a href="/admin" class="menu-option">관리자</a>' if is_admin else ""
+            admin_link='<a href="/viewer" class="menu-option">뷰어</a> \
+            <form method="get" action="/env_config" style="margin: 0; padding: 0;"> \
+            <button class="menu-option" type="submit">설정</button> \
+            </form>' if is_admin else ""
+            
         )
 
     return f"""
