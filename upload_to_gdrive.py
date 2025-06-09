@@ -104,7 +104,7 @@ def create_folder_and_upload_file(service, folder_name, root_folder_id, screensh
 
 
 
-
+import pytz
 import os
 import time
 from datetime import datetime
@@ -132,7 +132,13 @@ LOGIN_PWD = os.getenv("LOGIN_PWD", "871104tla#")
 
 BASE_URL = "https://mmkkshim.pythonanywhere.com/"
 
-today_str = (datetime.now() - timedelta(minutes=5)).strftime("%Y-%m-%d")
+
+
+
+kst = pytz.timezone("Asia/Seoul")
+
+
+today_str = (datetime.now(kst) - timedelta(minutes=5)).strftime("%Y-%m-%d")
 # print("5분전 날짜로 캡쳐")
 screenshot_dir = os.path.join(DASHBOARD_PATH, "screenshots", today_str)
 os.makedirs(screenshot_dir, exist_ok=True)
