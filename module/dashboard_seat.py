@@ -296,7 +296,7 @@ def check_seat_status(driver):
     last_used_free = total_free - last_count
     
     # === 주의/경고/복구 (broadcast only, no flag logic)
-    if (remaining_seats < last_used_free):
+    if (remaining_seats < last_count):
         if (remaining_seats <= DANGER_THRESHOLD):
             send_broadcast_and_update(f"[경고] 🚨 잔여 자유석 {remaining_seats}석 - 일일권 제한 강화 필요", broadcast=True, category="seat")
         elif (remaining_seats <= WARNING_THRESHOLD):
