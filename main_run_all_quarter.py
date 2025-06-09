@@ -59,5 +59,8 @@ if __name__ == "__main__":
 
         print("▶️ 상품 확인 시작")
         run_and_log(main_check_product, "/home/mmkkshim/anding_bot/logs/run_product.log", label="상품 확인")
+
+        print("▶️ 결제 확인 시작")
+        run_and_log(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log", label="결제 확인")
     else:
         print(f"[스킵] 좌석 수 {used_free} > THRESHOLD {threshold} → 좌석 및 상품 확인 생략")
