@@ -21,6 +21,11 @@ def run_and_log(func, log_path, label=None):
             except Exception as e:
                 print(f"❌ {label} 실패: {e}", flush=True)
 
+import pytz
+
+kst = pytz.timezone("Asia/Seoul")
+now = datetime.now(kst)
+
 if __name__ == "__main__":
     ip = requests.get("https://api.ipify.org").text
     print(f"현재 외부 IP 주소: {ip}")
@@ -35,13 +40,20 @@ if __name__ == "__main__":
 
     run_and_log(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log", label="결제 확인")
 
-    # now_hour_kst = (datetime.utcnow().hour + 9) % 24  # KST 기준 시간
-    # if now_hour_kst not in [0, 1]:
-    #     print("▶️ 결제 확인 시작")
-    #     # run_and_log(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log", label="결제 확인")
-    # else:
-    #     print("⏸ 결제 확인은 KST 00~0시 10분에는 실행되지 않습니다.")
+    now_kst = datetime.now(kst)
 
+    now_kst_hour = (now_kst.hour)
+    now_kst_min = (now_kst.min)
+    
+    print(now_kst_hour)
+    print(now_kst_min)
+
+    if now_kst_hour < 1 and now_kst_min <=10:
+        print("⏸ 결제 확인은 KST 00~0시 10분에는 실행되지 않습니다.")
+    else:
+        print("▶️ 결제 확인 시작")
+        run_and_log(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log", label="결제 확인")
+    
     print("▶️ 월별 매출 확인 시작")
     run_and_log(main_monthly_payment, "/home/mmkkshim/anding_bot/logs/run_m.log", label="월별 매출")
 
