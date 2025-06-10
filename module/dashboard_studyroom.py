@@ -11,9 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 # --- Set 종료일 to today, click 검색, and wait for table update ---
 from selenium.webdriver.common.keys import Keys
-from datetime import datetime
-
-from datetime import datetime
+from datetime import datetime, timedelta
 import argparse
 import pytz
 from dotenv import load_dotenv
@@ -76,11 +74,12 @@ def check_studyroom(driver):
 
     # (테이블 대기 삭제됨: 검색 버튼 클릭 이후로 이동)
     today_date_str = datetime.now(kst).strftime("%Y.%m.%d")
+    tomorrow_str = (datetime.now(kst) + timedelta(days=1)).strftime("%Y.%m.%d")
 
     # Set the 종료일 input field using JavaScript
     end_input = driver.find_element(By.CSS_SELECTOR, "input[name='s_end_date']")
     if DEBUG: print("[DEBUG] 종료일 input 태그 구조 (name='s_end_date'):", end_input.get_attribute("outerHTML"))
-    script = f"document.querySelector('input[name=\"s_end_date\"]').value = '{today_date_str}';"
+    script = f"document.querySelector('input[name=\"s_end_date\"]').value = '{tomorrow_str}';"
     driver.execute_script(script)
     time.sleep(0.5)
     value_after = driver.execute_script("return document.querySelector('input[name=\"s_end_date\"]').value;")
@@ -106,6 +105,8 @@ def check_studyroom(driver):
         raise Exception("❌ [예약룸 오류] 유효한 예약 데이터를 포함한 행이 나타나지 않았습니다.")
 
     rows = driver.find_elements(By.CSS_SELECTOR, "table#m_table_1 tbody tr")
+    rows = [row for row in rows if today_date_str in row.text.split()[4]]
+    if DEBUG: print(f"[DEBUG] 필터링된 rows 수 (start_time 시작 조건): {len(rows)}")
     if DEBUG: print(f"[DEBUG] 검색 결과 행 수: {len(rows)}")
 
     reservations_2 = []
