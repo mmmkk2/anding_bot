@@ -43,9 +43,9 @@ if __name__ == "__main__":
     now_kst = datetime.now(kst)
 
     now_kst_hour = (now_kst.hour)
-    now_kst_min = int(now_kst.min)
+    now_kst_min = (now_kst.min)
     
-    print(now_kst_hour)
+    # print(now_kst_hour)
     print(now_kst_min)
 
     # if now_kst_hour < 1 and now_kst_min <=10:
