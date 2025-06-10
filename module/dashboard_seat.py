@@ -292,18 +292,15 @@ def check_seat_status(driver):
         last_count = 99
 
 
-    print(last_count)
     total_free = 28
     last_remaining_free = total_free - last_count
-    print(last_remaining_free)
     
-
     # === 주의/경고/복구 (broadcast only, no flag logic)
-    if (remaining_seats < last_remaining_free):
-        if (remaining_seats <= DANGER_THRESHOLD):
-            send_broadcast_and_update(f"[경고] 🚨 잔여 자유석 {remaining_seats}석 - 일일권 제한 강화 필요", broadcast=True, category="seat")
-        elif (remaining_seats <= WARNING_THRESHOLD):
-            send_broadcast_and_update(f"[주의] ⚠️ 잔여 자유석 {remaining_seats}석 - 이용 주의 필요", broadcast=True, category="seat")
+    # if (remaining_seats < last_remaining_free):
+    if (remaining_seats <= DANGER_THRESHOLD):
+        send_broadcast_and_update(f"[경고] 🚨 잔여 자유석 {remaining_seats}석 - 일일권 제한 강화 필요", broadcast=True, category="seat")
+    elif (remaining_seats <= WARNING_THRESHOLD):
+        send_broadcast_and_update(f"[주의] ⚠️ 잔여 자유석 {remaining_seats}석 - 이용 주의 필요", broadcast=True, category="seat")
     
     # === 최종 CSV 로그
     return free_rows, laptop_rows, msg
