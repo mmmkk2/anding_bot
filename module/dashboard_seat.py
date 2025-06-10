@@ -292,9 +292,12 @@ def check_seat_status(driver):
         last_count = 99
 
 
+    print(last_count)
     total_free = 28
     last_remaining_free = total_free - last_count
+    print(last_remaining_free)
     
+
     # === 주의/경고/복구 (broadcast only, no flag logic)
     if (remaining_seats < last_remaining_free):
         if (remaining_seats <= DANGER_THRESHOLD):
