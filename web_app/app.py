@@ -807,8 +807,10 @@ def studyroom_dashboard():
                     # Updated masking logic
                     if len(orig) == 2:
                         masked = re.sub(r"^([가-힣])[가-힣]$", r"\1x", orig)
-                    elif len(orig) >= 3:
-                        masked = re.sub(r"^([가-힣])[가-힣]{2,}$", r"\1xx", orig)
+                    elif len(orig) == 3:
+                        masked = re.sub(r"^([가-힣])[가-힣]([가-힣])$", r"\1x\2", orig)
+                    elif len(orig) >= 4:
+                        masked = re.sub(r"^([가-힣])[가-힣]{2,}([가-힣])$", r"\1xx\2", orig)
                     else:
                         masked = orig
                     td.string = masked
