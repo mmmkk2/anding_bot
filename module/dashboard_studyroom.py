@@ -106,7 +106,7 @@ def check_studyroom(driver):
   
     rows = driver.find_elements(By.CSS_SELECTOR, "table#m_table_1 tbody tr")
     if DEBUG: print(f"[DEBUG] 필터링된 rows 수: {len(rows)}")
-    rows = [row for row in rows if today_date_str in row.find_elements(By.TAG_NAME, "td")[4].text.strip()]
+    # rows = [row for row in rows if today_date_str in row.find_elements(By.TAG_NAME, "td")[4].text.strip()]
     if DEBUG: print(f"[DEBUG] 필터링된 rows 수 (start_time 시작 조건): {len(rows)}")
     if DEBUG: print(f"[DEBUG] 검색 결과 행 수: {len(rows)}")
 
