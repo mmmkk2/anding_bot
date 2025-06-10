@@ -33,12 +33,14 @@ if __name__ == "__main__":
     print("▶️ 상품 확인 시작")
     run_and_log(main_check_product, "/home/mmkkshim/anding_bot/logs/run_product.log", label="상품 확인")
 
-    now_hour_kst = (datetime.utcnow().hour + 9) % 24  # KST 기준 시간
-    if now_hour_kst not in [0, 1/6]:
-        print("▶️ 결제 확인 시작")
-        run_and_log(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log", label="결제 확인")
-    else:
-        print("⏸ 결제 확인은 KST 00~01시에는 실행되지 않습니다.")
+    run_and_log(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log", label="결제 확인")
+
+    # now_hour_kst = (datetime.utcnow().hour + 9) % 24  # KST 기준 시간
+    # if now_hour_kst not in [0, 1]:
+    #     print("▶️ 결제 확인 시작")
+    #     # run_and_log(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log", label="결제 확인")
+    # else:
+    #     print("⏸ 결제 확인은 KST 00~0시 10분에는 실행되지 않습니다.")
 
     print("▶️ 월별 매출 확인 시작")
     run_and_log(main_monthly_payment, "/home/mmkkshim/anding_bot/logs/run_m.log", label="월별 매출")

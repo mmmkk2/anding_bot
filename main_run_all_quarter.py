@@ -50,9 +50,9 @@ if __name__ == "__main__":
     # for test
     # danger_threshold = 8
     total_free = 28
-    used_free = total_free - last_count
+    last_remaining_free = total_free - last_count
 
-    if used_free <= threshold:
+    if last_remaining_free <= threshold:
         # 먼저 seat은 단독 실행 (Selenium 안정성 확보용)
         print("▶️ 좌석 확인 시작")
         run_and_log(main_check_seat, "/home/mmkkshim/anding_bot/logs/run_s.log", label="좌석 확인")
@@ -63,4 +63,4 @@ if __name__ == "__main__":
         print("▶️ 결제 확인 시작")
         run_and_log(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log", label="결제 확인")
     else:
-        print(f"[스킵] 좌석 수 {used_free} > THRESHOLD {threshold} → 좌석 및 상품 확인 생략")
+        print(f"[스킵] 좌석 수 {last_remaining_free} > THRESHOLD {threshold} → 좌석 및 상품 확인 생략")
