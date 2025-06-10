@@ -380,11 +380,6 @@ def render_dashboard(is_admin=True, is_viewer=False):
                         {payment_summary}<br>
                         <div class="updated">Updated {payment_updated}</div>
                     </div>
-                    <div class="summary-buttons">
-                      <form method="post" action="/run_p_output">
-                        <button class="pill small" type="submit"> 📜 </button>
-                      </form>
-                    </div>
                 </div>
                 <button class="toggle-button" onclick="toggle('payment')">자세히 보기</button>
                 <div id="payment" class="content">
@@ -396,11 +391,6 @@ def render_dashboard(is_admin=True, is_viewer=False):
                     <div class="summary-header">
                         📊 <b>월별 누적 매출</b><br>{monthly_summary_line}<br>
                         <div class="updated">Updated {monthly_updated}</div>
-                    </div>
-                    <div class="summary-buttons">
-                      <form method="post" action="/run_m_output">
-                        <button class="pill small" type="submit">📜 </button>
-                      </form>
                     </div>
                 </div>
                 <button class="toggle-button" onclick="toggle('monthly')">자세히 보기</button>
@@ -518,11 +508,6 @@ def render_dashboard(is_admin=True, is_viewer=False):
                         {seat_summary_line}<br>
                         <div class="updated">Updated {seat_updated}</div>
                     </div>
-                    <div class="summary-buttons">
-                    {"".join([
-                      '<form method="post" action="/run_s_output"><button class="pill small" type="submit">📜 </button></form>'
-                    ]) if is_admin and not is_viewer else ""}
-                    </div>
                 </div>
                 <button class="toggle-button" onclick="toggle('seat')">자세히 보기</button>
                 <div id="seat" class="content">
@@ -552,11 +537,6 @@ def render_dashboard(is_admin=True, is_viewer=False):
                         {'🔴' if using_2 else '⚪'} 2인실 : 예약 {count_2}건 <br>
                         {'🔴' if using_4 else '⚪'} 4인실 : 예약 {count_4}건 <br>
                         <div class="updated">Updated {studyroom_updated}</div>
-                    </div>
-                    <div class="summary-buttons">
-                    {"".join([
-                      '<form method="post" action="/run_r_output"><button class="pill small" type="submit">📜 </button></form>'
-                    ]) if is_admin and not is_viewer else ""}
                     </div>
                 </div>
                 <button class="toggle-button" onclick="toggle('studyroom')">자세히 보기</button>
