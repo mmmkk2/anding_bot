@@ -31,7 +31,7 @@ if __name__ == "__main__":
     print(f"현재 외부 IP 주소: {ip}")
     print(f"📡 Running on hostname: {socket.gethostname()}")
 
-    # 먼저 seat은 단독 실행 (Selenium 안정성 확보용)
+    
     # print("▶️ 좌석 확인 시작")
     # run_and_log(main_check_seat, "/home/mmkkshim/anding_bot/logs/run_s.log", label="좌석 확인")
 
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     now_kst = datetime.now(kst)
 
     now_kst_hour = (now_kst.hour)
-    now_kst_min = (now_kst.min)
+    now_kst_min = int(now_kst.min)
     
     print(now_kst_hour)
     print(now_kst_min)
