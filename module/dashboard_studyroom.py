@@ -103,8 +103,9 @@ def check_studyroom(driver):
         with open(os.path.join(DEBUG_PATH, "debug_studyroom_timeout.html"), "w", encoding="utf-8") as f:
             f.write(driver.page_source)
         raise Exception("❌ [예약룸 오류] 유효한 예약 데이터를 포함한 행이 나타나지 않았습니다.")
-
+  
     rows = driver.find_elements(By.CSS_SELECTOR, "table#m_table_1 tbody tr")
+    if DEBUG: print(f"[DEBUG] 필터링된 rows 수: {len(rows)}")
     rows = [row for row in rows if today_date_str in row.text.split()[4]]
     if DEBUG: print(f"[DEBUG] 필터링된 rows 수 (start_time 시작 조건): {len(rows)}")
     if DEBUG: print(f"[DEBUG] 검색 결과 행 수: {len(rows)}")
