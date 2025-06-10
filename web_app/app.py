@@ -599,8 +599,8 @@ def env_config():
         }})();
         </script>
         """.format(
-            admin_link= '<a href="/admin" class="menu-option">관리자mode</a> \
-            <a href="/viewer" class="menu-option">뷰어mode</a> \
+            admin_link= '<a href="/admin" class="menu-option">관리자</a> \
+            <a href="/viewer" class="menu-option">뷰어</a> \
             <form method="get" action="/env_config" style="margin: 0; padding: 0;"> \
             <button class="menu-option" type="submit">설정</button> \
             </form>' if is_admin else ""
