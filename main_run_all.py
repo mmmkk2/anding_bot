@@ -32,13 +32,13 @@ if __name__ == "__main__":
     print(f"📡 Running on hostname: {socket.gethostname()}")
 
     # 먼저 seat은 단독 실행 (Selenium 안정성 확보용)
-    print("▶️ 좌석 확인 시작")
-    run_and_log(main_check_seat, "/home/mmkkshim/anding_bot/logs/run_s.log", label="좌석 확인")
+    # print("▶️ 좌석 확인 시작")
+    # run_and_log(main_check_seat, "/home/mmkkshim/anding_bot/logs/run_s.log", label="좌석 확인")
 
-    print("▶️ 상품 확인 시작")
-    run_and_log(main_check_product, "/home/mmkkshim/anding_bot/logs/run_product.log", label="상품 확인")
+    # print("▶️ 상품 확인 시작")
+    # run_and_log(main_check_product, "/home/mmkkshim/anding_bot/logs/run_product.log", label="상품 확인")
 
-    run_and_log(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log", label="결제 확인")
+    # run_and_log(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log", label="결제 확인")
 
     now_kst = datetime.now(kst)
 
@@ -48,14 +48,14 @@ if __name__ == "__main__":
     print(now_kst_hour)
     print(now_kst_min)
 
-    if now_kst_hour < 1 and now_kst_min <=10:
-        print("⏸ 결제 확인은 KST 00~0시 10분에는 실행되지 않습니다.")
-    else:
-        print("▶️ 결제 확인 시작")
-        run_and_log(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log", label="결제 확인")
+    # if now_kst_hour < 1 and now_kst_min <=10:
+    #     print("⏸ 결제 확인은 KST 00~0시 10분에는 실행되지 않습니다.")
+    # else:
+    #     print("▶️ 결제 확인 시작")
+    #     run_and_log(main_check_payment, "/home/mmkkshim/anding_bot/logs/run_p.log", label="결제 확인")
     
-    print("▶️ 월별 매출 확인 시작")
-    run_and_log(main_monthly_payment, "/home/mmkkshim/anding_bot/logs/run_m.log", label="월별 매출")
+    # print("▶️ 월별 매출 확인 시작")
+    # run_and_log(main_monthly_payment, "/home/mmkkshim/anding_bot/logs/run_m.log", label="월별 매출")
 
-    print("▶️ 스터디룸 확인 시작")
-    run_and_log(main_check_studyroom, "/home/mmkkshim/anding_bot/logs/run_r.log", label="스터디룸 확인")
+    # print("▶️ 스터디룸 확인 시작")
+    # run_and_log(main_check_studyroom, "/home/mmkkshim/anding_bot/logs/run_r.log", label="스터디룸 확인")
