@@ -145,32 +145,32 @@ def check_studyroom(driver):
                     "end_time": end_time, "date_part": date_part, "today": today_str
                 })
 
-            if date_part == today_str:
-                if "2인" in room_type:
-                    room_label = "2인실"
-                    reservations_2.append({
-                        "date": date_part,
-                        "time": reservation_time,
-                        "name": name,
-                        "room": room_label
-                    })
-                elif "4인" in room_type:
-                    room_label = "4인실"
-                    reservations_4.append({
-                        "date": date_part,
-                        "time": reservation_time,
-                        "name": name,
-                        "room": room_label
-                    })
-            else:
-                if DEBUG:
-                    print("[DEBUG] 필터 제외됨:", {
-                        "room_type": room_type,
-                        "name": name,
-                        "end_time": end_time,
-                        "date_part": date_part,
-                        "today_str": today_str
-                    })
+            # if date_part == today_str:
+            if "2인" in room_type:
+                room_label = "2인실"
+                reservations_2.append({
+                    "date": date_part,
+                    "time": reservation_time,
+                    "name": name,
+                    "room": room_label
+                })
+            elif "4인" in room_type:
+                room_label = "4인실"
+                reservations_4.append({
+                    "date": date_part,
+                    "time": reservation_time,
+                    "name": name,
+                    "room": room_label
+                })
+            # else:
+            #     if DEBUG:
+            #         print("[DEBUG] 필터 제외됨:", {
+            #             "room_type": room_type,
+            #             "name": name,
+            #             "end_time": end_time,
+            #             "date_part": date_part,
+            #             "today_str": today_str
+            #         })
 
     count_2 = len(reservations_2)
     count_4 = len(reservations_4)
