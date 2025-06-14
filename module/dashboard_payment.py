@@ -165,6 +165,7 @@ def check_payment_status(driver):
             payment_date = cols[7].text.strip()    # 결제일시
             seat_type = cols[8].text.strip().split("/")[0] + " / " + cols[9].text.strip()      # 결제상품 (예: 스터디룸(2인) 등)
             seat_type = seat_type.replace('(유효기간없음)', '').strip() # 
+            seat_type = seat_type.replace('유효기간', '').strip() # 
 
             # cols[9]는 시작시간, cols[10]는 종료시간, cols[11]는 가입일
 

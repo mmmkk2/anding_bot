@@ -125,7 +125,7 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
                         seat_type = cols[offset].text.strip()
                         seat_number_text = cols[offset + 1].text.strip().replace("번", "").strip()
                         identifier = cols[offset + 3].text.strip()
-                        product = cols[offset + 4].text.strip().replace('(유효기간없음)', '').strip()
+                        product = cols[offset + 4].text.strip().replace('(유효기간없음)', '').strip().replace('유효기간', '').strip() 
                         start_time = cols[offset + 5].text.strip()
                         end_time = cols[offset + 6].text.strip()
                     except IndexError:
