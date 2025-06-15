@@ -31,7 +31,7 @@ except:
 parser = argparse.ArgumentParser()
 parser.add_argument("--manual", action="store_true", help="수동 실행 모드 (디버깅 활성화)")
 args = parser.parse_args()
-DEBUG = args.manual and os.getenv("DEBUG", "true").lower() == "true"
+DEBUG = args.manual or os.getenv("DEBUG", "true").lower() == "true"
 
 print(args.manual)
 
@@ -189,25 +189,42 @@ def fetch_monthly_sales_from_calendar(driver):
         summary_amount_prev = df_prev["amount"].sum()
         summary_amount_curr = df_current["amount"].sum()
 
-        # Align current month cumulative sales to dates (labels)
-        # Use two-digit day for label consistency
+        print(df_current["date"])
+
+        # === 일평균 및 예측 매출 계산 ===
+        today_day_int = len(df_current["date"])
+        if today_day_int > 0:
+            daily_avg = summary_amount_curr // today_day_int
+            days_in_month = now.replace(month=now.month % 12 + 1, day=1) - pd.Timedelta(days=1)
+            days_in_month = days_in_month.day
+            predicted_amount = daily_avg * days_in_month
+        else:
+            daily_avg = 0
+            predicted_amount = 0
+        if DEBUG:
+            print(f"[DEBUG] 일평균 매출: {daily_avg:,}원")
+            print(f"[DEBUG] 예측 매출: {predicted_amount:,}원")
+
+        
+        # Align current month cumulative sales to dates (labels) - dynamic max day for both months
         dates_current = df_current["date"].dt.strftime("%d").apply(lambda x: f"{int(x):02d}").tolist()
         cumsum_map_current = dict(zip(dates_current, df_current["cumsum"].tolist()))
+        # Determine max day between previous and current month
+        max_day = 31
 
-        # For each date in previous month, get corresponding cumsum of current month or None for future dates
-        today_day = now.strftime("%d")
+        dates = [f"{d:02d}" for d in range(1, max_day + 1)]
+        dates.insert(0, "00")
+
+        # Rebuild cumsums_current with matching length
+        cumsums_current = [0] + [cumsum_map_current.get(d, None) for d in dates[1:]]
+        dates_current = dates
+
         update_mode = "M" if args.manual else "B"
         now_str = f"{datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')} ({update_mode})"
         if DEBUG:
             print(f"[DEBUG] now_str: {now_str}")
-        cumsums_current = []
-        for d in dates:
-            if d < today_day:
-                cumsums_current.append(cumsum_map_current.get(d, 0))
-            else:
-                cumsums_current.append(None)  # Leave future dates as blank
-        # Insert a zero at the start of cumsums_current
-        cumsums_current.insert(0, 0)
+        print(cumsums_current)
+        print(dates)
 
         chart_html = f"""
         <!DOCTYPE html>
@@ -220,7 +237,7 @@ def fetch_monthly_sales_from_calendar(driver):
         </head>
         <body>
             <div class="box">
-                <canvas id="monthlyChart" style="max-width: 100%; height: auto;"></canvas>
+                <canvas id="monthlyChart" style="max-width: 100%; height: auto; aspect-ratio: 16 / 9;"></canvas>
                 <script>
                     // Prepare data for Chart.js: set first point to null, and pointRadius 0 for first.
                     const cumsumsPrev = [null, ...{json.dumps(cumsums[1:])}];
@@ -266,7 +283,28 @@ def fetch_monthly_sales_from_calendar(driver):
                                     beginAtZero: false,
                                     ticks: {{
                                         callback: function(value) {{
-                                            return value.toLocaleString() + '원';
+                                            if (window.innerWidth <= 480) {{
+                                                return (value / 1000000).toFixed(0) + '백만원';
+                                            }} else {{
+                                                return value.toLocaleString() + '원';
+                                            }}
+                                        }}
+                                    }}
+                                }}
+                            }},
+                            plugins: {{
+                                tooltip: {{
+                                    usePointStyle: true,
+                                    displayColors: false,
+                                    callbacks: {{
+                                        label: function(context) {{
+                                            const daily = context.raw - (context.dataset.data[context.dataIndex - 1] || 0);
+                                            const now = context.raw;
+                                            if (daily !== 0) {{
+                                                return `일일매출: ${{daily.toLocaleString()}}원 \n 누적 매출: ${{now.toLocaleString()}}원`;
+                                            }} else {{
+                                                return `누적 매출: ${{now != null ? now.toLocaleString() + '원' : 'N/A'}}`;
+                                            }}
                                         }}
                                     }}
                                 }}
@@ -274,12 +312,35 @@ def fetch_monthly_sales_from_calendar(driver):
                         }}
                     }});
                 </script>
-                <div class="summary-box">
-                    <div> 총 결제: {prev_month}월 {summary_amount_prev:,}원 / {curr_month}월 {summary_amount_curr:,}원<br> </div>
-                    <div class="updated">Updated {now_str}</div>
+               <div class="summary-box-right" style="width: 100%;">
+                  <div class="summary-box">
+                    <table class="summary-table">
+                      <tr>
+                        <td>{prev_month}월 누적 매출</td>
+                        <td>:</td>
+                        <td>{summary_amount_prev:,}원</td>
+                      </tr>                    
+                      <tr>
+                        <td>{curr_month}월 누적 매출</td>
+                        <td>:</td>
+                        <td>{summary_amount_curr:,}원</td>
+                      </tr>
+                      <tr>
+                        <td>{curr_month}월 일평균 매출</td>
+                        <td>:</td>
+                        <td>{daily_avg:,}원</td>
+                      </tr>
+                      <tr>
+                        <td>{curr_month}월 예측 매출</td>
+                        <td>:</td>
+                        <td>{predicted_amount:,}원</td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
                 </div>                
-            </div>
-
+            </div> 
+        <div class="updated">Updated {now_str}</div>
         </body>
         </html>
         """

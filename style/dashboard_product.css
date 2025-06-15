@@ -20,30 +20,15 @@ body {
     text-align: center;
     overflow-y: auto;
     margin: 0 auto;
-}      
+}  
+
 h1 {
     font-size: 1.1rem;
     margin-bottom: 1rem;
     color: #333;
 }
-.emoji {
-    font-size: 1.0rem;
-    margin-bottom: 1rem;
-}
-.stat {
-    font-size: 0.9rem;
-    margin: 0.3rem 0;
-}
-/* Single, clean definition for .updated */
-.updated {
-    font-size: 0.8rem;
-    color: #888;
-    margin-top: 1rem;
-    width: 100%;
-    text-align: right !important;
-    display: block;
-    box-sizing: border-box;
-}
+
+
 .tables {
     width: 100%;
     display: flex;
@@ -93,30 +78,40 @@ tr:nth-child(even) {
 table.sortable th {
     cursor: pointer;
 }
-      
 
-
-
-@media (max-width: 480px) {
-    body {
-        /* max-height: 50vh; */
-        min-height: 50vh;
-    }
-    .box {
-        max-height: 200vh;
-    }
-    /* Removed .updated-box and .pill tweaks as redundant or unused */
-    canvas {
-        min-height: 35vh !important;
-        max-height: 35vh !important;
-    }
+.updated {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 1rem;
+    width: 100%;
+    text-align: right !important;
+    display: block;
+    box-sizing: border-box;
 }
 
+.tab-btn {
+    background: #e0e4e7;
+    color: #000;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+}
 
+.tab-btn.active {
+    background: #a4bacd;
+    font-weight: bold;
+}
 
+.tab-wrapper.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
 
-canvas {
-    width: 100%; 
-    min-height: 50vh;
-    max-height: 50vh;
-}  
+@media (max-width: 480px) {
+    .box {
+    max-width: 95vw;
+    }
+}    

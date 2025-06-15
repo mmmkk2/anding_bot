@@ -3,7 +3,6 @@
 /local_backup/
 /tester/
 /log/
-/web_app/
 payment_run.sh
 seat_run.sh
 /credentials/

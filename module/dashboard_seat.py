@@ -1,4 +1,3 @@
-import sys
 import json
 from module.set import login, find_location, create_driver, send_broadcast_and_update, send_telegram_and_log
 
@@ -10,19 +9,14 @@ from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-# from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
-from datetime import datetime
-import argparse
-import pytz
-
 from datetime import timedelta
+import argparse
 
 
 kst = pytz.timezone("Asia/Seoul")
-now = datetime.now(kst)
-today_str = now.strftime("%Y.%m.%d")
+today_str = datetime.now(kst).strftime("%Y.%m.%d")
 
 
 try:
@@ -55,8 +49,6 @@ WARNING_THRESHOLD = int(os.getenv("WARNING_THRESHOLD"))
 DANGER_THRESHOLD = int(os.getenv("DANGER_THRESHOLD"))
 WARNING_CUM_THRESHOLD = int(os.getenv("WARNING_CUM_THRESHOLD", "50"))
 
-
-chart_timedelta = float(os.getenv("CHART_TIME_DELTA"))
 
 # Dashboard path for logs and HTML
 DASHBOARD_PATH = os.getenv("DASHBOARD_PATH")
@@ -98,7 +90,6 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
         yesterday_date_str = (datetime.now(kst) - timedelta(days=1)).strftime("%Y.%m.%d")
         try:
             # 날짜 필터 설정
-            print(1)
             # start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_start_date_start']")))
             # start_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='s_enter_date_start']")))
             # driver.execute_script(f"document.querySelector('input[name=\"s_start_date_start\"]').value = '{today_date_str}';")
@@ -134,15 +125,16 @@ def extract_seat_data(driver, SEAT_URL, seat_type_filter=None):
                         seat_type = cols[offset].text.strip()
                         seat_number_text = cols[offset + 1].text.strip().replace("번", "").strip()
                         identifier = cols[offset + 3].text.strip()
-                        product = cols[offset + 4].text.strip()
+                        product = cols[offset + 4].text.strip().replace('(유효기간없음)', '').strip().replace('유효기간', '').strip() 
                         start_time = cols[offset + 5].text.strip()
+                        end_time = cols[offset + 6].text.strip()
                     except IndexError:
                         continue
                     if not identifier:
                         continue
                     
                     if (seat_type_filter is None) or (seat_type in seat_type_filter):
-                        all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time))
+                        all_rows_data.append((seat_type, seat_number_text, identifier, product, start_time, end_time))
                 except Exception:
                     continue
             try:
@@ -178,9 +170,7 @@ def check_seat_status(driver):
     excluded_seats = fixed_set.union(laptop_set)
 
     free_rows_data = extract_seat_data(driver, SEAT_URL, seat_type_filter=["개인석"])
-    print(free_rows_data)
     fixed_rows_data = extract_seat_data(driver, FIXED_URL, seat_type_filter=["고정석"])
-    print(fixed_rows_data)
 
     all_rows_data = free_rows_data + fixed_rows_data
 
@@ -190,7 +180,7 @@ def check_seat_status(driver):
         free_rows = []
         fixed_rows = []
 
-        for seat_type, seat_number, name, product, start_time in all_rows_data:
+        for seat_type, seat_number, name, product, start_time, end_time in all_rows_data:
             try:
                 seat_number_int = int(seat_number)
             except ValueError:
@@ -199,22 +189,21 @@ def check_seat_status(driver):
             # Priority: 노트북석 > 고정석 > 자유석
             if seat_number_int in LAPTOP_SEAT_NUMBERS:
                 seat_type = "노트북석"
-                laptop_rows.append((seat_type, seat_number, name, product, start_time))
+                laptop_rows.append((seat_type, seat_number, name, product, start_time, end_time))
             elif seat_number_int in FIXED_SEAT_NUMBERS:
                 seat_type = "고정석"
-                fixed_rows.append((seat_type, seat_number, name, product, start_time))
+                fixed_rows.append((seat_type, seat_number, name, product, start_time, end_time))
             else:
                 seat_type = "자유석"
-                free_rows.append((seat_type, seat_number, name, product, start_time))
+                free_rows.append((seat_type, seat_number, name, product, start_time, end_time))
 
 
-    # --- Sort rows by 시작시간 (start_time) ---
-    import datetime as dt
+    # --- Sort rows by 입실시간 (start_time) ---
     def sort_by_start_time(row):
         try:
-            return dt.datetime.strptime(row[4], '%Y.%m.%d %H:%M')
+            return datetime.strptime(row[4], '%Y.%m.%d %H:%M')
         except:
-            return dt.datetime.min
+            return datetime.min
     free_rows.sort(key=sort_by_start_time, reverse=True)
     laptop_rows.sort(key=sort_by_start_time, reverse=True)
     fixed_rows.sort(key=sort_by_start_time, reverse=True)
@@ -263,10 +252,6 @@ def check_seat_status(driver):
     else:
         status_emoji = "🟢"
 
-    # line_color = 'rgba(75, 192, 192, 1)'  # green
-    # line_color = 'rgba(255, 99, 132, 1)'  # red
-    # line_color = 'rgba(255, 206, 86, 1)'  # yellow
-
 
     # === 메시지 작성
     msg = (
@@ -295,13 +280,28 @@ def check_seat_status(driver):
         rows_dict=rows_dict
     )
 
+    # === DANGER_THRESHOLD 이하일 때만 좌석 + 상품 실행 ===
+    seat_csv_path = "/home/mmkkshim/anding_bot/dashboard_log/seat_history.csv"
+    try:
+        with open(seat_csv_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            last_line = lines[-1] if lines else None
+            last_count = int(last_line.strip().split(",")[1]) if last_line else 99
+    except Exception as e:
+        print(f"[경고] 좌석 이력 CSV 로딩 실패: {e}")
+        last_count = 99
 
+
+    total_free = 28
+    last_remaining_free = total_free - last_count
+    
     # === 주의/경고/복구 (broadcast only, no flag logic)
-    if remaining_seats <= DANGER_THRESHOLD:
+    # if (remaining_seats < last_remaining_free):
+    if (remaining_seats <= DANGER_THRESHOLD):
         send_broadcast_and_update(f"[경고] 🚨 잔여 자유석 {remaining_seats}석 - 일일권 제한 강화 필요", broadcast=True, category="seat")
-    elif remaining_seats <= WARNING_THRESHOLD:
+    elif (remaining_seats <= WARNING_THRESHOLD):
         send_broadcast_and_update(f"[주의] ⚠️ 잔여 자유석 {remaining_seats}석 - 이용 주의 필요", broadcast=True, category="seat")
-
+    
     # === 최종 CSV 로그
     return free_rows, laptop_rows, msg
 
@@ -312,11 +312,11 @@ def render_table(title, rows):
         <h2>{title}</h2>
         <table class="sortable" data-sortable>
             <thead>
-                <tr><th>#</th><th>Seat#</th><th>이름</th><th>상품</th><th>시작시간</th></tr>
+                <tr><th>#</th><th>Seat#</th><th>이름</th><th>상품</th><th>입실시간</th></tr>
             </thead>
             <tbody>
     """
-    for idx, (seat_type, seat_number, name, product, start_time) in enumerate(rows, 1):
+    for idx, (seat_type, seat_number, name, product, start_time, end_time) in enumerate(rows, 1):
         html_table += f"<tr><td>{len(rows) - idx + 1}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td class='time'>{start_time.replace('.', '-')}</td></tr>"
     html_table += """
             </tbody>
@@ -324,6 +324,26 @@ def render_table(title, rows):
     </div>
     """
     return html_table
+
+def render_table_expire(title, rows):
+    html_table = f"""
+    <div class="table-box">
+        <h2>{title}</h2>
+        <table class="sortable" data-sortable>
+            <thead>
+                <tr><th>#</th><th>Seat#</th><th>이름</th><th>상품</th><th>종료시간</th></tr>
+            </thead>
+            <tbody>
+    """
+    for idx, (seat_type, seat_number, name, product, start_time, end_time) in enumerate(rows, 1):
+        html_table += f"<tr><td>{idx}</td><td>{seat_number}</td><td>{name}</td><td>{product}</td><td class='time'>{end_time.replace('.', '-')}</td></tr>"
+    html_table += """
+            </tbody>
+        </table>
+    </div>
+    """
+    return html_table
+
 
 
 # === 메인 실행 ===
@@ -383,6 +403,21 @@ def main_check_seat():
                         send_broadcast_and_update(f"[안내] 👥 금일 누적 이용자 수 {today_user_count}명 초과", broadcast=True, category="seat")
                         with open(CUM_ALERT_FLAG_PATH, "w") as f:
                             f.write(today_str)
+
+            # ✅ 좌석 맵 캡처
+            try:
+                map_url = f"{BASE_URL}/use/mapUse"
+                driver.get(map_url)
+                time.sleep(2)
+                map_screenshot_path = os.path.join(DASHBOARD_PATH, "../static/images/seat_map.png")
+                os.makedirs(os.path.dirname(map_screenshot_path), exist_ok=True)
+                driver.execute_script("window.scrollTo(0, 80);")
+                time.sleep(0.5)
+                element = driver.find_element(By.CSS_SELECTOR, "div#store_map_container > div#store_map_wrap")
+                element.screenshot(map_screenshot_path)
+                print(f"[DEBUG] 좌석맵 캡처 저장됨: {map_screenshot_path}")
+            except Exception as e:
+                print(f"[DEBUG] 좌석맵 캡처 실패: {e}")
 
             free_rows, laptop_rows, seat_status_msg  = check_seat_status(driver)
             # Use the same now_str for the monitoring message
@@ -508,8 +543,7 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                         beginAtZero: true,
                         max: 30,
                         title: {{
-                            display: true,
-                            text: '자유석 이용자 수'
+                            display: false
                         }},
                         ticks: {{
                             callback: function(value) {{
@@ -559,28 +593,56 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     </head>
     <body>
         <div class="box">
-            <div class="stat">🪑 {used_free}/{total_free} · 💻 {used_laptop}/{total_laptop} · 🟩 {remaining}석 · 👥 {cum_user_counts[-1] if cum_user_counts else "정보 없음"}명</div>
-            <div style="margin-top:0.5rem;"> 
-                <canvas id="seatChart" style="max-width: 100%; height: auto; aspect-ratio: 16 / 12;"></canvas>
-                {chart_script}
-            </div>
-"""
+        
+            <div class="stat">🪑 {used_free}/{total_free} · 💻 {used_laptop}/{total_laptop} · 🟩 {remaining}석 · 👥 {cum_user_counts[-1] if cum_user_counts else "정보 없음"}명</div>                        
+            <canvas id="seatChart" style="max-width: 100%; height: auto; aspect-ratio: 16 / 9;"></canvas>
+            {chart_script}
+    """
 
     html += """
     <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
     """
+
+    # Add separate table for 자유석 종료시간 6시간 이내
+    near_expire_rows = []
+    now_kst = datetime.now(kst)
+    threshold_time = now_kst + timedelta(hours=6)
+    for row in rows_dict.get("자유석", []):
+        try:
+            end_time_str = row[5]
+            end_time = datetime.strptime(end_time_str, "%Y.%m.%d %H:%M")
+            end_time = kst.localize(end_time)
+            if now_kst <= end_time <= threshold_time:
+                near_expire_rows.append(row)
+        except Exception as e:
+            if DEBUG:
+                print(f"[DEBUG] 종료시간 파싱 실패: {e} | 값: {row[5]}")
+            continue
+
+    # Sort near_expire_rows in ascending order of 종료시간
+    near_expire_rows.sort(key=lambda x: datetime.strptime(x[5], "%Y.%m.%d %H:%M"))
+
+    if near_expire_rows:
+        html += render_table_expire("종료 예정 자유석", near_expire_rows)
+
+    # Insert the seat map image just below the chart area
+    html += f"""
+        <div style="text-align: center; margin: 1rem 0;">
+            <img src="https://mmkkshim.pythonanywhere.com/static/images/seat_map.png" alt="좌석 배치도" style="max-width: 100%; border: 1px solid #ccc; border-radius: 8px;">
+        </div>
+    """
+    
     for title, rows in rows_dict.items():
         html += render_table(title, rows)
     
     html += f"""
+    </div>        
     </div>
-        <div class="summary-box">
-            <div class="updated">Updated {now_str}</div>
-        </div>
-    </div>
+    <div class="updated">Updated {now_str}</div>
+    
     """
     # Move the updated line outside the .box, after the entire box
-    # (already included inside summary-box, so omit here)
+    
     html += """
     <script>
       document.addEventListener('DOMContentLoaded', function () {
