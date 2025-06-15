@@ -48,6 +48,12 @@ def login():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
+        # Handle "로그인 상태 유지" checkbox
+        remember = request.form.get("remember")
+        if remember:
+            session.permanent = True
+        else:
+            session.permanent = False
         if username == LOGIN_ID and password == LOGIN_PWD:
             session["logged_in"] = True
             session["is_admin"] = True
@@ -116,6 +122,12 @@ def login():
         button:hover {
             background: #343a40;
         }
+        .remember-label {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -124,6 +136,9 @@ def login():
             <h3>로그인</h3>
             <input type="text" name="username" placeholder="아이디" required>
             <input type="password" name="password" placeholder="비밀번호" required>
+            <label class="remember-label">
+                <input type="checkbox" name="remember" style="margin-right: 0.5rem;"> 로그인 상태 유지
+            </label>
             <button type="submit">로그인</button>
         </form>
     </div>
