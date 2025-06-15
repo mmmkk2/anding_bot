@@ -280,6 +280,8 @@ def update_product_status(driver, product_name, sell_enable=True, renew_enable=T
                 break
         if not found:
             log(f"[WARN] 상품명 '{product_name}' 을(를) 찾을 수 없음.")
+        else:
+            log(f"[INFO] '{product_name}' 상태 변경 완료: 판매={sell_enable}, 연장={renew_enable}")
     except Exception as e:
         log(f"[ERROR] 상품 상태 변경 중 오류: {e}")
 
