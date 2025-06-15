@@ -239,24 +239,24 @@ def fetch_product_html():
 
 
 # --- 상품 판매/연장 상태 변경 함수 ---
-def update_product_status(driver, product_name, sell_enable=True, renew_enable=None):
+def update_product_status(driver, product_name, sell_enable=True, renew_enable=True):
     """
     상품 판매 및 연장 상태를 변경하고 저장 버튼 클릭.
+    둘 다 bool로 필수 처리: True=ON, False=OFF
     """
     try:
         rows = driver.find_elements(By.CSS_SELECTOR, "tbody > tr")
         for row in rows:
             name_input = row.find_element(By.NAME, "product_nm")
-            if name_input.get_attribute("value").strip() == product_name:
+            if product_name in name_input.get_attribute("value").strip():
                 checkboxes = row.find_elements(By.CSS_SELECTOR, 'input[type="checkbox"]')
                 if len(checkboxes) >= 2:
                     use_checkbox = checkboxes[0]
                     renew_checkbox = checkboxes[1]
                     if use_checkbox.is_selected() != sell_enable:
                         use_checkbox.click()
-                    if renew_enable is not None and renew_checkbox.is_selected() != renew_enable:
+                    if renew_checkbox.is_selected() != renew_enable:
                         renew_checkbox.click()
-                    # ✅ Save button click
                     save_btn = driver.find_element(By.ID, "btn_save")
                     save_btn.click()
                 break
