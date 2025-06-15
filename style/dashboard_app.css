@@ -119,7 +119,7 @@ body {
 
 #toggle-iframe-product {
     min-height: 25vh;
-    max-height: 1300vh;
+    max-height: 1000px;
     width: 100%;
 }
 
