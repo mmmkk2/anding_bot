@@ -74,7 +74,8 @@ def _get_active_products(html):
                 #     continue
                 # if "9시간" in name or "12시간" in name:
                 #     continue
-                if price_input==0:
+                # 안내문 pass
+                if price<=1:
                     continue
 
                 
