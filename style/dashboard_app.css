@@ -109,18 +109,11 @@ body {
     display: none;
     margin-top: 1rem;
 }
-iframe {
-    width: 100%;
-    min-height: 600px;
-    border: none;
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
 
 
 #toggle-iframe-seat {
     min-height: 400px;
-    max-height: 80vh;
+    max-height: 2400px;
     width: 100%;
 }
 
