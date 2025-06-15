@@ -347,100 +347,77 @@ def render_table_expire(title, rows):
 
 
 # === 메인 실행 ===
-def main_check_seat():
 
-    # ✅ 인증번호 파일 초기화
-    if os.path.exists("auth_code.txt"):
-        os.remove("auth_code.txt")
-
-
-    location_tag = find_location()
-    print(f"📢 [좌석 - 모니터링] 시작합니다.")
-
-    driver = create_driver()
-
+# === 좌석 모니터링 주요 로직 분리 ===
+def run_check_seat(driver):
     now_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
+
+    today_user_count = get_today_user_count(driver)
+    print(f"[DEBUG] 추출된 누적 사용자 수 텍스트: '{today_user_count}'")
+
+    # ✅ 누적 이용자 수 저장
+    if today_user_count is not None:
+        cum_users_path = os.path.join(DASHBOARD_PATH, "cum_users_history.csv")
+        os.makedirs(os.path.dirname(cum_users_path), exist_ok=True)
+        with open(cum_users_path, "a", encoding="utf-8") as f:
+            f.write(f"{now_str},{today_user_count}\n")
+
+        # ✅ 일일 누적 이용자 수 저장 (05시대에만, 하루 1회만 저장)
+        now_kst = datetime.now(kst)
+        if 5 <= now_kst.hour < 6:
+            daily_count_path = os.path.join(DASHBOARD_PATH, "daily_count_history.csv")
+            os.makedirs(os.path.dirname(daily_count_path), exist_ok=True)
+            today_date = (now_kst - timedelta(days=1)).strftime("%Y-%m-%d") if now_kst.hour < 5 else now_kst.strftime("%Y-%m-%d")
+            already_written = False
+            if os.path.exists(daily_count_path):
+                with open(daily_count_path, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if line.startswith(today_date):
+                            already_written = True
+                            break
+            if not already_written:
+                with open(daily_count_path, "a", encoding="utf-8") as f:
+                    f.write(f"{today_date},{today_user_count}\n")
+
+        # === 누적 이용자수 경고 임계치 초과 1회 알림 ===
+        CUM_ALERT_FLAG_PATH = os.path.join(DASHBOARD_PATH, "cum_alert_flag.txt")
+        if today_user_count >= WARNING_CUM_THRESHOLD:
+            already_alerted = False
+            if os.path.exists(CUM_ALERT_FLAG_PATH):
+                with open(CUM_ALERT_FLAG_PATH, "r") as f:
+                    if f.read().strip() == today_str:
+                        already_alerted = True
+            if not already_alerted:
+                send_broadcast_and_update(f"[안내] 👥 금일 누적 이용자 수 {today_user_count}명 초과", broadcast=True, category="seat")
+                with open(CUM_ALERT_FLAG_PATH, "w") as f:
+                    f.write(today_str)
+
+    # ✅ 좌석 맵 캡처
     try:
-        if login(driver):
-    
-            today_user_count = get_today_user_count(driver)
-            print(f"[DEBUG] 추출된 누적 사용자 수 텍스트: '{today_user_count}'")
-
-            # ✅ 누적 이용자 수 저장
-            if today_user_count is not None:
-                cum_users_path = os.path.join(DASHBOARD_PATH, "cum_users_history.csv")
-                os.makedirs(os.path.dirname(cum_users_path), exist_ok=True)
-                with open(cum_users_path, "a", encoding="utf-8") as f:
-                    f.write(f"{now_str},{today_user_count}\n")
-
-                # ✅ 일일 누적 이용자 수 저장 (05시대에만, 하루 1회만 저장)
-                now_kst = datetime.now(kst)
-                if 5 <= now_kst.hour < 6:
-                    daily_count_path = os.path.join(DASHBOARD_PATH, "daily_count_history.csv")
-                    os.makedirs(os.path.dirname(daily_count_path), exist_ok=True)
-                    # 날짜가 오전 0시~5시 사이 실행 시 전날 날짜로 기록
-                    today_date = (now_kst - timedelta(days=1)).strftime("%Y-%m-%d") if now_kst.hour < 5 else now_kst.strftime("%Y-%m-%d")
-                    already_written = False
-                    if os.path.exists(daily_count_path):
-                        with open(daily_count_path, "r", encoding="utf-8") as f:
-                            for line in f:
-                                if line.startswith(today_date):
-                                    already_written = True
-                                    break
-                    if not already_written:
-                        with open(daily_count_path, "a", encoding="utf-8") as f:
-                            f.write(f"{today_date},{today_user_count}\n")
-
-                # === 누적 이용자수 경고 임계치 초과 1회 알림 ===
-                CUM_ALERT_FLAG_PATH = os.path.join(DASHBOARD_PATH, "cum_alert_flag.txt")
-                if today_user_count >= WARNING_CUM_THRESHOLD:
-                    already_alerted = False
-                    if os.path.exists(CUM_ALERT_FLAG_PATH):
-                        with open(CUM_ALERT_FLAG_PATH, "r") as f:
-                            if f.read().strip() == today_str:
-                                already_alerted = True
-                    if not already_alerted:
-                        send_broadcast_and_update(f"[안내] 👥 금일 누적 이용자 수 {today_user_count}명 초과", broadcast=True, category="seat")
-                        with open(CUM_ALERT_FLAG_PATH, "w") as f:
-                            f.write(today_str)
-
-            # ✅ 좌석 맵 캡처
-            try:
-                map_url = f"{BASE_URL}/use/mapUse"
-                driver.get(map_url)
-                time.sleep(2)
-                map_screenshot_path = os.path.join(DASHBOARD_PATH, "../static/images/seat_map.png")
-                os.makedirs(os.path.dirname(map_screenshot_path), exist_ok=True)
-                driver.execute_script("window.scrollTo(0, 80);")
-                time.sleep(0.5)
-                element = driver.find_element(By.CSS_SELECTOR, "div#store_map_container > div#store_map_wrap")
-                element.screenshot(map_screenshot_path)
-                print(f"[DEBUG] 좌석맵 캡처 저장됨: {map_screenshot_path}")
-            except Exception as e:
-                print(f"[DEBUG] 좌석맵 캡처 실패: {e}")
-
-            free_rows, laptop_rows, seat_status_msg  = check_seat_status(driver)
-            # Use the same now_str for the monitoring message
-            loop_msg = (
-                f"\n\n🪑 좌석 모니터링 정상 동작 중\n"
-                f"⏰ 날짜 + 실행 시각: {now_str}"
-            )
-            full_msg = loop_msg + "\n\n" + seat_status_msg
-            send_broadcast_and_update(full_msg, broadcast=False, category="seat")
-
-            print(f"{location_tag} ✅ [좌석 - 모니터링] 정상 종료되었습니다.")
-        else:
-            send_broadcast_and_update("❌ [좌석] 로그인 실패", broadcast=False, category="seat")
+        map_url = f"{BASE_URL}/use/mapUse"
+        driver.get(map_url)
+        time.sleep(2)
+        map_screenshot_path = os.path.join(DASHBOARD_PATH, "../static/images/seat_map.png")
+        os.makedirs(os.path.dirname(map_screenshot_path), exist_ok=True)
+        driver.execute_script("window.scrollTo(0, 80);")
+        time.sleep(0.5)
+        element = driver.find_element(By.CSS_SELECTOR, "div#store_map_container > div#store_map_wrap")
+        element.screenshot(map_screenshot_path)
+        print(f"[DEBUG] 좌석맵 캡처 저장됨: {map_screenshot_path}")
     except Exception as e:
-        send_broadcast_and_update(f"❌ [좌석 오류] {e}", broadcast=False, category="seat")
-        # Save debug HTML on failure
-        if DEBUG:
-            debug_file = os.path.join(DEBUG_PATH, f"debug_seat_{datetime.now(kst).strftime('%Y%m%d_%H%M%S')}.html")
-            with open(debug_file, "w", encoding="utf-8") as f:
-                f.write(driver.page_source)
-            print(f"[DEBUG] 예외 발생 → 페이지 소스 저장됨: {debug_file}")
-    finally:
-        driver.quit()
+        print(f"[DEBUG] 좌석맵 캡처 실패: {e}")
+
+    free_rows, laptop_rows, seat_status_msg  = check_seat_status(driver)
+    loop_msg = (
+        f"\n\n🪑 좌석 모니터링 정상 동작 중\n"
+        f"⏰ 날짜 + 실행 시각: {now_str}"
+    )
+    full_msg = loop_msg + "\n\n" + seat_status_msg
+    send_broadcast_and_update(full_msg, broadcast=False, category="seat")
+
+    print(f"✅ [좌석 - 모니터링] 정상 종료되었습니다.")
+
+
 
 
 def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, remaining, rows_dict):
@@ -720,3 +697,27 @@ def get_today_user_count(driver):
         if DEBUG:
             print(f"[DEBUG] 금일 누적 이용자 수 가져오기 실패 (Selenium): {e}")
         return None
+    
+
+
+
+def main_check_seat():
+    # ✅ 인증번호 파일 초기화
+    if os.path.exists("auth_code.txt"):
+        os.remove("auth_code.txt")
+
+    driver = create_driver()
+    try:
+        if login(driver):
+            run_check_seat(driver)
+        else:
+            send_broadcast_and_update("❌ [좌석] 로그인 실패", broadcast=False, category="seat")
+    except Exception as e:
+        send_broadcast_and_update(f"❌ [좌석 오류] {e}", broadcast=False, category="seat")
+        if DEBUG:
+            debug_file = os.path.join(DEBUG_PATH, f"debug_seat_{datetime.now(kst).strftime('%Y%m%d_%H%M%S')}.html")
+            with open(debug_file, "w", encoding="utf-8") as f:
+                f.write(driver.page_source)
+            print(f"[DEBUG] 예외 발생 → 페이지 소스 저장됨: {debug_file}")
+    finally:
+        driver.quit()    
