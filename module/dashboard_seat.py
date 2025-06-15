@@ -296,17 +296,14 @@ def check_seat_status(driver):
     last_remaining_free = total_free - last_count
     
     # === 주의/경고/복구 (broadcast only, no flag logic)
-    broadcast_msg=None
+    # if (remaining_seats < last_remaining_free):
     if (remaining_seats <= DANGER_THRESHOLD):
-        broadcast_msg = f"[경고] 🚨 잔여 자유석 {remaining_seats}석 - 일일권 제한 강화 필요"        
+        send_broadcast_and_update(f"[경고] 🚨 잔여 자유석 {remaining_seats}석 - 일일권 제한 강화 필요", broadcast=True, category="seat")
     elif (remaining_seats <= WARNING_THRESHOLD):
-        broadcast_msg = f"[주의] ⚠️ 잔여 자유석 {remaining_seats}석 - 이용 주의 필요"
-    
-    if broadcast_msg is not None:
-        send_broadcast_and_update(broadcast_msg, broadcast=True, category="seat")
+        send_broadcast_and_update(f"[주의] ⚠️ 잔여 자유석 {remaining_seats}석 - 이용 주의 필요", broadcast=True, category="seat")
     
     # === 최종 CSV 로그
-    return free_rows, laptop_rows, msg, remaining_seats, broadcast_msg
+    return free_rows, laptop_rows, msg
 
 
 def render_table(title, rows):
@@ -611,18 +608,6 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     now_kst = datetime.now(kst)
     threshold_time = now_kst + timedelta(hours=6)
     for row in rows_dict.get("자유석", []):
-        try:
-            end_time_str = row[5]
-            end_time = datetime.strptime(end_time_str, "%Y.%m.%d %H:%M")
-            end_time = kst.localize(end_time)
-            if now_kst <= end_time <= threshold_time:
-                near_expire_rows.append(row)
-        except Exception as e:
-            if DEBUG:
-                print(f"[DEBUG] 종료시간 파싱 실패: {e} | 값: {row[5]}")
-            continue
-
-    for row in rows_dict.get("노트북석", []):
         try:
             end_time_str = row[5]
             end_time = datetime.strptime(end_time_str, "%Y.%m.%d %H:%M")
