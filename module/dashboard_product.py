@@ -270,8 +270,10 @@ def update_product_status(driver, product_name, sell_enable=True, renew_enable=T
                         renew_checkbox = checkboxes[1]
                         if use_checkbox.is_selected() != sell_enable:
                             use_checkbox.click()
+                            time.sleep(0.3)  # 안정화 대기
                         if renew_checkbox.is_selected() != renew_enable:
                             renew_checkbox.click()
+                            time.sleep(0.3)  # 안정화 대기
                         save_btn = driver.find_element(By.ID, "btn_save")
                         save_btn.click()
                         found = True
