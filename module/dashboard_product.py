@@ -66,12 +66,18 @@ def _get_active_products(html):
                     continue
 
                 name = name_input.get("value", "").strip()
-                if "좌석" in name:
+                time = int(time_input.get("value", "0").strip())
+                price = int(price_input.get("value", "0").strip())
+                # if "좌석" in name:
+                #     continue
+                # if "이용자" in name:
+                #     continue
+                # if "9시간" in name or "12시간" in name:
+                #     continue
+                if price_input==0:
                     continue
-                if "이용자" in name:
-                    continue
-                if "9시간" in name or "12시간" in name:
-                    continue
+
+                
                 # Optionally filter out unwanted products here if needed
                 use_checkbox, renew_checkbox = checkboxes[:2]
                 is_active = 'checked' in use_checkbox.attrs
@@ -80,8 +86,8 @@ def _get_active_products(html):
                 try:
                     tab_products[key].append({
                         "name": name,
-                        "time": int(time_input.get("value", "0").strip()),
-                        "price": int(price_input.get("value", "0").strip()),
+                        "time": time,
+                        "price": price,
                         "active": is_active,
                         "renewable": is_renewable,
                     })
