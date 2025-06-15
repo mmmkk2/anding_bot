@@ -140,8 +140,8 @@ body {
 }
 
 #toggle-iframe-monthly {
-    min-height: 60vh;
-    max-height: 60vh;
+    min-height: 50vh;
+    max-height: 50vh;
     width: 100%;
 }
 
