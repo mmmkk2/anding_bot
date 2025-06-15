@@ -242,7 +242,7 @@ def fetch_product_html():
 def update_product_status(driver, product_name, sell_enable=True, renew_enable=True):
     """
     상품 판매 및 연장 상태를 변경하고 저장 버튼 클릭.
-    페이지 이동 및 개인석 탭 클릭 포함.
+    모든 탭을 순회하여 _get_active_products와 동일한 방식으로 탐색.
     """
     try:
         driver.get(PRODUCT_URL)
@@ -251,22 +251,34 @@ def update_product_status(driver, product_name, sell_enable=True, renew_enable=T
         personal_tab.click()
         time.sleep(2)
 
-        rows = driver.find_elements(By.CSS_SELECTOR, "tbody > tr")
-        for row in rows:
-            name_input = row.find_element(By.NAME, "product_nm")
-            if product_name in name_input.get_attribute("value").strip():
-                checkboxes = row.find_elements(By.CSS_SELECTOR, 'input[type="checkbox"]')
-                if len(checkboxes) >= 2:
-                    use_checkbox = checkboxes[0]
-                    renew_checkbox = checkboxes[1]
-                    if use_checkbox.is_selected() != sell_enable:
-                        use_checkbox.click()
-                    if renew_checkbox.is_selected() != renew_enable:
-                        renew_checkbox.click()
-                    save_btn = driver.find_element(By.ID, "btn_save")
-                    save_btn.click()
+        found = False
+        for tab_id in ["tab_1", "tab_2", "tab_3"]:
+            try:
+                tab = driver.find_element(By.ID, tab_id)
+            except Exception:
+                continue
+            rows = tab.find_elements(By.CSS_SELECTOR, "tbody > tr")
+            for row in rows:
+                try:
+                    name_input = row.find_element(By.NAME, "product_nm")
+                except Exception:
+                    continue
+                if product_name in name_input.get_attribute("value").strip():
+                    checkboxes = row.find_elements(By.CSS_SELECTOR, 'input[type="checkbox"]')
+                    if len(checkboxes) >= 2:
+                        use_checkbox = checkboxes[0]
+                        renew_checkbox = checkboxes[1]
+                        if use_checkbox.is_selected() != sell_enable:
+                            use_checkbox.click()
+                        if renew_checkbox.is_selected() != renew_enable:
+                            renew_checkbox.click()
+                        save_btn = driver.find_element(By.ID, "btn_save")
+                        save_btn.click()
+                        found = True
+                        break
+            if found:
                 break
-        else:
+        if not found:
             log(f"[WARN] 상품명 '{product_name}' 을(를) 찾을 수 없음.")
     except Exception as e:
         log(f"[ERROR] 상품 상태 변경 중 오류: {e}")
