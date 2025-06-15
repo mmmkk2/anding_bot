@@ -372,7 +372,7 @@ def main_check_seat():
             # ✅ 누적 이용자 수 저장
             if today_user_count is not None:
                 cum_users_path = os.path.join(DASHBOARD_PATH, "cum_users_history.csv")
-                os.maƒkedirs(os.path.dirname(cum_users_path), exist_ok=True)
+                os.makedirs(os.path.dirname(cum_users_path), exist_ok=True)
                 with open(cum_users_path, "a", encoding="utf-8") as f:
                     f.write(f"{now_str},{today_user_count}\n")
 
