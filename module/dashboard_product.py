@@ -242,9 +242,15 @@ def fetch_product_html():
 def update_product_status(driver, product_name, sell_enable=True, renew_enable=True):
     """
     상품 판매 및 연장 상태를 변경하고 저장 버튼 클릭.
-    둘 다 bool로 필수 처리: True=ON, False=OFF
+    페이지 이동 및 개인석 탭 클릭 포함.
     """
     try:
+        driver.get(PRODUCT_URL)
+        time.sleep(2)
+        personal_tab = driver.find_element(By.XPATH, "//a[contains(text(), '개인석')]")
+        personal_tab.click()
+        time.sleep(2)
+
         rows = driver.find_elements(By.CSS_SELECTOR, "tbody > tr")
         for row in rows:
             name_input = row.find_element(By.NAME, "product_nm")
