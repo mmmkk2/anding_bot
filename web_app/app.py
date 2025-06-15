@@ -128,6 +128,11 @@ def login():
             font-size: 0.9rem;
             margin-bottom: 1rem;
         }
+        .remember-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin-right: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -137,7 +142,7 @@ def login():
             <input type="text" name="username" placeholder="아이디" required>
             <input type="password" name="password" placeholder="비밀번호" required>
             <label class="remember-label">
-                <input type="checkbox" name="remember" style="margin-right: 0.5rem;"> 로그인 상태 유지
+                <input type="checkbox" name="remember"> 로그인 상태 유지
             </label>
             <button type="submit">로그인</button>
         </form>
