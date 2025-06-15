@@ -68,12 +68,9 @@ def _get_active_products(html):
                 name = name_input.get("value", "").strip()
                 time = int(time_input.get("value", "0").strip())
                 price = int(price_input.get("value", "0").strip())
-                # if "좌석" in name:
-                #     continue
-                # if "이용자" in name:
-                #     continue
-                # if "9시간" in name or "12시간" in name:
-                #     continue
+
+                if "9시간" in name or "12시간" in name:
+                    continue
                 # 안내문 pass
                 if time==0:
                     continue
