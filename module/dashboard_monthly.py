@@ -361,18 +361,13 @@ def main_monthly_payment():
     if os.path.exists("auth_code.txt"):
         os.remove("auth_code.txt")
 
-    location_tag = find_location()
-    # send_telegram_and_log(f"📢 [결제 - 모니터링] 시작합니다.")  # Disabled Telegram notification
-
     driver = create_driver()
 
     try:
         if login(driver):
             fetch_monthly_sales_from_calendar(driver)
-            # send_telegram_and_log(f"{location_tag} ✅ [결제 - 모니터링] 정상 종료되었습니다.")  # Disabled Telegram notification
         
     except Exception as e:
-        # send_broadcast_and_update(f"❌ [결제 오류] {e}", broadcast=False, category="payment")  # Disabled broadcast in except
         pass
     finally:
         driver.quit()
