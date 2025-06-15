@@ -196,31 +196,14 @@ document.addEventListener("DOMContentLoaded", function () {{
 
 
 # --- Main product dashboard check ---
-def fetch_product_html():
-    log("🌐 상품 페이지 로그인 및 HTML 가져오기 시도")
-    driver = create_driver()
-    html = ""
-    try:
-        if login(driver):
-            driver.get(PRODUCT_URL)
-            time.sleep(2)
-            personal_tab = driver.find_element(By.XPATH, "//a[contains(text(), '개인석')]")
-            personal_tab.click()
-            time.sleep(2)
-            html = driver.page_source
-            log("✅ 개인석 상품 HTML 가져오기 완료")
-        else:
-            log("❌ 상품 페이지 로그인 실패")
-    except Exception as e:
-        log(f"[ERROR] 상품 HTML 수집 중 오류: {e}")
-    finally:
-        driver.quit()
-    return html
-
-
-def main_check_product():
+def run_check_product(driver):
     log("🔍 [상품] 활성 상품 현황 수집 시작")
-    html = fetch_product_html()
+    driver.get(PRODUCT_URL)
+    time.sleep(2)
+    personal_tab = driver.find_element(By.XPATH, "//a[contains(text(), '개인석')]")
+    personal_tab.click()
+    time.sleep(2)
+    html = driver.page_source
     products_by_tab = _get_active_products(html)
     total_count = sum(len(v) for v in products_by_tab.values())
     summary = f"현재 시간권 상품 총 {total_count}종"
@@ -232,8 +215,67 @@ def main_check_product():
         f.write(html_rendered)
     log(f"💾 HTML 저장 완료: {html_path}")
     print(summary)
+    return html  # return the HTML in case caller wants it
 
 
-# If executed directly
-if __name__ == "__main__":
-    main_check_product()
+def fetch_product_html():
+    log("🌐 상품 페이지 로그인 및 HTML 가져오기 시도")
+    driver = create_driver()
+    html = ""
+    try:
+        if login(driver):
+            html = run_check_product(driver)
+            log("✅ 개인석 상품 HTML 가져오기 완료")
+        else:
+            log("❌ 상품 페이지 로그인 실패")
+    except Exception as e:
+        log(f"[ERROR] 상품 HTML 수집 중 오류: {e}")
+    finally:
+        driver.quit()
+    return html
+
+
+
+
+
+# --- 상품 판매/연장 상태 변경 함수 ---
+def update_product_status(driver, product_name, sell_enable=True, renew_enable=None):
+    """
+    상품 판매 및 연장 상태를 변경하고 저장 버튼 클릭.
+    """
+    try:
+        rows = driver.find_elements(By.CSS_SELECTOR, "tbody > tr")
+        for row in rows:
+            name_input = row.find_element(By.NAME, "product_nm")
+            if name_input.get_attribute("value").strip() == product_name:
+                checkboxes = row.find_elements(By.CSS_SELECTOR, 'input[type="checkbox"]')
+                if len(checkboxes) >= 2:
+                    use_checkbox = checkboxes[0]
+                    renew_checkbox = checkboxes[1]
+                    if use_checkbox.is_selected() != sell_enable:
+                        use_checkbox.click()
+                    if renew_enable is not None and renew_checkbox.is_selected() != renew_enable:
+                        renew_checkbox.click()
+                    # ✅ Save button click
+                    save_btn = driver.find_element(By.ID, "btn_save")
+                    save_btn.click()
+                break
+        else:
+            log(f"[WARN] 상품명 '{product_name}' 을(를) 찾을 수 없음.")
+    except Exception as e:
+        log(f"[ERROR] 상품 상태 변경 중 오류: {e}")
+
+
+
+def main_check_product():
+    log("🌐 상품 페이지 로그인 및 현황 체크 시작")
+    driver = create_driver()
+    try:
+        if login(driver):
+            run_check_product(driver)
+        else:
+            log("❌ 상품 페이지 로그인 실패")
+    except Exception as e:
+        log(f"[ERROR] main_check_product 예외: {e}")
+    finally:
+        driver.quit()
