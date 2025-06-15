@@ -829,7 +829,7 @@ def monthly_graph():
 # --- Log routes ---
 @app.route("/run_all_output", methods=["POST"])
 def run_all_output():
-    return render_log("/home/mmkkshim/anding_bot/logs/run_all.log")
+    return render_log(" /home/mmkkshim/anding_bot/logs/run_all.log")
 
 # 좌석 현황 로그
 @app.route("/run_s_output", methods=["POST"])

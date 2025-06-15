@@ -603,13 +603,15 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
     <div class="tables" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
     """
 
+
+
     # Add separate table for 자유석 종료시간 6시간 이내
     near_expire_rows = []
     now_kst = datetime.now(kst)
     threshold_time = now_kst + timedelta(hours=6)
 
-    for row in list(rows_dict.values):
-    # for row in rows_dict.get("자유석", []):
+    
+    for row in rows_dict.get("자유석", []):
         try:
             end_time_str = row[5]
             end_time = datetime.strptime(end_time_str, "%Y.%m.%d %H:%M")
@@ -621,35 +623,30 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 print(f"[DEBUG] 종료시간 파싱 실패: {e} | 값: {row[5]}")
             continue
 
-    # for row in rows_dict.get("노트북석", []):
-    #     try:
-    #         end_time_str = row[5]
-    #         end_time = datetime.strptime(end_time_str, "%Y.%m.%d %H:%M")
-    #         end_time = kst.localize(end_time)
-    #         if now_kst <= end_time <= threshold_time:
-    #             near_expire_rows.append(row)
-    #     except Exception as e:
-    #         if DEBUG:
-    #             print(f"[DEBUG] 종료시간 파싱 실패: {e} | 값: {row[5]}")
-    #         continue
+    for row in rows_dict.get("노트북석", []):
+        try:
+            end_time_str = row[5]
+            end_time = datetime.strptime(end_time_str, "%Y.%m.%d %H:%M")
+            end_time = kst.localize(end_time)
+            if now_kst <= end_time <= threshold_time:
+                near_expire_rows.append(row)
+        except Exception as e:
+            if DEBUG:
+                print(f"[DEBUG] 종료시간 파싱 실패: {e} | 값: {row[5]}")
+            continue
 
-    # for row in rows_dict.get("고정석", []):
-    #     try:
-    #         end_time_str = row[5]
-    #         end_time = datetime.strptime(end_time_str, "%Y.%m.%d %H:%M")
-    #         end_time = kst.localize(end_time)
-    #         if now_kst <= end_time <= threshold_time:
-    #             near_expire_rows.append(row)
-    #     except Exception as e:
-    #         if DEBUG:
-    #             print(f"[DEBUG] 종료시간 파싱 실패: {e} | 값: {row[5]}")
-    #         continue
-        
+
     # Sort near_expire_rows in ascending order of 종료시간
     near_expire_rows.sort(key=lambda x: datetime.strptime(x[5], "%Y.%m.%d %H:%M"))
 
     if near_expire_rows:
         html += render_table_expire("종료 예정 좌석", near_expire_rows)
+
+
+    # Todo : fix_expire_rows
+    fix_expire_rows = []
+    threshold_time = now_kst + timedelta(hours=1)
+
 
     # Insert the seat map image just below the chart area
     html += f"""
