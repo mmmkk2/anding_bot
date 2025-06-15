@@ -61,3 +61,6 @@ def main_check_product():
         log(f"[ERROR] main_check_product 예외: {e}")
     finally:
         driver.quit()
+
+if __name__ == "__main__":
+    main_check_product()
