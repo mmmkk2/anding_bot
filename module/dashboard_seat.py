@@ -619,6 +619,18 @@ def save_seat_dashboard_html(used_free, total_free, used_laptop, total_laptop, r
                 print(f"[DEBUG] 종료시간 파싱 실패: {e} | 값: {row[5]}")
             continue
 
+    for row in rows_dict.get("노트북석", []):
+        try:
+            end_time_str = row[5]
+            end_time = datetime.strptime(end_time_str, "%Y.%m.%d %H:%M")
+            end_time = kst.localize(end_time)
+            if now_kst <= end_time <= threshold_time:
+                near_expire_rows.append(row)
+        except Exception as e:
+            if DEBUG:
+                print(f"[DEBUG] 종료시간 파싱 실패: {e} | 값: {row[5]}")
+            continue
+
     # Sort near_expire_rows in ascending order of 종료시간
     near_expire_rows.sort(key=lambda x: datetime.strptime(x[5], "%Y.%m.%d %H:%M"))
 
